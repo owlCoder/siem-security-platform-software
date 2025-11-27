@@ -1,5 +1,5 @@
 export interface StorageLogDTO {
+    id: number;
     fileName: string;
-    numEvents: number;
-    createdAt: Date;
+    eventCount: number;
 }
