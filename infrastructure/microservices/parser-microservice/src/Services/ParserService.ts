@@ -4,7 +4,6 @@ import { ParserEvent } from "../Domain/models/ParserEvent";
 import { IParserService } from "../Domain/services/IParserService";
 import axios, { AxiosInstance } from "axios";
 import { Event } from "../Domain/models/Event";
-import { EventResponseType } from "../Domain/types/EventResponse";
 import { AnlysisEngineResponseType } from "../Domain/types/AnalysisEngineResponse";
 
 
@@ -50,40 +49,35 @@ export class ParserService implements IParserService {
         return result.affected !== undefined && result.affected !== null && result.affected > 0;
     }
 
-    async normalizeEvent(message: string): Promise<Event> {
+    async normalizeAndSaveEvent(eventMessage: string): Promise<EventDTO> {
+        let event = await this.normalizeEventWithRegexes(eventMessage);
+
+        if (event.id === -1)    // Couldn't normalize with regexes -> send it to LLM
+            event = await this.normalizeEventWithLlm(eventMessage);
+
+        const eventDTO = (await this.eventClient.post<EventDTO>("ruta neka", event)).data;    // Saving to the Events table (calling event-collector)
+        if (eventDTO.id === 0)
+            throw Error("Failed to save event to the database");
+
+        const parserEvent: ParserEvent = { parserId: 0, eventId: eventDTO.id, textBeforeParsing: eventMessage, timestamp: new Date() }
+        await this.parserEventRepository.insert(parserEvent);   // Saving to the Parser table
+
+        return eventDTO;
+    }
+
+    private async normalizeEventWithRegexes(message: string): Promise<Event> {
         //postaviti regex i ako nema podudaranja vratiti prazan objekat
         throw new Error("Method not implemented.");
     }
 
-    async llmAnalysis(message: string): Promise<EventDTO> { //mozda bolje eventDTO da vracamo
-        //mozda  da oni prave prompt za LLM a ne da im mi to radimo,samo zamjeniti message sa prompt ako ga pravimo
+    private async normalizeEventWithLlm(message: string): Promise<Event> {
         const response = await this.analysisEngineClient.post<AnlysisEngineResponseType>("ruta njhova", message);
+
         if (!response.data.eventData) {
             throw new Error("Event data in response is NULL");
         }
+
         return response.data.eventData;
-    }
-
-    async normalizeAndSaveEvent(message: string): Promise<EventDTO> {
-        const event = await this.normalizeEvent(message);
-        if (event.id === -1) {
-            const eventLLM = await this.llmAnalysis(message);
-            const parserEvent: ParserEvent = { parserId: 0, eventId: eventLLM.id, textBeforeParsing: message, timestamp: new Date() }
-            await this.parserEventRepository.insert(parserEvent);
-            return eventLLM;
-        } else {
-            const response = await this.eventClient.post<EventResponseType>("ruta neka", event);//dodati naziv rute kad postave u kontroleru
-
-            if (response.data.success) {
-                await this.parserEventRepository.insert(event); //mozemo koristiti insert jer nam ne treba povratna vrijednost 
-                // vec imamo event
-                const eventDTO = this.toDTO(event);
-                return eventDTO;
-            } else {
-                throw Error("Error when we sent a event");
-            }
-        }
-
     }
 
     private toDTO(event: Event): EventDTO {
