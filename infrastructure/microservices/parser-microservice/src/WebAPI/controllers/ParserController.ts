@@ -3,29 +3,25 @@ import { IParserService } from "../../Domain/services/IParserService";
 export class ParserController {
     private readonly router: Router;
 
-    constructor(
-        private readonly parserService: IParserService,
-    ) {
+    constructor(private readonly parserService: IParserService) {
         this.router = Router();
         this.initializeRoutes();
     }
 
     private initializeRoutes(): void {
-        //dodati rute jos koje trebaju
         this.router.get("/parserEvents", this.getAllParserEvents.bind(this));
         this.router.get("/parserEvents/:id", this.getParserEvent.bind(this));
-        this.router.post("/parserEvents/normalize", this.NormalizeMessage.bind(this));
+        this.router.post("/parserEvents/log", this.log.bind(this));
         this.router.delete("/parserEvents/:id", this.deleteParserEvent.bind(this));
     }
 
-    private async NormalizeMessage(req: Request, res: Response): Promise<void>{
-        try{
-            const rawMessage=req.body.message as string;  //drugi tim mora da nam salje json sa message kako bi 
-                                                             // mi izvukli poruku
-            console.log('raw message je'+rawMessage);
-            const response=this.parserService.normalizeAndSaveEvent(rawMessage);
+    private async log(req: Request, res: Response): Promise<void> {
+        try {
+            const rawMessage = req.body.message as string;  //drugi tim mora da nam salje json sa message kako bi mi izvukli poruku
+            console.log('Log message before normalization: ' + rawMessage);
+            const response = this.parserService.normalizeAndSaveEvent(rawMessage);
             res.status(201).json(response);
-        }catch(err){
+        } catch (err) {
             res.status(500).json({ message: (err as Error).message });
         }
     }
@@ -40,7 +36,6 @@ export class ParserController {
     }
 
     private async getParserEvent(req: Request, res: Response): Promise<void> {
-
         try {
             const id = Number(req.params.id)
             console.log("id params->" + id);
@@ -55,8 +50,7 @@ export class ParserController {
         }
     }
 
-     private async deleteParserEvent(req: Request, res: Response): Promise<void> {
-
+    private async deleteParserEvent(req: Request, res: Response): Promise<void> {
         try {
             const id = Number(req.params.id)
             console.log("id params->" + id);
@@ -64,6 +58,7 @@ export class ParserController {
                 res.status(400).json({ message: "Invalid ID" });
                 return;
             }
+
             const response = await this.parserService.deleteById(id);
             if (!response) {
                 res.status(404).json({ message: `Parse Event with id=${id} not found` });

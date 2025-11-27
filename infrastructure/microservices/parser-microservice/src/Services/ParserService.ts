@@ -257,13 +257,10 @@ export class ParserService implements IParserService {
     }
 
     private async normalizeEventWithLlm(message: string): Promise<Event> {
-        const response = await this.analysisEngineClient.post<AnlysisEngineResponseType>("ruta njhova", message);
+        const prompt = "CUSTOM PROMPT: " + message;
+        const responseFromLlm = (await this.analysisEngineClient.post<string>("ruta njhova", prompt)).data;    // CSV format of Event class attributes
 
-        if (!response.data.eventData) {
-            throw new Error("Event data in response is NULL");
-        }
-
-        return response.data.eventData;
+        throw new Error("Not implemented yet.");
     }
 
     private toDTO(event: Event): EventDTO {
