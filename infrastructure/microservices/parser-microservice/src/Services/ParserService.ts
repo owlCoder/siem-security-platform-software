@@ -52,7 +52,7 @@ export class ParserService implements IParserService {
     }
 
     async normalizeAndSaveEvent(eventMessage: string): Promise<EventDTO> {
-        let event = await this.normalizeEventWithRegexes(eventMessage);
+        let event = this.normalizeEventWithRegexes(eventMessage);
         console.log(event);
         return this.toDTO(event);       // TESTING AT THE MOMENT
 
@@ -77,6 +77,10 @@ export class ParserService implements IParserService {
             return parseResult.event!;
 
         parseResult = this.parsePermissionChangeMessage(message);
+        if (parseResult.doesMatch)
+            return parseResult.event!;
+
+        parseResult = this.parseDbAccessMessage(message);
         if (parseResult.doesMatch)
             return parseResult.event!;
 
@@ -137,6 +141,33 @@ export class ParserService implements IParserService {
         return {
             doesMatch: true,
             event
+        };
+    }
+
+    private parseDbAccessMessage(message: string): ParseResult {
+        const DB_ACCESS_REGEX = /\b(bulk|massive|large|batch)\s+(read|select|insert|update|delete|export|import|operation|query|write)s?\b/i;
+        const USERNAME_REGEX = /\b(user(name)?|account)\s*[:=]\s*"?([A-Za-z0-9._-]+)"?/i;
+
+        if (!DB_ACCESS_REGEX.test(message))
+            return { doesMatch: false };
+
+        const usernameMatch = USERNAME_REGEX.exec(message);
+        if (!usernameMatch || !usernameMatch[3])
+            return { doesMatch: false };
+
+        const username = usernameMatch[3];
+
+        const normalizedDescription = `User '${username}' performed a large database access operation.`;
+
+        const event = new Event();
+        event.source = '';
+        event.type = EventType.WARNING;
+        event.description = normalizedDescription;
+        event.timestamp = new Date();
+
+        return {
+            doesMatch: true,
+            event,
         };
     }
 
