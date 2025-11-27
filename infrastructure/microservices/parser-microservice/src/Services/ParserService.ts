@@ -4,7 +4,8 @@ import { ParserEvent } from "../Domain/models/ParserEvent";
 import { IParserService } from "../Domain/services/IParserService";
 import axios, { AxiosInstance } from "axios";
 import { Event } from "../Domain/models/Event";
-import { AnlysisEngineResponseType } from "../Domain/types/AnalysisEngineResponse";
+import { EventType } from "../Domain/enums/EventType";
+import { ParseResult } from "../Domain/types/ParseResult";
 
 
 export class ParserService implements IParserService {
@@ -51,33 +52,60 @@ export class ParserService implements IParserService {
 
     async normalizeAndSaveEvent(eventMessage: string): Promise<EventDTO> {
         let event = await this.normalizeEventWithRegexes(eventMessage);
+        console.log(event);
+        return this.toDTO(event);   // TESTING AT THE MOMENT
 
-        if (event.id === -1)    // Couldn't normalize with regexes -> send it to LLM
+        /*if (event.id === -1)    // Couldn't normalize with regexes -> send it to LLM
             event = await this.normalizeEventWithLlm(eventMessage);
 
         const eventDTO = (await this.eventClient.post<EventDTO>("ruta neka", event)).data;    // Saving to the Events table (calling event-collector)
-        if (eventDTO.id === 0)
+        if (eventDTO.id === -1)
             throw Error("Failed to save event to the database");
 
         const parserEvent: ParserEvent = { parserId: 0, eventId: eventDTO.id, textBeforeParsing: eventMessage, timestamp: new Date() }
         await this.parserEventRepository.insert(parserEvent);   // Saving to the Parser table
 
-        return eventDTO;
+        return eventDTO;*/
     }
 
-    private async normalizeEventWithRegexes(message: string): Promise<Event> {
-        //postaviti regex i ako nema podudaranja vratiti prazan objekat
-        throw new Error("Method not implemented.");
+    private normalizeEventWithRegexes(message: string): Event {
+        let parseResult;
+
+        parseResult = this.parseLoginMessage(message);
+        if (parseResult.doesMatch)
+            return parseResult.event!;
+
+        return new Event();
     }
 
-    private async normalizeEventWithLlm(message: string): Promise<Event> {
-        const response = await this.analysisEngineClient.post<AnlysisEngineResponseType>("ruta njhova", message);
+    private parseLoginMessage(message: string): ParseResult {
+        const SUCCESS_LOGIN_REGEX = /\b(success(ful(ly)?)?|logged\s+in|login\s+ok|authentication\s+successful)\b/i;
+        const FAIL_LOGIN_REGEX = /\b(fail(ed)?|unsuccessful|incorrect|invalid|denied|error).*(login|authentication)\b/i;
+        const USERNAME_REGEX = /\b(user(name)?|account)\s*[:=]\s*"?([A-Za-z0-9._-]+)"?/i;
 
-        if (!response.data.eventData) {
-            throw new Error("Event data in response is NULL");
-        }
+        if (!SUCCESS_LOGIN_REGEX.test(message) && !FAIL_LOGIN_REGEX.test(message))      // Checks for login event
+            return { doesMatch: false };
 
-        return response.data.eventData;
+
+        const usernameMatch = USERNAME_REGEX.exec(message);     // Extracting the username
+        if (!usernameMatch || !usernameMatch[3])
+            return { doesMatch: false };
+
+        const username = usernameMatch[3];
+
+        const normalizedDescription = SUCCESS_LOGIN_REGEX.test(message) ?
+            `User '${username}' successfully logged in.` : `Unsuccessful login attempt for user '${username}'.`;
+
+        const event = new Event();
+        event.source = '';              // Not sure what is source of event, TODO: Change this
+        event.type = EventType.INFO;
+        event.description = normalizedDescription;
+        event.timestamp = new Date();
+
+        return {
+            doesMatch: true,
+            event
+        };
     }
 
     private toDTO(event: Event): EventDTO {
