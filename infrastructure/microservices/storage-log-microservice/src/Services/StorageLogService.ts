@@ -11,7 +11,7 @@ import { execSync } from "child_process";
 const ARCHIVE_DIR = process.env.ARCHIVE_PATH || path.join(__dirname, "../../archives");
 const TEMP_DIR = path.join(ARCHIVE_DIR, "tmp");
 
-export class StorageLogServices implements IStorageLogService{
+export class StorageLogService implements IStorageLogService{
     constructor(
         private readonly storageRepo: Repository<StorageLog>,
         private readonly eventClient: typeof axios,

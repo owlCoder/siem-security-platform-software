@@ -20,7 +20,7 @@ export class Alert {
   status!: AlertStatus;
 
   @Column({ type: "json" })
-  correlatedEvents!: string;
+  correlatedEvents!: number[];
 
   @Column({ type: "varchar", length: 100 })
   source!: string;

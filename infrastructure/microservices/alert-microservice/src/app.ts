@@ -8,9 +8,9 @@ import { Alert } from './Domain/models/Alert';
 import { Db } from './Database/DbConnectionPool';
 //import { IUsersService } from './Domain/services/IUsersService';
 //import { UsersService } from './Services/UsersService';
-import { UsersController } from './WebAPI/controllers/UsersController';
-import { ILogerService } from './Domain/services/ILogerService';
-import { LogerService } from './Services/LogerService';
+//import { UsersController } from './WebAPI/controllers/UsersController';
+//import { ILogerService } from './Domain/services/ILogerService';
+//import { LogerService } from './Services/LogerService';
 
 dotenv.config({ quiet: true });
 
@@ -35,7 +35,7 @@ const userRepository: Repository<Alert> = Db.getRepository(Alert);
 
 // Services
 //const userService: IUsersService = new UsersService(userRepository);
-const logerService: ILogerService = new LogerService();
+//const logerService: ILogerService = new LogerService();
 
 // WebAPI routes
 //const userController = new UsersController(userService, logerService);
