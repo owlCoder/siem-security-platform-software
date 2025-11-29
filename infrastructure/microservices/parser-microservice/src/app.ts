@@ -9,6 +9,7 @@ import { ParserEvent } from './Domain/models/ParserEvent';
 import { IParserService } from './Domain/services/IParserService';
 import { ParserService } from './Services/ParserService';
 import { ParserController } from './WebAPI/controllers/ParserController';
+import { EventValidator } from './Application/validators/EventValidator';
 
 dotenv.config({ quiet: true });
 
@@ -31,8 +32,10 @@ initialize_database();
 // ORM Repositories
 const parserEventRepository: Repository<ParserEvent> = Db.getRepository(ParserEvent);
 
+//validator
+const validator = new EventValidator();
 // Services
-const parserService: IParserService = new ParserService(parserEventRepository);
+const parserService: IParserService = new ParserService(parserEventRepository, validator);
 
 // WebAPI routes
 const parserController = new ParserController(parserService);

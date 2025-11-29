@@ -7,13 +7,14 @@ import { Event } from "../Domain/models/Event";
 import { EventType } from "../Domain/enums/EventType";
 import { ParseResult } from "../Domain/types/ParseResult";
 import { AnlysisEngineResponseType } from "../Domain/types/AnalysisEngineResponse";
-
+import { IEventValidator } from "../Domain/validators/IEventValidator";
 
 export class ParserService implements IParserService {
+
     private readonly analysisEngineClient: AxiosInstance;
     private readonly eventClient: AxiosInstance;
 
-    constructor(private parserEventRepository: Repository<ParserEvent>) {
+    constructor(private parserEventRepository: Repository<ParserEvent>, private validator: IEventValidator ) {
         console.log(`\x1b[35m[Logger@1.45.4]\x1b[0m Service started`);
 
         const analysisServiceURL = process.env.ANALYSIS_ENGINE_API;
@@ -54,13 +55,24 @@ export class ParserService implements IParserService {
     }
 
     async normalizeAndSaveEvent(eventMessage: string): Promise<EventDTO> {
+        this.validator.validateInputMessage(eventMessage); //validation
+
         let event = this.normalizeEventWithRegexes(eventMessage);
 
         
         if (event.id === -1)    // Couldn't normalize with regexes -> send it to LLM
             event = await this.normalizeEventWithLlm(eventMessage);
 
-        const eventDTO = (await this.eventClient.post<EventDTO>("/AnalysisEngine/processEvent", event)).data;    // Saving to the Events table (calling event-collector)
+        //Validate generated event
+        this.validator.validateEvent(event);
+
+        const dto = this.toDTO(event);
+
+        this.validator.validateDTO(dto);
+
+        const eventDTO = (await this.eventClient.post<EventDTO>("/events", dto)).data;    // Saving to the Events table (calling event-collector)
+
+
         if (eventDTO.id === -1)
             throw Error("Failed to save event to the database");
 

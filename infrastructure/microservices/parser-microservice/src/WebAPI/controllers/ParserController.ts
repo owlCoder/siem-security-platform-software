@@ -29,7 +29,7 @@ export class ParserController {
     private async getAllParserEvents(req: Request, res: Response): Promise<void> {
         try {
             const response = this.parserService.getAll();
-            res.status(201).json(response);
+            res.status(200).json(response);
         } catch (err) {
             res.status(500).json({ message: (err as Error).message });
         }
@@ -44,7 +44,7 @@ export class ParserController {
                 return;
             }
             const response = await this.parserService.getParserEventById(id);
-            res.status(201).json(response);
+            res.status(200).json(response);
         } catch (err) {
             res.status(404).json({ message: (err as Error).message });
         }
