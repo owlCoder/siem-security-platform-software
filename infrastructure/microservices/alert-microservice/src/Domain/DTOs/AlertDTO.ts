@@ -8,7 +8,7 @@ export interface AlertDTO {
   description: string;
   severity: AlertSeverity;
   status: AlertStatus;
-  correlatedEvents: number[]; // Ovdje je niz, u bazi je JSON string
+  correlatedEvents: number[]; 
   source: string;
   createdAt: Date;
   resolvedAt: Date | null;

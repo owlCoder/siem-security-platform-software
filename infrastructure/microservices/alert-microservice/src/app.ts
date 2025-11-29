@@ -1,46 +1,34 @@
-import express from 'express';
-import cors from 'cors';
+import express from "express";
+import cors from "cors";
 import "reflect-metadata";
-import { initialize_database } from './Database/InitializeConnection';
-import dotenv from 'dotenv';
-import { Repository } from 'typeorm';
-import { Alert } from './Domain/models/Alert';
-import { Db } from './Database/DbConnectionPool';
-//import { IUsersService } from './Domain/services/IUsersService';
-//import { UsersService } from './Services/UsersService';
-//import { UsersController } from './WebAPI/controllers/UsersController';
-//import { ILogerService } from './Domain/services/ILogerService';
-//import { LogerService } from './Services/LogerService';
+import dotenv from "dotenv";
+import { initialize_database } from "./Database/InitializeConnection";
+import { Db } from "./Database/DbConnectionPool";
+import { Repository } from "typeorm";
+import { Alert } from "./Domain/models/Alert";
+import { AlertService } from "./Services/AlertService";
+import { AlertController } from "./WebAPI/controllers/AlertController";
 
-dotenv.config({ quiet: true });
+dotenv.config();
 
 const app = express();
-
-// Read CORS settings from environment
-const corsOrigin = process.env.CORS_ORIGIN ?? "*";
-const corsMethods = process.env.CORS_METHODS?.split(",").map(m => m.trim()) ?? ["POST"];
-
-// Protected microservice from unauthorized access
-app.use(cors({
-  origin: corsOrigin,
-  methods: corsMethods,
-}));
-
 app.use(express.json());
+
+app.use(cors({
+  origin: process.env.CORS_ORIGIN ?? "*",
+  methods: process.env.CORS_METHODS?.split(",") ?? ["GET", "POST"]
+}));
 
 initialize_database();
 
-// ORM Repositories
-const userRepository: Repository<Alert> = Db.getRepository(Alert);
+// Repo
+const alertRepository: Repository<Alert> = Db.getRepository(Alert);
 
-// Services
-//const userService: IUsersService = new UsersService(userRepository);
-//const logerService: ILogerService = new LogerService();
+// Service
+const alertService = new AlertService(alertRepository);
 
-// WebAPI routes
-//const userController = new UsersController(userService, logerService);
-
-// Registering routes
-//app.use('/api/v1', userController.getRouter());
+// Controller
+const alertController = new AlertController(alertService);
+app.use("/api/v1", alertController.getRouter());
 
 export default app;
