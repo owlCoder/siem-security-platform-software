@@ -97,7 +97,23 @@ export class ParserService implements IParserService {
         if (parseResult.doesMatch)
             return parseResult.event!;
 
-        const event = new Event();
+        parseResult = this.parseServiceConfigurationChangeMessage(message);
+        if (parseResult.doesMatch)
+            return parseResult.event!;
+
+        parseResult = this.pareseResourceExplotationMessage(message);
+        if (parseResult.doesMatch)
+            return parseResult.event!;
+
+        parseResult = this.parseFileChangeMessage(message);
+        if (parseResult.doesMatch)
+            return parseResult.event!;
+
+        parseResult = this.parseNetworkAnomalyMessage(message);
+        if (parseResult.doesMatch)
+            return parseResult.event!;
+
+        const event = new Event();  // Nothing matched → send to LLM
         event.id = -1;
         return event;
     }
