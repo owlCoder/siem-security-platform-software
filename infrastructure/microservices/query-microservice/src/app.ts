@@ -7,6 +7,9 @@ import { initialize_database } from './Database/InitializeConnection';
 import { Db } from './Database/DbConnectionPool';
 import { CacheEntry } from './Domain/models/CacheEntry';
 import { MongoRepository } from 'typeorm';
+import { QueryRepositoryService } from './Services/QueryRepositoryService';
+import { QueryService } from './Services/QueryService';
+import { QueryController } from './WebAPI/controllers/QueryController';
 
 
 dotenv.config({ quiet: true });
@@ -38,11 +41,15 @@ void (async () => {
 
 // ORM Repository
 const cacheRepository : MongoRepository<CacheEntry> = Db.getMongoRepository(CacheEntry);
-// Servisi
 
+// Servisi
+const queryRepositoryService = new QueryRepositoryService(cacheRepository);
+const queryService = new QueryService();
 
 // WebAPI rute
+const queryController = new QueryController(queryRepositoryService);
 
 // Registracija ruta
+app.use('/api/v1', queryController.getRouter());
 
 export default app;
