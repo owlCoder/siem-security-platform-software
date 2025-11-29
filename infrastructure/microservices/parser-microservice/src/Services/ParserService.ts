@@ -331,7 +331,35 @@ export class ParserService implements IParserService {
         };
     }
 
-    
+    //8
+    private parseNetworkAnomalyMessage(message: string): ParseResult {
+        //sus ip, ip scanning, ip abuese
+        const IP_ANOMALY_REGEX = /\b(ip\s*(abuse|misuse|attack|scan|scanning|flood|probe|spoof))\b/i;
+        //unknown device, unauthorized device, device attack
+        const DEVICE_ANOMALY_REGEX = /\b(unauthorized\s*device|unknown\s*device|device\s*(attack|probe|breach))\b/i;
+        //Network anomaly, service abuse, service intrusion
+        const SERVICE_ANOMALY_REGEX = /\b(network\s*(anomaly|intrusion|attack|suspicious|breach)|service\s*(abuse|attack|misuse))\b/i;
+
+        if (!IP_ANOMALY_REGEX.test(message) && !DEVICE_ANOMALY_REGEX.test(message) && !SERVICE_ANOMALY_REGEX.test(message))
+            return { doesMatch: false };
+
+        const username = this.extractUsernameFromMessage(message);
+
+        const description = username !== ''
+            ? `Network anomaly detected involving user '${username}'.`
+            : `Network anomaly detected.`;
+
+        const event = new Event();
+        event.source = '';
+        event.type = EventType.WARNING; 
+        event.description = description;
+        event.timestamp = new Date();
+
+        return {
+            doesMatch: true,
+            event
+        };
+    }
 
     private extractUsernameFromMessage(message: string): string {   // Returns username or empty string if username is not found
         const USERNAME_REGEX = /\b(user(name)?|account)\s*[:=]\s*"?([A-Za-z0-9._-]+)"?/i;
