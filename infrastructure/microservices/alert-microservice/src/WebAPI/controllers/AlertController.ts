@@ -2,9 +2,10 @@ import { Router, Request, Response } from "express";
 import { IAlertService } from "../../Domain/services/IAlertService";
 import { AlertSeverity } from "../../Domain/enums/AlertSeverity";
 import { AlertStatus } from "../../Domain/enums/AlertStatus";
+import { CreateAlertDTO } from "../../Domain/DTOs/CreateAlertDTO";
+import { ResolveAlertDTO } from "../../Domain/DTOs/ResolveAlertDTO";
 
 export class AlertController {
-
   private router: Router;
 
   constructor(private alertService: IAlertService) {
@@ -29,16 +30,21 @@ export class AlertController {
 
   async createAlert(req: Request, res: Response) {
     try {
-      const result = await this.alertService.createAlert(req.body);
+      const data: CreateAlertDTO = req.body;
+      const result = await this.alertService.createAlert(data);
       return res.status(201).json(result);
     } catch (err: any) {
-      return res.status(500).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
     }
   }
 
   async getAllAlerts(req: Request, res: Response) {
-    const alerts = await this.alertService.getAllAlerts();
-    res.json(alerts);
+    try {
+      const alerts = await this.alertService.getAllAlerts();
+      res.json(alerts);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
   }
 
   async getAlertById(req: Request, res: Response) {
@@ -51,20 +57,29 @@ export class AlertController {
   }
 
   async getAlertsBySeverity(req: Request, res: Response) {
-    const severity = req.params.severity as AlertSeverity;
-    const results = await this.alertService.getAlertsBySeverity(severity);
-    res.json(results);
+    try {
+      const severity = req.params.severity.toUpperCase() as AlertSeverity;
+      const results = await this.alertService.getAlertsBySeverity(severity);
+      res.json(results);
+    } catch (err: any) {
+      res.status(400).json({ error: "Invalid severity value" });
+    }
   }
 
   async getAlertsByStatus(req: Request, res: Response) {
-    const status = req.params.status as AlertStatus;
-    const results = await this.alertService.getAlertsByStatus(status);
-    res.json(results);
+    try {
+      const status = req.params.status.toUpperCase() as AlertStatus;
+      const results = await this.alertService.getAlertsByStatus(status);
+      res.json(results);
+    } catch (err: any) {
+      res.status(400).json({ error: "Invalid status value" });
+    }
   }
 
   async resolveAlert(req: Request, res: Response) {
     try {
-      const updated = await this.alertService.resolveAlert(Number(req.params.id), req.body);
+      const data: ResolveAlertDTO = req.body;
+      const updated = await this.alertService.resolveAlert(Number(req.params.id), data);
       res.json(updated);
     } catch (err: any) {
       res.status(404).json({ error: err.message });
@@ -73,15 +88,20 @@ export class AlertController {
 
   async updateAlertStatus(req: Request, res: Response) {
     try {
-      const updated = await this.alertService.updateAlertStatus(Number(req.params.id), req.body.status);
+      const status: AlertStatus = req.body.status;
+      const updated = await this.alertService.updateAlertStatus(Number(req.params.id), status);
       res.json(updated);
     } catch (err: any) {
-      res.status(404).json({ error: err.message });
+      res.status(400).json({ error: err.message });
     }
   }
 
   async deleteAlert(req: Request, res: Response) {
-    const ok = await this.alertService.deleteAlert(Number(req.params.id));
-    res.json({ success: ok });
+    try {
+      const ok = await this.alertService.deleteAlert(Number(req.params.id));
+      res.json({ success: ok });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
   }
 }

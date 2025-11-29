@@ -1,15 +1,20 @@
-import { Repository } from "typeorm";
-import { Alert } from "../Domain/models/Alert";
-import { IAlertService } from "../Domain/services/IAlertService";
-import { AlertDTO, CreateAlertDTO, ResolveAlertDTO } from "../Domain/DTOs/AlertDTO";
+import { AlertDTO } from "../Domain/DTOs/AlertDTO";
+import { CreateAlertDTO } from "../Domain/DTOs/CreateAlertDTO";
+import { ResolveAlertDTO } from "../Domain/DTOs/ResolveAlertDTO";
 import { AlertSeverity } from "../Domain/enums/AlertSeverity";
 import { AlertStatus } from "../Domain/enums/AlertStatus";
+import { IAlertRepositoryService } from "../Domain/services/IAlertRepositoryService";
+import { IAlertService } from "../Domain/services/IAlertService";
+import { IThreatAnalyzerService } from "../Domain/services/IThreatAnalyzerService";
+
 
 export class AlertService implements IAlertService {
+  constructor(
+    private repo: IAlertRepositoryService,
+    private threatAnalyzer: IThreatAnalyzerService
+  ) {}
 
-  constructor(private alertRepository: Repository<Alert>) {}
-
-  private toDTO(alert: Alert): AlertDTO {
+  private toDTO(alert: any): AlertDTO {
     return {
       id: alert.id,
       title: alert.title,
@@ -25,81 +30,61 @@ export class AlertService implements IAlertService {
   }
 
   async createAlert(data: CreateAlertDTO): Promise<AlertDTO> {
-    const alert = this.alertRepository.create({
+    const entity = await this.repo.create({
       ...data,
       status: AlertStatus.ACTIVE,
-      detectionRule: null,
       resolvedAt: null,
-      resolvedBy: null,
-      resolutionNotes: null
+      resolvedBy: null
     });
 
-    const saved = await this.alertRepository.save(alert);
+    const saved = await this.repo.save(entity);
     return this.toDTO(saved);
   }
 
   async getAllAlerts(): Promise<AlertDTO[]> {
-    const alerts = await this.alertRepository.find();
-    return alerts.map(a => this.toDTO(a));
+    return (await this.repo.findAll()).map(a => this.toDTO(a));
   }
 
   async getAlertById(id: number): Promise<AlertDTO> {
-    const alert = await this.alertRepository.findOne({ where: { id } });
-    if (!alert) throw new Error(`Alert with ID ${id} not found`);
+    const alert = await this.repo.findById(id);
+    if (!alert) throw new Error(`Alert ${id} not found`);
     return this.toDTO(alert);
   }
 
   async getAlertsBySeverity(severity: AlertSeverity): Promise<AlertDTO[]> {
-    const alerts = await this.alertRepository.find({ where: { severity } });
-    return alerts.map(a => this.toDTO(a));
+    return (await this.repo.findBySeverity(severity)).map(a => this.toDTO(a));
   }
 
   async getAlertsByStatus(status: AlertStatus): Promise<AlertDTO[]> {
-    const alerts = await this.alertRepository.find({ where: { status } });
-    return alerts.map(a => this.toDTO(a));
+    return (await this.repo.findByStatus(status)).map(a => this.toDTO(a));
   }
 
   async resolveAlert(id: number, data: ResolveAlertDTO): Promise<AlertDTO> {
-    const alert = await this.alertRepository.findOne({ where: { id } });
+    const alert = await this.repo.findById(id);
     if (!alert) throw new Error(`Alert ${id} not found`);
 
     alert.status = data.status;
     alert.resolvedBy = data.resolvedBy;
     alert.resolvedAt = new Date();
 
-    const updated = await this.alertRepository.save(alert);
-    return this.toDTO(updated);
+    return this.toDTO(await this.repo.save(alert));
   }
 
   async updateAlertStatus(id: number, status: AlertStatus): Promise<AlertDTO> {
-    const alert = await this.alertRepository.findOne({ where: { id } });
+    const alert = await this.repo.findById(id);
     if (!alert) throw new Error(`Alert ${id} not found`);
 
     alert.status = status;
 
-    const updated = await this.alertRepository.save(alert);
-    return this.toDTO(updated);
+    return this.toDTO(await this.repo.save(alert));
   }
 
   async deleteAlert(id: number): Promise<boolean> {
-    const result = await this.alertRepository.delete(id);
-    return result.affected !== 0;
+    return this.repo.delete(id);
   }
 
-  // Za AnalysisEngine
-  async analyzeEventsForThreats(eventIds: number[]): Promise<AlertDTO | null> {
-    // Dummy logika za sada
-    if (eventIds.length > 5) {
-      const created = await this.createAlert({
-        title: "Suspicious event correlation detected",
-        description: `Detected suspicious correlation across ${eventIds.length} events.`,
-        severity: AlertSeverity.HIGH,
-        correlatedEvents: eventIds,
-        source: "AnalysisEngine"
-      });
-      return created;
-    }
-
-    return null;
+  // Ovo poziva AnalysisEngine
+  async showAlert(correlationId: number): Promise<void> {
+    await this.threatAnalyzer.analyze([correlationId]);
   }
 }

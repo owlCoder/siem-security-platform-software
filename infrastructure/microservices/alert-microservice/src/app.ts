@@ -6,8 +6,11 @@ import { initialize_database } from "./Database/InitializeConnection";
 import { Db } from "./Database/DbConnectionPool";
 import { Repository } from "typeorm";
 import { Alert } from "./Domain/models/Alert";
-import { AlertService } from "./Services/AlertService";
 import { AlertController } from "./WebAPI/controllers/AlertController";
+import { AlertRepositoryService } from "./Services/AlertRepositoryService";
+import { ThreatAnalyzerService } from "./Services/ThreatAnalyzerService";
+import { AlertService } from "./Services/AlertService";
+
 
 dotenv.config();
 
@@ -16,18 +19,15 @@ app.use(express.json());
 
 app.use(cors({
   origin: process.env.CORS_ORIGIN ?? "*",
-  methods: process.env.CORS_METHODS?.split(",") ?? ["GET", "POST"]
+  methods: process.env.CORS_METHODS?.split(",") ?? ["GET", "POST", "PUT", "DELETE"]
 }));
 
 initialize_database();
 
-// Repo
-const alertRepository: Repository<Alert> = Db.getRepository(Alert);
-
-// Service
-const alertService = new AlertService(alertRepository);
-
-// Controller
+const typeormAlertRepo: Repository<Alert> = Db.getRepository(Alert);
+const alertRepository = new AlertRepositoryService(typeormAlertRepo);
+const threatAnalyzer = new ThreatAnalyzerService(alertRepository);
+const alertService = new AlertService(alertRepository, threatAnalyzer);
 const alertController = new AlertController(alertService);
 app.use("/api/v1", alertController.getRouter());
 
