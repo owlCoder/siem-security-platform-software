@@ -1,12 +1,12 @@
 import { Router, Request, Response } from "express";
-import { IQueryService } from "../../Domain/services/IQueryService";
+import { IQueryRepositoryService } from "../../Domain/services/IQueryRepositoryService";
 import { CacheEntry } from "../../Domain/models/CacheEntry";
 
 export class QueryController {
     private readonly router: Router;
 
     constructor(
-        private readonly queryService: IQueryService,
+        private readonly queryService: IQueryRepositoryService,
     ) {
         this.router = Router();
         this.initializeRoutes();
