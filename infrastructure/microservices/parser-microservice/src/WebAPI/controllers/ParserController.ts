@@ -19,7 +19,7 @@ export class ParserController {
         try {
             const rawMessage = req.body.message as string;  //drugi tim mora da nam salje json sa message kako bi mi izvukli poruku
             console.log('Log message before normalization: ' + rawMessage);
-            const response = this.parserService.normalizeAndSaveEvent(rawMessage);
+            const response =  await this.parserService.normalizeAndSaveEvent(rawMessage);
             res.status(201).json(response);
         } catch (err) {
             res.status(500).json({ message: (err as Error).message });

@@ -67,6 +67,15 @@ export class ParserService implements IParserService {
         const parserEvent: ParserEvent = { parserId: 0, eventId: eventDTO.id, textBeforeParsing: eventMessage, timestamp: new Date() }
         await this.parserEventRepository.insert(parserEvent);   // Saving to the Parser table
 
+        
+        // const eventDTO: EventDTO = {
+        // id: event.id,
+        // source: event.source,
+        // type: event.type,
+        // description: event.description,
+        // timestamp: event.timestamp
+        // };
+
         return eventDTO;
     }
 
@@ -274,7 +283,8 @@ export class ParserService implements IParserService {
 
     //6A
     private parseServiceConfigurationChangeMessage(message: string): ParseResult {
-         const SERVICE_CONFIG_REGEX = /\b(config(uration)?\s*(file|setting|service)?\s*(changed?|modified?|updated?|edited?)|service\s*(restart(ed)?|reloaded?|stopped?|started?)|settings\s*(changed?|updated?|modified?))\b/i;
+         const SERVICE_CONFIG_REGEX = /\b(config(uration)?\s*(file|setting|service)?\s*((was\s*)?(changed?|modified?|updated?|edited?))|service\s*(restart(ed)?|reloaded?|stopped?|started?)|settings\s*((was\s*)?(changed?|updated?|modified?)))\b/i;
+
 
         if (!SERVICE_CONFIG_REGEX.test(message))
             return { doesMatch: false };
@@ -324,7 +334,7 @@ export class ParserService implements IParserService {
 
     //7
     private parseFileChangeMessage(message: string): ParseResult {
-         const FILE_EVENT_REGEX = /\b(file\s*(changed|modified|edited|tampered|corrupted)|malicious\s+file|infected\s+file|virus\s+detected|checksum\s*(failed|mismatch)|hash\s*(failed|mismatch)|integrity\s*(check\s*)?(failed|mismatch))\b/i;
+        const FILE_EVENT_REGEX = /\b(file\s*(changed|modified|modification|edited|tampered|corrupted)|malicious\s+file|infected\s+file|virus\s+detected|unauthorized\s+file\s*(change|modification)|checksum\s*(failed|mismatch)|hash\s*(failed|mismatch)|integrity\s*(check\s*)?(failed|mismatch))\b/i;
         
          if (!FILE_EVENT_REGEX.test(message))
             return { doesMatch: false };
