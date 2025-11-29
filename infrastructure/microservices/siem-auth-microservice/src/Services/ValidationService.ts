@@ -1,6 +1,7 @@
 import { IValidationService } from '../Domain/services/IValidationService';
 import { AuthTokenClaims } from '../Domain/types/AuthTokenClaims';
 import { VerifyResult } from '../Domain/types/VerifyResult';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 export type JWTValidationOptions = {
     secret?: string;
@@ -30,9 +31,26 @@ export class ValidationService implements IValidationService {
         // Bearer "token" ili samo "token"
     }
     
-    verifyToken(token: string): Promise<VerifyResult> {
-        throw new Error('Method not implemented.');
-    }
+    async verifyToken(token: string): Promise<VerifyResult> {
+        if(!token){
+            return { valid: false, error: 'No token provided.' }
+        }
+
+        try{
+            const decoded = jwt.verify(token, this.secret) as JwtPayload | string;
+
+            const payload = this.normalizeClaims(decoded);
+            if(payload === null){
+                return {valid: false, error: 'Token missing requred claims.'};
+            }
+
+            const isSysAdmin = payload.role === this.sysAdminRoleId;
+            
+            return { valid: true, payload, isSysAdmin};
+        } catch(error: any){
+            return {valid: false, error: 'Invalid token!'};
+        }
+    } 
 
     isSysAdminPayload(payload?: AuthTokenClaims, sysAdminRoleId?: number): boolean {
        if(!payload){
@@ -49,6 +67,17 @@ export class ValidationService implements IValidationService {
        }
 
        return payload.role === sysId;
+    }
+
+    private normalizeClaims(decoded: JwtPayload | string): AuthTokenClaims | null {
+        if(!decoded){
+            return null;
+        }
+
+        // treba implementirati dalje
+        
+        // return dummy podaci
+        return {user_id: 1, username: 'borko', role: 1};
     }
 
 }
