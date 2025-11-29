@@ -1,19 +1,18 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
 import dotenv from "dotenv";
-import { Event } from "../Domain/models/Event";
+import { CacheEntry } from "../Domain/models/CacheEntry";
 
 dotenv.config();
 
 export const Db = new DataSource({
-  type: "mysql",
-  host: process.env.DB_HOST,
-  port: Number(process.env.DB_PORT),
-  username: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  ssl: { rejectUnauthorized: false },
+  type: "mongodb",
+  host: process.env.MONGO_HOST,
+  port: Number(process.env.MONGO_PORT),
+  username: process.env.MONGO_USER,
+  password: process.env.MONGO_PASSWORD,
+  database: process.env.MONGO_DB_NAME,
   synchronize: true,
   logging: false,
-  entities: [Event],
+  entities: [CacheEntry],
 });
