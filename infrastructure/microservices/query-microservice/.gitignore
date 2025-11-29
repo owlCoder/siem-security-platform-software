@@ -70,3 +70,6 @@ typings/
 .serverless
 
 dist
+
+package.json
+package-lock.json
