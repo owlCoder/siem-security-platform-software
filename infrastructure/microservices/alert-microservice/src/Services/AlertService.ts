@@ -5,14 +5,9 @@ import { AlertSeverity } from "../Domain/enums/AlertSeverity";
 import { AlertStatus } from "../Domain/enums/AlertStatus";
 import { IAlertRepositoryService } from "../Domain/services/IAlertRepositoryService";
 import { IAlertService } from "../Domain/services/IAlertService";
-import { IThreatAnalyzerService } from "../Domain/services/IThreatAnalyzerService";
-
 
 export class AlertService implements IAlertService {
-  constructor(
-    private repo: IAlertRepositoryService,
-    private threatAnalyzer: IThreatAnalyzerService
-  ) {}
+  constructor(private repo: IAlertRepositoryService) {}
 
   private toDTO(alert: any): AlertDTO {
     return {
@@ -81,10 +76,5 @@ export class AlertService implements IAlertService {
 
   async deleteAlert(id: number): Promise<boolean> {
     return this.repo.delete(id);
-  }
-
-  // Ovo poziva AnalysisEngine
-  async showAlert(correlationId: number): Promise<void> {
-    await this.threatAnalyzer.analyze([correlationId]);
   }
 }

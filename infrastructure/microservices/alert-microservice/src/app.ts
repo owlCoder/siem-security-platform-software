@@ -8,27 +8,34 @@ import { Repository } from "typeorm";
 import { Alert } from "./Domain/models/Alert";
 import { AlertController } from "./WebAPI/controllers/AlertController";
 import { AlertRepositoryService } from "./Services/AlertRepositoryService";
-import { ThreatAnalyzerService } from "./Services/ThreatAnalyzerService";
 import { AlertService } from "./Services/AlertService";
-
+import { AlertNotificationService } from "./Services/AlertNotificationService"; 
+import { IAlertNotificationService } from "./Domain/services/IAlertNotificationService"; 
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 
-app.use(cors({
-  origin: process.env.CORS_ORIGIN ?? "*",
-  methods: process.env.CORS_METHODS?.split(",") ?? ["GET", "POST", "PUT", "DELETE"]
-}));
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN ?? "*",
+    methods: process.env.CORS_METHODS?.split(",") ?? ["GET", "POST", "PUT", "DELETE"]
+  })
+);
 
 initialize_database();
 
+// repositories
 const typeormAlertRepo: Repository<Alert> = Db.getRepository(Alert);
+
+// services
 const alertRepository = new AlertRepositoryService(typeormAlertRepo);
-const threatAnalyzer = new ThreatAnalyzerService(alertRepository);
-const alertService = new AlertService(alertRepository, threatAnalyzer);
-const alertController = new AlertController(alertService);
+const alertService = new AlertService(alertRepository);
+const alertNotificationService: IAlertNotificationService = new AlertNotificationService();
+
+// controller
+const alertController = new AlertController(alertService, alertNotificationService);
 app.use("/api/v1", alertController.getRouter());
 
 export default app;

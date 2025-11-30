@@ -13,7 +13,4 @@ export interface IAlertService {
   resolveAlert(id: number, data: ResolveAlertDTO): Promise<AlertDTO>;
   updateAlertStatus(id: number, status: AlertStatus): Promise<AlertDTO>;
   deleteAlert(id: number): Promise<boolean>;
-
-  // poziva ga AnalysisEngine
-  showAlert(correlationId: number): Promise<void>;
 }
