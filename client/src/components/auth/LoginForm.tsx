@@ -48,8 +48,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ authAPI }) => {
   };
 
   useEffect(() => {
-    if(isAuthenticated)
-        navigate("/dashboard");
+    if (isAuthenticated)
+      navigate("/dashboard");
   })
 
   return (
@@ -97,7 +97,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ authAPI }) => {
         >
           <div className="flex items-center gap-2">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="var(--win11-close-hover)">
-              <path d="M8 2a6 6 0 100 12A6 6 0 008 2zm0 1a5 5 0 110 10A5 5 0 018 3zm0 2a.5.5 0 01.5.5v3a.5.5 0 01-1 0v-3A.5.5 0 018 5zm0 6a.75.75 0 110 1.5.75.75 0 010-1.5z"/>
+              <path d="M8 2a6 6 0 100 12A6 6 0 008 2zm0 1a5 5 0 110 10A5 5 0 018 3zm0 2a.5.5 0 01.5.5v3a.5.5 0 01-1 0v-3A.5.5 0 018 5zm0 6a.75.75 0 110 1.5.75.75 0 010-1.5z" />
             </svg>
             <span style={{ fontSize: "13px", color: "var(--win11-text-primary)" }}>{error}</span>
           </div>
@@ -110,6 +110,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ authAPI }) => {
         disabled={isLoading}
         style={{ marginTop: "8px" }}
       >
+
         {isLoading ? (
           <div className="flex items-center gap-2">
             <div className="spinner" style={{ width: "16px", height: "16px", borderWidth: "2px" }}></div>
@@ -119,6 +120,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({ authAPI }) => {
           "Login"
         )}
       </button>
+
+      {/* Placeholder button until auth is implemented */}
+
+      <button onClick={() => navigate('/mainLayout')}>Skip Login</button>
+
+
+
     </form>
   );
 };

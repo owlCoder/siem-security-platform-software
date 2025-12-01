@@ -26,13 +26,9 @@ export function TitleBar() {
 
   return (
     <div className="title-bar">
-      {/* App icon */}
-      <div className="title-bar-icon">
-        <img style={{marginTop: -5 }} src='/icon.png' width="20" height="20" />
-      </div>
 
       {/* Centered title */}
-      <div className="title">eCommerce Shop 1.44.2</div>
+      <div className="title">SIEM</div>
 
       {/* Window control buttons */}
       <div className="window-controls">
