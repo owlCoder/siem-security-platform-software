@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import { IParserService } from "../../Domain/services/IParserService";
 import { IParserRepositoryService } from "../../Domain/services/IParserRepositoryService";
 import { ILogerService } from "../../Domain/services/ILogerService";
+import { ValidateInputMessage } from "../validators/ParserValidator";
 export class ParserController {
     private readonly router: Router;
 
@@ -25,6 +26,11 @@ export class ParserController {
         try {
             const rawMessage = req.body.message as string;  // Team 2 sends JSON with event message and event source (microservice which called log)
             const source = req.body.source as string;
+            const validate = ValidateInputMessage(rawMessage);
+            if (!validate.success) {
+                res.status(400).json({ success: false, message: validate.message });
+                return;
+            }
 
             this.logger.log(`Raw log message from "${source}": ${rawMessage}`)
 

@@ -30,7 +30,7 @@ export class ParserService implements IParserService {
 
     async normalizeAndSaveEvent(eventMessage: string, eventSource: string): Promise<EventDTO> {
         const timeOfEvent: Date = new Date();
-        this.validator.validateInputMessage(eventMessage);
+        //this.validator.validateInputMessage(eventMessage);
 
         let event = this.normalizeEventWithRegexes(eventMessage);
 
