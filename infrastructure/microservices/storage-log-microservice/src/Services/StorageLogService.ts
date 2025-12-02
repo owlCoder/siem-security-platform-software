@@ -15,6 +15,7 @@ const TEMP_DIR = path.join(ARCHIVE_DIR, "tmp");
 export class StorageLogService implements IStorageLogService{
     constructor(
         private readonly storageRepo: Repository<StorageLog>,
+        //dodati query client i da bude AxiosInstance
         private readonly eventClient: typeof axios,
         private readonly correlationClient: typeof axios
     ){
@@ -31,15 +32,12 @@ export class StorageLogService implements IStorageLogService{
         const hours = 72;
         // dobavljanje dogadjaja i pretnje
         //getOldEvents(int hours) : List<Event>
+
+        //dobavljanje podataka ide od queryClient
         const eventsToArchive = (await this.eventClient.get<EventDTO[]>(
-            "neka ruta", // zamijeniti rutu kada se zavrsi event collector servis
+            "neka ruta", // zamijeniti rutu od query service
             {params: { hours }}
         )).data;
-
-        // // dobavljanje alerta/correlationa
-        // const allCorrelations = (await this.correlationClient.get<CorrelationDTO[]>(
-        //     "neka ruta" // zamijeniti rutu kada se zavrsi alert servis
-        // )).data;
 
         const groups: Record<string, string[]> = {};
 
@@ -49,13 +47,6 @@ export class StorageLogService implements IStorageLogService{
 
             groups[key].push(`EVENT | ID=${e.id} | TYPE=${e.type} | SOURCE=${e.source} | ${e.description} | ${e.timestamp}`);
         }
-
-        // for(const c of correlationsToArchive){
-        //     const key = this.getTimeGroup(c.timestamp);
-        //     if(!groups[key]) groups[key] = [];
-
-        //     groups[key].push(`CORRELATION | ID=${c.id} | ALERT=${c.is_alert} | ${c.description} | ${c.timestamp}`);
-        // }
 
         // generisanje txt fajlova
         const txtFiles: string[] = [];
@@ -77,7 +68,7 @@ export class StorageLogService implements IStorageLogService{
         // upis u bazu
         const entry = this.storageRepo.create({
             fileName: tarName,
-            eventCount: eventsToArchive.length //+ correlationsToArchive.length
+            eventCount: eventsToArchive.length 
         });
 
         await this.storageRepo.save(entry);
@@ -95,7 +86,7 @@ export class StorageLogService implements IStorageLogService{
 
         //salje se Analysis Engine Service-u
         await this.correlationClient.delete(
-            "neka ruta", // zamijeniti rutu kada se zavrsi alert servis
+            "neka ruta", // zamijeniti rutu kada se zavrsi analysis servis
             {data: eventsToArchive.map(c => c.id)}
             //{data: correlationsToArchive.map(c => c.id)}
         );
