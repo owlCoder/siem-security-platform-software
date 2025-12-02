@@ -1,13 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Sidebar from '../components/sidebar/Sidebar';
-import Event from './Event';
-import Statistics from './Statistics';
-import Storage from './Storage';
+
 // npm install react-icons
 // Inline styles for now, will be in CSS later
 
 export default function MainLayout() {
-     const [activePage, setActivePage] = useState<"Dashboard"| "Events" | "Statistics" | "Storage" >("Dashboard");
+
     const layoutStyle: React.CSSProperties = {
         display: 'flex',
         position: 'fixed',
@@ -29,17 +27,14 @@ export default function MainLayout() {
     return (
         <div style={layoutStyle}>
 
-            <Sidebar activePage={setActivePage}/>
-            {activePage==="Events" ? <Event/> : 
-                activePage==="Statistics" ? <Statistics/>  : 
-                    activePage==="Storage" ? <Storage/> :
+            <Sidebar />
+
             <div style={mainStyle}>
                 <p>This is main content!</p>
                 <p>This is main content!</p>
                 <p>This is main content!</p>
                 <p>This is main content!</p>
             </div>
-            }
         </div>
     );
 }
