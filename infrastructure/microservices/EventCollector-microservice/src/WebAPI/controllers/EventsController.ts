@@ -98,7 +98,8 @@ export class EventsController {
 
     private async deleteOldEvents(req: Request, res: Response): Promise<void> {
         try {
-            const anyDeleted = await this.eventsService.deleteOldEvents(req.params.oldIds);
+            const oldIds: number[] = req.params.oldIds.split(",").map(id => Number(id));
+            const anyDeleted = await this.eventsService.deleteOldEvents(oldIds);
             res.status(200).json({ success: anyDeleted });
         } catch (err) {
             const message = (err as Error).message;

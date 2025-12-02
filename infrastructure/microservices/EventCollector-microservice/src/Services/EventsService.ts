@@ -36,12 +36,12 @@ export class EventsService implements IEventsService {
         return event;
     }
 
-    async deleteById(id: Number): Promise<boolean> {
-        const result = await this.eventRepository.delete({ id });
+    async deleteById(id: number): Promise<boolean> {
+        const result = await this.eventRepository.delete({ id:id });
         return !!result.affected && result.affected > 0;
     }
 
-     async deleteOldEvents(oldIds:Number[]): Promise<boolean> {
+     async deleteOldEvents(oldIds:number[]): Promise<boolean> {
         var deletedOnes = 0;
         for(const id of oldIds){
            var sucessfulDelete= await this.deleteById(id);
