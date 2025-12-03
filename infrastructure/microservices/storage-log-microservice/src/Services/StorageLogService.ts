@@ -1,5 +1,5 @@
 import path from "path";
-import axios from "axios";
+import axios, { AxiosInstance } from "axios";
 import { Repository } from "typeorm";
 import { StorageLog } from "../Domain/models/StorageLog";
 import { mkdirSync, unlinkSync, writeFileSync } from "fs";
@@ -16,8 +16,9 @@ export class StorageLogService implements IStorageLogService{
     constructor(
         private readonly storageRepo: Repository<StorageLog>,
         //dodati query client i da bude AxiosInstance
-        private readonly eventClient: typeof axios,
-        private readonly correlationClient: typeof axios
+        private readonly queryClient: AxiosInstance,
+        private readonly eventClient: AxiosInstance,
+        private readonly correlationClient: AxiosInstance
     ){
         //radi proveru 
         mkdirSync(ARCHIVE_DIR, {recursive: true});
@@ -34,7 +35,7 @@ export class StorageLogService implements IStorageLogService{
         //getOldEvents(int hours) : List<Event>
 
         //dobavljanje podataka ide od queryClient
-        const eventsToArchive = (await this.eventClient.get<EventDTO[]>(
+        const eventsToArchive = (await this.queryClient.get<EventDTO[]>(
             "neka ruta", // zamijeniti rutu od query service
             {params: { hours }}
         )).data;
