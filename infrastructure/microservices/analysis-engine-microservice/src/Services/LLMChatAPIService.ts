@@ -58,6 +58,7 @@ export class LLMChatAPIService implements ILLMChatAPIService {
                 "correlation_detected": boolean,
                 "confidence": number,
                 "description": string,
+                "severity": "LOW" | "MEDIUM" | "HIGH",
                 "related_event_ids": number[]
                 }
 

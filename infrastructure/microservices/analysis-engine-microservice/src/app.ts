@@ -44,7 +44,7 @@ const CorrelationRepo: Repository<Correlation> = Db.getRepository(Correlation);
 const CorrelationMapRepo: Repository<CorrelationEventMap> = Db.getRepository(CorrelationEventMap);
 
 const llmChatAPIService: ILLMChatAPIService = new LLMChatAPIService();
-const correlationService: ICorrelationService = new CorrelationService(CorrelationRepo, CorrelationMapRepo);
+const correlationService: ICorrelationService = new CorrelationService(CorrelationRepo, CorrelationMapRepo, llmChatAPIService);
 
 
 const analysisEngineController = new AnalysisEngineController(correlationService, llmChatAPIService);
