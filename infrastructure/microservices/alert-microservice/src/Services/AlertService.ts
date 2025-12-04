@@ -90,10 +90,6 @@ export class AlertService implements IAlertService {
     return this.toDTO(await this.repo.save(alert));
   }
 
-  async deleteAlert(id: number): Promise<boolean> {
-    return this.repo.delete(id);
-  }
-
   async getAlertsWithFilters(query: AlertQueryDTO): Promise<PaginatedAlertsDTO> {
     const { alerts, total } = await this.repo.findWithFilters(query);
 

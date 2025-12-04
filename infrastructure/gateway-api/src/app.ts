@@ -18,9 +18,19 @@ const corsMethods = process.env.CORS_METHODS?.split(",").map(m => m.trim()) ?? [
 app.use(cors({
   origin: corsOrigin,
   methods: corsMethods,
+  credentials: true,
 }));
 
 app.use(express.json());
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'OK',
+    service: 'Gateway',
+    timestamp: new Date().toISOString()
+  });
+});
 
 // Services
 const gatewayService: IGatewayService = new GatewayService();

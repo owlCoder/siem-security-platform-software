@@ -3,18 +3,13 @@ import { AuthTokenClaims } from '../Domain/types/AuthTokenClaims';
 import { VerifyResult } from '../Domain/types/VerifyResult';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 
-export type JWTValidationOptions = {
-    secret?: string;
-    sysAdminRoleId?: number;
-}
-
 export class ValidationService implements IValidationService {
     private secret: string;
     private sysAdminRoleId: number;
 
     constructor(secret: string, sysAdminRoleId?: number) {
         this.secret = secret;
-        this.sysAdminRoleId = 1;
+        this.sysAdminRoleId = sysAdminRoleId ?? 1;
     }
 
     normalizeAuthHeader(header?: string): string | null {
@@ -70,14 +65,37 @@ export class ValidationService implements IValidationService {
     }
 
     private normalizeClaims(decoded: JwtPayload | string): AuthTokenClaims | null {
-        if(!decoded){
+        if(!decoded && typeof(decoded) === 'string'){
             return null;
         }
 
-        // treba implementirati dalje
+        const payload = decoded as JwtPayload;
+
+        const user_id = payload.user_id;
+        const username = payload.username;
+        const role = payload.role;
+
+        if(!user_id || username || role === undefined){
+            // fali podataka
+            return null;
+        }
+
+        if(typeof(user_id) != 'number'){
+            // id nije number
+            return null;
+        }
         
-        // return dummy podaci
-        return {user_id: 1, username: 'borko', role: 1};
+        if(typeof(username) != 'string'){
+            // username nije string
+            return null;
+        }
+        
+        if(typeof(role) != 'number'){
+            // role nije number (sysAdmin je br. 1)
+            return null;
+        }
+
+        return {user_id: user_id, username: username, role: role};
     }
 
 }

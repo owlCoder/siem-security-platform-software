@@ -7,6 +7,7 @@ export class RecurringCorrelationJob implements IRecurringJob {
 
     async execute(): Promise<void> {
         console.log(`\x1b[35m[RecurringCorrelationJob@1.0.0]\x1b[0m Executing recurring correlation job...`);
-        await this.correlationService.findCorrelations();
+        var result = await this.correlationService.findCorrelations();
+        
     }
 }   

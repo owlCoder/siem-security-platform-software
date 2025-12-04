@@ -13,6 +13,7 @@ export class AnalysisEngineController {
 
     private initializeRoutes(): void {
         this.router.post("/AnalysisEngine/processEvent", this.processEvent.bind(this));
+        this.router.post("/AnalysisEngine/correlations/deleteByEventIds", this.deleteCorrelationsByEventIds.bind(this));
     }
 
     private async processEvent(req: Request, res: Response): Promise<void> {
@@ -24,7 +25,7 @@ export class AnalysisEngineController {
                 return;
             }
 
-            const processedEventJson = await this.llmChatAPIService.sendCorrelationPrompt(rawMessage);
+            const processedEventJson = await this.llmChatAPIService.sendNormalizationPrompt(rawMessage);
 
             res.status(200).json({ eventData: processedEventJson });
             //it needs to be called eventData because ParserService expects it
@@ -33,6 +34,27 @@ export class AnalysisEngineController {
         }
     }
 
+    private async deleteCorrelationsByEventIds(req: Request, res: Response): Promise<void> {
+        try{
+            const eventIds: number[] = req.body.eventIds;
+
+            if(!eventIds || eventIds.length === 0){
+                res.status(400).json({ error: "eventIds array is required" });
+                return;
+            }
+
+           const deletedCount =  await this.correlationService.deleteCorrelationsByEventIds(eventIds);
+           if (deletedCount === 0) {
+               res.status(204); //"No correlations found for the provided event IDs
+               return;
+           }
+           
+           res.status(200).json({ message: `Deleted ${deletedCount} correlations associated with the provided event IDs.` });
+
+        }catch(err){
+            res.status(500).json({ error: (err as Error).message });
+        }
+    }
     public getRouter(): Router {
         return this.router;
     }

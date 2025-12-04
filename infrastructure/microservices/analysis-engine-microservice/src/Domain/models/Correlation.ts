@@ -1,7 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from "typeorm";
+import { CorrelationEventMap } from "./CorrelationEventMap";
 
-@Entity("correlation")
-export class Correlation{
+@Entity("correlations")
+export class Correlation {
     @PrimaryGeneratedColumn()
     id!: number;
 
@@ -11,6 +12,11 @@ export class Correlation{
     @Column({ type: "timestamp" })
     timestamp!: Date;
 
-    @Column({ type: "boolean"})
+    @Column({ type: "boolean", default: false })
     isAlert!: boolean;
+
+    @OneToMany(() => CorrelationEventMap, (map) => map.correlation, {
+        cascade: true,
+    })
+    events!: CorrelationEventMap[];
 }

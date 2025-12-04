@@ -1,8 +1,6 @@
 import axios from "axios";
-import dotenv from "dotenv";
 import { ILLMChatAPIService } from "../Domain/Services/ILLMChatAPIService";
 import { ChatMessage } from "../Domain/types/ChatMessage";
-
 
 export class LLMChatAPIService implements ILLMChatAPIService {
 
@@ -15,103 +13,134 @@ export class LLMChatAPIService implements ILLMChatAPIService {
         this.gemmaModelId = process.env.GEMMA_MODEL_ID ?? "";
         this.deepseekModelId = process.env.DEEPSEEK_MODEL_ID ?? "";
 
-        if (!this.apiUrl) {
-            throw new Error("LLM_API_URL (or API_URL) not defined in environment variables");
-        }
-        if (!this.gemmaModelId) {
-            throw new Error("GEMMA_MODEL_ID not defined in environment variables");
-        }
-        if (!this.deepseekModelId) {
-            throw new Error("DEEPSEEK_MODEL_ID not defined in environment variables");
-        }
+        if (!this.apiUrl) throw new Error("LLM_API_URL not configured");
+        if (!this.gemmaModelId) throw new Error("GEMMA_MODEL_ID not configured");
+        if (!this.deepseekModelId) throw new Error("DEEPSEEK_MODEL_ID not configured");
     }
-
-    
 
     async sendNormalizationPrompt(rawMessage: string): Promise<string | JSON> {
         const messages: ChatMessage[] = [
             {
                 role: "system",
-                content: `You are an SIEM analyzer that transforms raw logs into Event JSON objects.
-                        Instructions:
-                        1. Output a single JSON object matching the Event entity:
-                        {
-                            "type": "INFO" | "ERROR" | "WARNING",
-                            "description": string
-                        }
-                        2. Ensure 'type' matches one of the EventType enum values.
-                        3. 'description' should summarize the content concisely.
-                        4. Output only the JSON, no explanations or extra text.`
+                content: `
+                You are a deterministic SIEM normalization engine.
+
+                RULES:
+                - Output ONLY a JSON object matching:
+                  {"type":"INFO"|"ERROR"|"WARNING","description":string}
+                - No explanations.
+                - No commentary.
+                - Absolutely no <think>.
+                `
             },
             {
                 role: "user",
-                content: `TASK: Create an Event JSON\nInput: ${rawMessage}`
+                content: `Normalize this raw log:\n${rawMessage}`
             }
         ];
 
-        return this.sendChatCompletion(this.gemmaModelId, messages);
+        return this.sendChatCompletion(this.gemmaModelId, messages, 0.0);
     }
 
     async sendCorrelationPrompt(rawMessage: string): Promise<string | JSON> {
-        const messages: ChatMessage[] = [
-            {
-                role: "system",
-                content: `You are a Senior Security Analyst specializing in SIEM correlation analysis.
-                        Respond with a single JSON object describing correlations between the provided events.
-                        JSON shape:
-                        {
-                          "correlation_detected": boolean,
-                          "confidence": number,   // 0-1
-                          "summary": string,
-                          "related_indicators": string[] // indicators, IPs, hosts, users, or rules involved
-                        }
-                        Output only JSON. No extra text.`
-            },
-            {
-                role: "user",
-                content: `TASK: Detect correlations between events\nInput: ${rawMessage}`
-            }
-        ];
+    const messages: ChatMessage[] = [
+        {
+            role: "system",
+            content: `
+                You are a deterministic SIEM Correlation Engine.
 
-        return this.sendChatCompletion(this.deepseekModelId, messages);
-    }
+                Your job is to analyze a list of security events and determine if a correlation exists.
 
-    private async sendChatCompletion(modelId: string, messages: ChatMessage[]): Promise<string | JSON> {
+                ### OUTPUT FORMAT (STRICT)
+                Return ONLY a JSON object with EXACTLY the following fields:
+
+                {
+                "correlation_detected": boolean,
+                "confidence": number,
+                "description": string,
+                "severity": "LOW" | "MEDIUM" | "HIGH",
+                "related_event_ids": number[]
+                }
+
+                ### RULES
+                - Output ONLY raw JSON.
+                - NO markdown.
+                - NO <think>.
+                - NO explanation text outside the JSON.
+                - Deterministic: same input must always produce the same output.
+                - "confidence" must be a number between 0 and 1.
+                - "related_event_ids" must contain ONLY event_id numbers that directly participate in the correlation.
+                - Use ONLY the provided event list — do not invent data.
+
+                ### CORRELATION CATEGORIES TO CHECK
+                You may detect correlations such as:
+                - privilege_escalation chains
+                - brute_force → auth_success sequence
+                - ransomware (multiple file_encrypt / crypto events)
+                - lateral_movement sequences
+                - cloud_login anomalies
+                - multi_stage_attack (multiple categories in sequence)
+
+                ONLY mark correlation_detected=true if the evidence is strong.
+            `
+        },
+        {
+            role: "user",
+            content: `Analyze the following events:\n${rawMessage}`
+        }
+    ];
+
+    return this.sendChatCompletion(this.deepseekModelId, messages, 0.0);
+}
+
+
+    private async sendChatCompletion(
+        modelId: string,
+        messages: ChatMessage[],
+        temperature: number
+    ): Promise<string | JSON> {
         try {
             const res = await axios.post(
                 this.apiUrl,
                 {
                     model: modelId,
                     messages,
-                    temperature: 0.1,
+                    temperature
                 },
                 {
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: "Bearer lm-studio",
-                    },
+                        Authorization: "Bearer lm-studio"
+                    }
                 }
             );
 
-            const responseText = res.data?.choices?.[0]?.message?.content ?? "No response from the model.";
+            let responseText =
+                res.data?.choices?.[0]?.message?.content ??
+                "No response from the model.";
 
-            // if LLM returns not onlu JSON, clean the response
-           const cleaned = responseText
+            // Remove DeepSeek R1 <think> 
+            let cleaned = responseText
                 .replace(/<think>[\s\S]*?<\/think>/gi, "")
-                .replace(/```(?:json)?\s*([\s\S]*?)```/gi, "$1")
+                .replace(/```(?:json)?/gi, "")
                 .replace(/```/g, "")
                 .trim();
 
+            
+            const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+            if (jsonMatch) cleaned = jsonMatch[0];
 
             try {
                 return JSON.parse(cleaned);
             } catch {
-                return cleaned;
+                return cleaned; 
             }
 
         } catch (error: any) {
             if (axios.isAxiosError(error)) {
-                const apiMsg = error.response?.data?.error?.message ?? error.response?.data?.message;
+                const apiMsg =
+                    error.response?.data?.error?.message ??
+                    error.response?.data?.message;
                 throw new Error(`LLM error: ${apiMsg ?? error.message}`);
             }
             throw new Error(`Unexpected error: ${error.message}`);

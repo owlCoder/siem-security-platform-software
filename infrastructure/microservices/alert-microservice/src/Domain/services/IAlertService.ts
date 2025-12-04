@@ -13,7 +13,6 @@ export interface IAlertService {
   getAlertsByStatus(status: AlertStatus): Promise<AlertDTO[]>;
   resolveAlert(id: number, data: ResolveAlertDTO): Promise<AlertDTO>;
   updateAlertStatus(id: number, status: AlertStatus): Promise<AlertDTO>;
-  deleteAlert(id: number): Promise<boolean>;
 
   getAlertsWithFilters(query: AlertQueryDTO): Promise<PaginatedAlertsDTO>;
 

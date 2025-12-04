@@ -1,4 +1,4 @@
-import { MongoRepository } from "typeorm";
+import { Int32, MongoRepository } from "typeorm";
 import { CacheEntry } from "../Domain/models/CacheEntry";
 import { IQueryRepositoryService } from "../Domain/services/IQueryRepositoryService";
 import axios, { AxiosInstance } from "axios";
@@ -31,15 +31,13 @@ export class QueryRepositoryService implements IQueryRepositoryService {
     }
 
     async getAllEvents(): Promise<Event[]> {
-        //const response = await this.eventClient.get("/events");
-        //return response.data;
-        return [];
+        const response = await this.eventClient.get("/events");
+        return response.data;
     }
 
-    async getOldEvents(): Promise<Event[]> {
+    async getOldEvents(hours : number): Promise<Event[]> {
         const allEvents = await this.getAllEvents();
-        // treba da nadjemo starije od 72h
-        const seventyTwoHoursAgo = new Date(Date.now() - 72 * 60 * 60 * 1000);
-        return allEvents.filter(event => new Date(event.timestamp) < seventyTwoHoursAgo);
+        const xHoursAgo = new Date(Date.now() - hours * 60 * 60 * 1000);
+        return allEvents.filter(event => new Date(event.timestamp) < xHoursAgo);
     }
 }
