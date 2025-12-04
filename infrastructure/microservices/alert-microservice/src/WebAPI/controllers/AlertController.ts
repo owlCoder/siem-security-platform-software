@@ -99,8 +99,18 @@ export class AlertController {
   }
 
   async getAlertById(req: Request, res: Response) {
-    try { res.json(await this.alertService.getAlertById(Number(req.params.id))); }
-    catch (err: any) { res.status(404).json({ error: err.message }); }
+    try { 
+      const alert = await this.alertService.getAlertById(Number(req.params.id));
+    
+      if (alert.id === 0) {
+        return res.status(404).json({ error: `Alert ${req.params.id} not found` });
+      }
+    
+      res.json(alert);
+    }
+    catch (err: any) { 
+      res.status(500).json({ error: err.message });
+    }
   }
 
   async getAlertsBySeverity(req: Request, res: Response) {
@@ -120,16 +130,30 @@ export class AlertController {
   async resolveAlert(req: Request, res: Response) {
     try {
       const updated = await this.alertService.resolveAlert(Number(req.params.id), req.body);
+    
+      if (updated.id === 0) {
+        return res.status(404).json({ error: `Alert ${req.params.id} not found` });
+      }
+    
       await this.notificationService.broadcastAlertUpdate(updated, "RESOLVED");
       res.json(updated);
-    } catch (err: any) { res.status(404).json({ error: err.message }); }
+    } catch (err: any) { 
+      res.status(500).json({ error: err.message }); 
+    }
   }
 
   async updateAlertStatus(req: Request, res: Response) {
     try {
       const updated = await this.alertService.updateAlertStatus(Number(req.params.id), req.body.status);
+    
+      if (updated.id === 0) {
+        return res.status(404).json({ error: `Alert ${req.params.id} not found` });
+      }
+    
       await this.notificationService.broadcastAlertUpdate(updated, "STATUS_CHANGED");
       res.json(updated);
-    } catch (err: any) { res.status(400).json({ error: err.message }); }
+    } catch (err: any) { 
+      res.status(400).json({ error: err.message }); 
+    }
   }
 }
