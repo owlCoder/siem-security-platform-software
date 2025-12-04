@@ -10,6 +10,21 @@ import { AlertQueryDTO, PaginatedAlertsDTO } from "../Domain/DTOs/AlertQueryDTO"
 export class AlertService implements IAlertService {
   constructor(private repo: IAlertRepositoryService) {}
 
+  private createEmptyDTO(): AlertDTO {
+    return {
+      id: 0,
+      title: "",
+      description: "",
+      severity: AlertSeverity.LOW,
+      status: AlertStatus.ACTIVE,
+      correlatedEvents: [],
+      source: "",
+      createdAt: new Date(),
+      resolvedAt: null,
+      resolvedBy: null
+    };
+  }
+
   private toDTO(alert: any): AlertDTO {
     return {
       id: alert.id,
@@ -43,7 +58,7 @@ export class AlertService implements IAlertService {
 
   async getAlertById(id: number): Promise<AlertDTO> {
     const alert = await this.repo.findById(id);
-    if (!alert) throw new Error(`Alert ${id} not found`);
+    if (!alert) return this.createEmptyDTO();
     return this.toDTO(alert);
   }
 
@@ -57,7 +72,7 @@ export class AlertService implements IAlertService {
 
   async resolveAlert(id: number, data: ResolveAlertDTO): Promise<AlertDTO> {
     const alert = await this.repo.findById(id);
-    if (!alert) throw new Error(`Alert ${id} not found`);
+    if (!alert) return this.createEmptyDTO();
 
     alert.status = data.status;
     alert.resolvedBy = data.resolvedBy;
@@ -68,7 +83,7 @@ export class AlertService implements IAlertService {
 
   async updateAlertStatus(id: number, status: AlertStatus): Promise<AlertDTO> {
     const alert = await this.repo.findById(id);
-    if (!alert) throw new Error(`Alert ${id} not found`);
+    if (!alert) return this.createEmptyDTO();
 
     alert.status = status;
 
@@ -79,7 +94,6 @@ export class AlertService implements IAlertService {
     return this.repo.delete(id);
   }
 
-  // filtering and pagination
   async getAlertsWithFilters(query: AlertQueryDTO): Promise<PaginatedAlertsDTO> {
     const { alerts, total } = await this.repo.findWithFilters(query);
 
@@ -95,6 +109,6 @@ export class AlertService implements IAlertService {
         total,
         totalPages
       }
-    }
+    };
   }
 }
