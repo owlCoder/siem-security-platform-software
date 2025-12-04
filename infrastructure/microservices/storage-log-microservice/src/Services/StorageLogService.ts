@@ -5,7 +5,6 @@ import { StorageLog } from "../Domain/models/StorageLog";
 import { mkdirSync, unlinkSync, writeFileSync } from "fs";
 import { IStorageLogService } from "../Domain/services/IStorageLogService";
 import { EventDTO } from "../Domain/DTOs/EventDTO";
-import { CorrelationDTO } from "../Domain/DTOs/CorrelationDTO";
 import { execSync } from "child_process";
 import { getTimeGroup } from "../Utils/TimeGroup";
 
@@ -13,16 +12,36 @@ const ARCHIVE_DIR = process.env.ARCHIVE_PATH || path.join(__dirname, "../../arch
 const TEMP_DIR = path.join(ARCHIVE_DIR, "tmp");
 
 export class StorageLogService implements IStorageLogService{
-    constructor(
-        private readonly storageRepo: Repository<StorageLog>,
-        //dodati query client i da bude AxiosInstance
-        private readonly queryClient: AxiosInstance,
-        private readonly eventClient: AxiosInstance,
-        private readonly correlationClient: AxiosInstance
-    ){
-        //radi proveru 
-        mkdirSync(ARCHIVE_DIR, {recursive: true});
-        mkdirSync(TEMP_DIR, {recursive: true});
+        private readonly queryClient: AxiosInstance;
+        private readonly eventClient: AxiosInstance;
+        private readonly correlationClient: AxiosInstance;
+    
+        constructor(private readonly storageRepo: Repository<StorageLog>){
+            const queryServiceURL = process.env.QUERY_SERVICE_API;
+            const eventServiceURL = process.env.EVENT_SERVICE_API;
+            const analysisServiceURL = process.env.ANALYSIS_ENGINE_API;
+
+            this.queryClient = axios.create({
+                baseURL: queryServiceURL,
+                headers: { "Content-Type" : "application/json" },
+                timeout: 5000
+            });
+
+            this.eventClient = axios.create({
+                baseURL: eventServiceURL,
+                headers: { "Content-Type" : "application/json" },
+                timeout: 5000
+            });
+
+            this.correlationClient = axios.create({
+                baseURL: analysisServiceURL,
+                headers: { "Content-Type" : "application/json" },
+                timeout: 5000
+            });
+
+            //radi proveru 
+            mkdirSync(ARCHIVE_DIR, {recursive: true});
+            mkdirSync(TEMP_DIR, {recursive: true});
     }
 
     public async getArchives(): Promise<StorageLog[]>{
@@ -32,11 +51,11 @@ export class StorageLogService implements IStorageLogService{
     public async runArchiveProcess(): Promise<void> {
         const hours = 72;
         // dobavljanje dogadjaja i pretnje
-        //getOldEvents(int hours) : List<Event>
 
+        //getOldEvents(int hours) : List<Event>
         //dobavljanje podataka ide od queryClient
         const eventsToArchive = (await this.queryClient.get<EventDTO[]>(
-            "neka ruta", // zamijeniti rutu od query service
+            "/query/oldEvents", 
             {params: { hours }}
         )).data;
 
@@ -81,15 +100,14 @@ export class StorageLogService implements IStorageLogService{
 
         // salje se Event Collector Service-u
         await this.eventClient.delete(
-            "neka ruta", // zamijeniti rutu kada se zavrsi event collector servis
+            "/events/old", 
             {data: eventsToArchive.map(e => e.id)}
         );
 
         //salje se Analysis Engine Service-u
         await this.correlationClient.delete(
-            "neka ruta", // zamijeniti rutu kada se zavrsi analysis servis
+            "/AnalysisEngine/correlations/deleteByEventIds",
             {data: eventsToArchive.map(c => c.id)}
-            //{data: correlationsToArchive.map(c => c.id)}
         );
     }
 }

@@ -15,6 +15,9 @@ dotenv.config({ quiet: true });
 
 const app = express();
 
+//parsiranje JSON body-ja
+app.use(express.json());
+
 // Read CORS settings from environment
 const corsOrigin = process.env.CORS_ORIGIN ?? "*";
 const corsMethods = process.env.CORS_METHODS?.split(",").map(m => m.trim()) ?? ["GET", "POST"];
@@ -25,33 +28,15 @@ app.use(cors({
   methods: corsMethods,
 }));
 
-app.use(express.json());
 
-initialize_database();
+// inicijalizacija baze
+void (async () => {
+  await initialize_database();
+})();
 
 const storageRepo = Db.getRepository(StorageLog);
 
-const queryClient = axios.create({
-  baseURL: process.env.QUERY_SERVICE_API ?? "neka ruta",
-  timeout: 5000
-});
-
-const eventClient = axios.create({
-  baseURL: process.env.EVENT_SERVICE_API ?? "neka ruta",
-  timeout: 5000
-});
-
-const correlationClient = axios.create({
-  baseURL: process.env.ANALYSIS_ENGINE_API ?? "neka ruta",
-  timeout: 5000
-});
-
-const storageLogService : IStorageLogService = new StorageLogService(
-  storageRepo,
-  queryClient,
-  eventClient,
-  correlationClient
-);
+const storageLogService : IStorageLogService = new StorageLogService(storageRepo);
 
 const storageController = new StorageLogController(storageLogService);
 
