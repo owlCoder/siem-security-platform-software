@@ -12,6 +12,7 @@ export class CorrelationService implements ICorrelationService{
     
     private readonly parserClient: AxiosInstance;
     private readonly alertClient: AxiosInstance;
+    private readonly queryClient: AxiosInstance;
 
     constructor(private correlationRepo: Repository<Correlation>, private correlationEventMap: Repository<CorrelationEventMap>, private readonly llmChatApiService: ILLMChatAPIService) {
 
@@ -19,6 +20,13 @@ export class CorrelationService implements ICorrelationService{
 
         const parserServiceURL = process.env.PARSER_SERVICE_API;
         const alertServiceURL = process.env.ALERT_SERVICE_API;
+        const queryServiceURL = process.env.QUERY_SERVICE_API;
+
+        this.queryClient = axios.create({
+            baseURL: queryServiceURL,
+            headers: { "Content-Type": "application/json" },
+            timeout: 5000,
+        });
 
         this.parserClient = axios.create({
             baseURL: parserServiceURL,
@@ -37,7 +45,8 @@ export class CorrelationService implements ICorrelationService{
     async findCorrelations(): Promise<void> {
         console.log(`\x1b[35m[CorrelationService]\x1b[0m Finding correlations...`);
 
-        const events: any[] = [];
+        const events = await this.queryClient.get(`/query/oldEvents/1`);
+
 
         const correlationDTO = mapLLMResponseToCorrelationDTO(
             await this.llmChatApiService.sendCorrelationPrompt(JSON.stringify(events))

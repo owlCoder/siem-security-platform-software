@@ -35,23 +35,26 @@ export class AnalysisEngineController {
     }
 
     private async deleteCorrelationsByEventIds(req: Request, res: Response): Promise<void> {
-        try{
+
+        try {
             const eventIds: number[] = req.body.eventIds;
 
-            if(!eventIds || eventIds.length === 0){
+            if (!eventIds || eventIds.length === 0) {
                 res.status(400).json({ error: "eventIds array is required" });
                 return;
             }
 
-           const deletedCount =  await this.correlationService.deleteCorrelationsByEventIds(eventIds);
-           if (deletedCount === 0) {
-               res.status(204); //"No correlations found for the provided event IDs
-               return;
-           }
-           
-           res.status(200).json({ message: `Deleted ${deletedCount} correlations associated with the provided event IDs.` });
+            const deletedCount = await this.correlationService.deleteCorrelationsByEventIds(eventIds);
 
-        }catch(err){
+            if (deletedCount === 0) {
+                res.status(204).json({ message: "No correlations found for the provided event IDs" });
+                return;
+            }
+            res.status(200).json({
+                message: `Deleted ${deletedCount} correlations associated with the provided event IDs.`
+            });
+
+        } catch (err) {
             res.status(500).json({ error: (err as Error).message });
         }
     }
