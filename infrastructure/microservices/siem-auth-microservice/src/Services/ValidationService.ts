@@ -65,7 +65,7 @@ export class ValidationService implements IValidationService {
     }
 
     private normalizeClaims(decoded: JwtPayload | string): AuthTokenClaims | null {
-        if(!decoded && typeof(decoded) === 'string'){
+        if(!decoded || typeof(decoded) === 'string'){
             return null;
         }
 
