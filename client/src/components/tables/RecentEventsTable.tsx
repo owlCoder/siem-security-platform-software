@@ -15,6 +15,7 @@ export default function RecentEventsTable({ events }: { events: EventRow[] }) {
         boxShadow: "0 2px 8px rgba(0,0,0,0.5)",
         marginTop: "12px",
         border: "1px solid #333",
+        margin:"10px"
     };
 
     const tableStyle: React.CSSProperties = {

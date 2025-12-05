@@ -3,6 +3,7 @@
    ============================================ */
 
 /* CSS Variables */
+@import "tailwindcss";
 :root {
   /* Background Colors */
   --win11-bg: #202020;
