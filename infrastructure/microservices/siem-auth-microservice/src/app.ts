@@ -21,7 +21,7 @@ const corsOrigin =
 
 const corsMethods =
   process.env.CORS_METHODS?.split(",").map((m) => m.trim()) ??
-  ["GET", "POST", "DELETE", "OPTIONS"];
+  ["GET", "POST"];
 
 app.use(
   cors({
@@ -30,13 +30,17 @@ app.use(
   }),
 );
 
+const secretJWT = proccess.env.JWT_SECRET?.split(",").map((m) => m.trim()) ?? ["*"];
+
+const sysAdminRoleId = proccess.env.SYS_ADMIN_ROLE_ID?.split(",").map((m) => m.trim());
+
 //Services
-const validationService: IValidationService = new ValidationService();
+const validationService: IValidationService = new ValidationService(secretJWT,sysAdminRoleId);
 
 // WebAPI routes
 const authController = new AuthController(validationService);
 
 // Registering routes
-app.use('/api/v1', authController.getRouter());
+app.use('/api/v1/auth', authController.getRouter());
 
 export default app;
