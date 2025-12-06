@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import EventTableRow from "./EventTableRow";
+import { EventType } from "../../enums/EventType";
 
 interface EventRow {
     id: string;
     time: string;
-    type: "Info" | "Warning" | "Error";
+    type: EventType;
 }
 
 // Inline styles for now, will be in CSS later

@@ -4,11 +4,13 @@ import { FiDownload } from "react-icons/fi";
 import { useAuth } from "../../hooks/useAuthHook";
 import { EventAPI } from "../../api/events/EventAPI";
 import { EventDTO } from "../../models/events/EventDTO";
+import { EventType } from "../../enums/EventType";
+import DropDownMenu from "../events/DropDownMenu";
 
 interface EventRow { 
     id: string;
     time: string;
-    type: "Info" | "Warning" | "Error";
+    type: EventType;
 }
 
 export default function Events() {
@@ -73,14 +75,14 @@ export default function Events() {
         let type: EventRow["type"];
         switch (e.type) {
             case "ERROR":
-                type = "Error";
+                type = EventType.ERROR;
                 break;
             case "WARNING":
-                type = "Warning";
+                type = EventType.WARNING;
                 break;
             case "INFO":
             default:
-                type = "Info";
+                type = EventType.INFO;
                 break;
         }
 
@@ -122,20 +124,7 @@ export default function Events() {
             <h3 style={{ padding: "10px", margin: "10px" }}>Events</h3>
 
             <div style={containerStyle}>
-                <select
-                    value={sortType}
-                    onChange={(e) => setSortType(Number(e.target.value))}
-                    style={elementsStyle}
-                >
-                    <option value={0}>Sort by  &nbsp;&nbsp;&nbsp;▼</option>
-                    <option value={1}>Event ID &nbsp;&nbsp;&nbsp;🡹</option>
-                    <option value={2}>Event ID &nbsp;&nbsp;&nbsp;🡻</option>
-                    <option value={3}>Date and Time &nbsp;&nbsp;&nbsp;🡹</option>
-                    <option value={4}>Date and Time &nbsp;&nbsp;&nbsp;🡻</option>
-                    <option value={5}>Type &nbsp;&nbsp;&nbsp;🡹</option>
-                    <option value={6}>Type &nbsp;&nbsp;&nbsp;🡻</option>
-                </select>
-
+                <DropDownMenu OnSortTypeChange={(value:number)=>setSortType(value)}/>
                 <input
                     style={elementsStyle}
                     placeholder="🔍Search by id"

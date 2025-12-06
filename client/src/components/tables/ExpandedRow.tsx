@@ -1,7 +1,9 @@
+import { EventType } from "../../enums/EventType";
+
 interface EventRow { //move into a right folders(types)
     id: string;
     time: string;
-    type: "Info" | "Warning" | "Error";
+    type: EventType;
 }
 interface ExpandedProps{ //move into a right folders(types)
     expanded:boolean;

@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import { ExpandedRow } from "./ExpandedRow";
+import { EventType } from "../../enums/EventType";
 
-interface EventRow {  //move into a right folders(types)
+interface EventRow {  //at the end,move into a right folders(types) 
     id: string;
     time: string;
-    type: "Info" | "Warning" | "Error";
+    type: EventType;
 }
-interface RowProps {  //move into a right folders(types)
+interface RowProps {   //at the end,move into a right folders(types) 
     e: EventRow;
     index: number;
 }
@@ -35,17 +36,17 @@ export default function AllEventsTable({ e, index }: RowProps) {
     };
 
     const badgeColors: Record<string, React.CSSProperties> = {
-        Info: {
+        INFO: {
             background: "rgba(59, 130, 246, 0.15)",
             color: "#60a5fa",
             border: "1px solid rgba(59, 130, 246, 0.3)",
         },
-        Warning: {
+        WARNING: {
             background: "rgba(234, 179, 8, 0.15)",
             color: "#facc15",
             border: "1px solid rgba(234, 179, 8, 0.3)",
         },
-        Error: {
+        ERROR: {
             background: "rgba(239, 68, 68, 0.15)",
             color: "#f87171",
             border: "1px solid rgba(239, 68, 68, 0.3)",
