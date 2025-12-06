@@ -2,8 +2,8 @@ import { ReactNode, useState, useEffect, createContext } from "react";
 import { decodeJWT } from "../helpers/decode_jwt";
 import { isTokenExpired } from "../helpers/expiration_jwt_validate";
 import { readValueByKey, removeValueByKey, saveValueByKey } from "../helpers/local_storage";
-import { AuthContextType } from "../types/AuthContextType";
-import { AuthTokenClaimsType } from "../types/AuthTokenClaimsType";
+import { AuthContextType } from "../types/auth/AuthContextType";
+import { AuthTokenClaimsType } from "../types/auth/AuthTokenClaimsType";
 
 // Create the context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

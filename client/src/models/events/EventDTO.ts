@@ -1,4 +1,4 @@
-export type EventType = "INFO" | "WARNING" | "ERROR";
+import { EventType } from "../../enums/EventType";
 
 export interface EventDTO {
   id: number;

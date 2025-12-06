@@ -2,7 +2,7 @@ import axios, { AxiosInstance } from "axios";
 import { LoginUserDTO } from "../../models/auth/LoginUserDTO";
 import { RegistrationUserDTO } from "../../models/auth/RegistrationUserDTO";
 import { IAuthAPI } from "./IAuthAPI";
-import { AuthResponseType } from "../../types/AuthResponseType";
+import { AuthResponseType } from "../../types/auth/AuthResponseType";
 
 export class AuthAPI implements IAuthAPI {
   private readonly axiosInstance: AxiosInstance;

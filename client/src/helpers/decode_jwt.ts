@@ -1,5 +1,5 @@
 import { jwtDecode } from "jwt-decode";
-import { AuthTokenClaimsType } from "../types/AuthTokenClaimsType";
+import { AuthTokenClaimsType } from "../types/auth/AuthTokenClaimsType";
 
 export const decodeJWT = (token: string): AuthTokenClaimsType | null => {
   try {

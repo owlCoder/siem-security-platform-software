@@ -1,6 +1,6 @@
 import { LoginUserDTO } from "../../models/auth/LoginUserDTO";
 import { RegistrationUserDTO } from "../../models/auth/RegistrationUserDTO";
-import { AuthResponseType } from "../../types/AuthResponseType";
+import { AuthResponseType } from "../../types/auth/AuthResponseType";
 
 export interface IAuthAPI {
   login(data: LoginUserDTO): Promise<AuthResponseType>;
