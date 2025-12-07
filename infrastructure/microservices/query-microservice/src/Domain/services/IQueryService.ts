@@ -15,10 +15,10 @@ export interface IQueryService {
 
     searchEvents(query: string): Promise<EventDTO[]>;
 
-    //runCacheInvalidationJob(): Promise<void>;
+    runCacheInvalidationJob(): Promise<void>;
 
-    //generatePdfReport(query: string): Promise<string>;
+    generatePdfReport(query: string): Promise<string>;
 
-    //cleanOldEventsAndNotifyStorage(): Promise<void>;
+    cleanOldEventsAndNotifyStorage(): Promise<void>;
 
 }
