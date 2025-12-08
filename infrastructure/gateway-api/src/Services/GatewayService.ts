@@ -91,7 +91,7 @@ export class GatewayService implements IGatewayService {
         valid: boolean;
         isSysAdmin: boolean;
         user: { user_id: number; username: string; role: number };
-      }>("api/v1/auth/validate");
+      }>("auth/validate");
 
       if (!response.data.success || !response.data.valid) {
         return { valid: false, error: "Token validation failed." };
