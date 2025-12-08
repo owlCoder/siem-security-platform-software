@@ -5,7 +5,7 @@ import { RegistrationUserDTO } from "../Domain/DTOs/RegistrationUserDTO";
 import { AuthResponseType } from "../Domain/types/AuthResponse";
 import { UserDTO } from "../Domain/DTOs/UserDTO";
 import { AlertDTO } from "../Domain/DTOs/AlertDTO";
-import { AlertQueryDTO} from "../Domain/DTOs/AlertQueryDTO";
+import { AlertQueryDTO } from "../Domain/DTOs/AlertQueryDTO";
 import { PaginatedAlertsDTO } from "../Domain/DTOs/PaginatedAlertsDTO";
 
 export class GatewayService implements IGatewayService {
@@ -13,12 +13,14 @@ export class GatewayService implements IGatewayService {
   private readonly userClient: AxiosInstance;
   private readonly alertClient: AxiosInstance;
   private readonly queryClient: AxiosInstance;
+  private readonly siemAuthClient: AxiosInstance;
 
   constructor() {
     const authBaseURL = process.env.AUTH_SERVICE_API;
     const userBaseURL = process.env.USER_SERVICE_API;
     const alertBaseURL = process.env.ALERT_SERVICE_API;
     const queryBaseURL = process.env.QUERY_SERVICE_API;
+    const siemAuthBaseURL = process.env.SIEM_AUTH_SERVICE_API;
 
     this.authClient = axios.create({
       baseURL: authBaseURL,
@@ -44,12 +46,21 @@ export class GatewayService implements IGatewayService {
       headers: { "Content-Type": "application/json" },
       timeout: 5000,
     });
+
+    this.siemAuthClient = axios.create({
+      baseURL: siemAuthBaseURL,
+      headers: { "Content-Type": "application/json" },
+      timeout: 5000,
+    });
   }
 
   // Auth microservice
   async login(data: LoginUserDTO): Promise<AuthResponseType> {
     try {
-      const response = await this.authClient.post<AuthResponseType>("/auth/login", data);
+      const response = await this.authClient.post<AuthResponseType>(
+        "/auth/login",
+        data
+      );
       return response.data;
     } catch {
       return { authenificated: false };
@@ -58,15 +69,42 @@ export class GatewayService implements IGatewayService {
 
   async register(data: RegistrationUserDTO): Promise<AuthResponseType> {
     try {
-      const response = await this.authClient.post<AuthResponseType>("/auth/register", data);
+      const response = await this.authClient.post<AuthResponseType>(
+        "/auth/register",
+        data
+      );
       return response.data;
     } catch {
       return { authenificated: false };
     }
   }
 
-  async validateToken(token: string) : Promise<{valid: boolean; payload?: any; isSysAdmin?: boolean; error?: string }>{
-    return {valid: false}
+  async validateToken(token: string): Promise<{
+    valid: boolean;
+    payload?: any;
+    isSysAdmin?: boolean;
+    error?: string;
+  }> {
+    try {
+      const response = await this.siemAuthClient.post<{
+        success: boolean;
+        valid: boolean;
+        isSysAdmin: boolean;
+        user: { user_id: number; username: string; role: number };
+      }>("api/v1/auth/validate");
+
+      if (!response.data.success || !response.data.valid) {
+        return { valid: false, error: "Token validation failed." };
+      }
+
+      return {
+        valid: true,
+        payload: response.data.user,
+        isSysAdmin: response.data.isSysAdmin,
+      };
+    } catch (error: any) {
+      return { valid: false, error: error };
+    }
   }
 
   // User microservice
@@ -94,35 +132,50 @@ export class GatewayService implements IGatewayService {
   }
 
   async searchAlerts(query: AlertQueryDTO): Promise<PaginatedAlertsDTO> {
-    const response = await this.alertClient.get<PaginatedAlertsDTO>("/alerts/search", {
-      params: query
-    });
+    const response = await this.alertClient.get<PaginatedAlertsDTO>(
+      "/alerts/search",
+      {
+        params: query,
+      }
+    );
     return response.data;
   }
 
-  async resolveAlert(id: number, resolvedBy: string, status: string): Promise<AlertDTO> {
-    const response = await this.alertClient.put<AlertDTO>(`/alerts/${id}/resolve`, {
-      resolvedBy,
-      status
-    });
+  async resolveAlert(
+    id: number,
+    resolvedBy: string,
+    status: string
+  ): Promise<AlertDTO> {
+    const response = await this.alertClient.put<AlertDTO>(
+      `/alerts/${id}/resolve`,
+      {
+        resolvedBy,
+        status,
+      }
+    );
     return response.data;
   }
 
   async updateAlertStatus(id: number, status: string): Promise<AlertDTO> {
-    const response = await this.alertClient.put<AlertDTO>(`/alerts/${id}/status`, { status });
+    const response = await this.alertClient.put<AlertDTO>(
+      `/alerts/${id}/status`,
+      { status }
+    );
     return response.data;
   }
 
   // Query Service
   async searchEvents(query: string): Promise<any[]> {
     const response = await this.queryClient.get<any[]>("/query/search", {
-      params: { query }
+      params: { query },
     });
     return response.data;
   }
 
   async getOldEvents(hours: number): Promise<any[]> {
-    const response = await this.queryClient.get<any[]>(`/query/oldEvents/${hours}`);
+    const response = await this.queryClient.get<any[]>(
+      `/query/oldEvents/${hours}`
+    );
     return response.data;
   }
 }

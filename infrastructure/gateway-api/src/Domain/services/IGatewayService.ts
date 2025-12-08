@@ -1,5 +1,5 @@
 import { AlertDTO } from "../DTOs/AlertDTO";
-import { AlertQueryDTO} from "../DTOs/AlertQueryDTO";
+import { AlertQueryDTO } from "../DTOs/AlertQueryDTO";
 import { LoginUserDTO } from "../DTOs/LoginUserDTO";
 import { PaginatedAlertsDTO } from "../DTOs/PaginatedAlertsDTO";
 import { RegistrationUserDTO } from "../DTOs/RegistrationUserDTO";
@@ -10,7 +10,14 @@ export interface IGatewayService {
   // Auth
   login(data: LoginUserDTO): Promise<AuthResponseType>;
   register(data: RegistrationUserDTO): Promise<AuthResponseType>;
-  validateToken(token: string) : Promise<{valid: boolean; payload?: any; isSysAdmin?: boolean; error?: string }>;
+  validateToken(
+    token: string
+  ): Promise<{
+    valid: boolean;
+    payload?: any;
+    isSysAdmin?: boolean;
+    error?: string;
+  }>;
 
   // Users
   getAllUsers(): Promise<UserDTO[]>;
@@ -20,7 +27,11 @@ export interface IGatewayService {
   getAllAlerts(): Promise<AlertDTO[]>;
   getAlertById(id: number): Promise<AlertDTO>;
   searchAlerts(query: AlertQueryDTO): Promise<PaginatedAlertsDTO>;
-  resolveAlert(id: number, resolvedBy: string, status: string): Promise<AlertDTO>;
+  resolveAlert(
+    id: number,
+    resolvedBy: string,
+    status: string
+  ): Promise<AlertDTO>;
   updateAlertStatus(id: number, status: string): Promise<AlertDTO>;
 
   // Query
