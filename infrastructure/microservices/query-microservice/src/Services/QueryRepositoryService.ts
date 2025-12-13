@@ -50,6 +50,10 @@ export class QueryRepositoryService implements IQueryRepositoryService {
 
     async findById(id: number): Promise<Event> {
         //ovo ne treba ovako ispraviti!!
+
+        // TODO!!!!!
+        // treba da trazi iz NoSQL baze a ne od event servisa
+        // id je string a ne broj
             const response = await this.eventClient.get(`/events/${id}`);
             if(!response){
                  this.loggerService.log(`findById error fetching id ${id}`);
@@ -179,5 +183,19 @@ export class QueryRepositoryService implements IQueryRepositoryService {
 
     public isIndexingInProgress(): boolean {
         return this.indexingInProgress;
+    }
+
+    // brze je da se trazi iz baze
+    // proveriti!!!
+    public async getLastThreeEvents(): Promise<Event[]> {
+        const allEvents = await this.getAllEvents();
+        const sortedEvents = allEvents.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        return sortedEvents.slice(0, 3);
+    }
+
+    public async getEventsCount(): Promise<number> {
+        const maxId = await this.getMaxId();
+        if (maxId === 0) return 0;
+        return maxId;
     }
 }

@@ -26,6 +26,15 @@ export class QueryService implements IQueryService {
     async searchEvents(query: string): Promise<EventDTO[]> {
         const allEvents = await this.queryRepositoryService.getAllEvents();
 
+        if (query.trim() === "") {
+            return allEvents.map(e => ({
+                source: e.source,
+                type: e.type,
+                description: e.description,
+                timestamp: e.timestamp,
+            }));
+        }
+
         // query je npr. "type=info|date=20/10/2025" ili "type=info|host=server1|dateFrom=2025-11-20|dateTo=2025-11-22"
         // pozivamo parseQueryString da dobijemo parove kljuc-vrednost sa nazivom polja i vrednosti za pretragu
         const filters = parseQueryString(query);
@@ -37,8 +46,7 @@ export class QueryService implements IQueryService {
         // filtriramo sve evente na osnovu dobijenih id-eva iz indeksa
         const filteredEvents = allEvents.filter(event => !matchingIds || matchingIds.has(event.id));
 
-        // dodaj pre vracanja kesiranje
-        return filteredEvents.filter(event => {
+        const result =  filteredEvents.filter(event => {
 
             for (const key of Object.keys(filters)) {
                 const value = filters[key].toLowerCase();
@@ -70,7 +78,19 @@ export class QueryService implements IQueryService {
             description: e.description,
             timestamp: e.timestamp,
         }));
+
+        /*
+        TODO:
+        kad se doda provera kesa, onda se prvo proveri pa onda kesira
+        // kesiranje
+        this.queryRepositoryService.addEntry({
+            key: query,
+            result: result,
+        });
+        */
+        return result;
     } 
+
     public async generatePdfReport(query: string): Promise<string> {
         
         const eventsToReport = await this.searchEvents(query); 

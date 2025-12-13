@@ -15,4 +15,6 @@ export interface IQueryRepositoryService {
     findById(id: number): Promise<Event>;
     //saveEvent(event: Event): Promise<Event>;
     //searchEvents(query: string): Promise<Event[]>;
+    getLastThreeEvents(): Promise<Event[]>;
+    getEventsCount(): Promise<number>;
 }

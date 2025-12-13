@@ -6,19 +6,9 @@
     // sve ostale metode idu u Utils folder
     // npr konvertovanje rezultata pretrage u JSON i obrnuto
 
-
-
 import { EventDTO } from "../DTOs/EventDTO";
-import { CacheEntry } from "../models/CacheEntry";
 
 export interface IQueryService {
-
     searchEvents(query: string): Promise<EventDTO[]>;
-
-    //runCacheInvalidationJob(): Promise<void>;
-
     generatePdfReport(query: string): Promise<string>;
-
-    //cleanOldEventsAndNotifyStorage(): Promise<void>;
-
 }

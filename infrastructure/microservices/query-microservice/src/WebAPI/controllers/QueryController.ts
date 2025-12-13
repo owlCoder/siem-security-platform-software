@@ -18,6 +18,9 @@ export class QueryController {
         this.router.post("/query/cache", this.addCacheEntry.bind(this));
         this.router.get("/query/oldEvents/:hours", this.getOldEvents.bind(this));
         this.router.get("/query/search", this.searchEvents.bind(this));
+        this.router.get("/query/lastThreeEvents", this.getLastThreeEvents.bind(this));
+        this.router.get("/query/events", this.getAllEvents.bind(this));
+        this.router.get("/query/eventsCount", this.getEventsCount.bind(this));
     }
 
     private async addCacheEntry(req: Request, res: Response): Promise<void> {
@@ -28,7 +31,6 @@ export class QueryController {
             await this.queryRepositoryService.addEntry({ key, result });
             res.status(201).json({ message: "Cache entry added successfully." });
         } catch (err) {
-            const message = (err as Error).message;
             res.status(500).json({ message: "Error while adding cache entry." });
         }
     }
@@ -45,7 +47,6 @@ export class QueryController {
             const oldEvents = await this.queryRepositoryService.getOldEvents(hours);
             res.status(200).json(oldEvents);
         } catch (err) {
-            const message = (err as Error).message;
             res.status(500).json({ message: "Error while retrieving old events." });
         }
     }
@@ -56,8 +57,34 @@ export class QueryController {
             const results = await this.queryService.searchEvents(query);
             res.status(200).json(results);
         } catch (err) {
-            const message = (err as Error).message;
             res.status(500).json({ message: "Error while searching events." });
+        }
+    }
+
+    private async getAllEvents(req: Request, res: Response): Promise<void> {
+        try {
+            const allEvents = await this.queryRepositoryService.getAllEvents();
+            res.status(200).json(allEvents);
+        } catch (err) {
+            res.status(500).json({ message: "Error while retrieving all events." });
+        }
+    }
+
+    private async getLastThreeEvents(req: Request, res: Response): Promise<void> {
+        try {
+            const lastThreeEvents = await this.queryRepositoryService.getLastThreeEvents();
+            res.status(200).json(lastThreeEvents);
+        } catch (err) {
+            res.status(500).json({ message: "Error while retrieving last three events." });
+        }
+    }
+
+    private async getEventsCount(req: Request, res: Response): Promise<void> {
+        try {
+            const eventsCount = await this.queryRepositoryService.getEventsCount();
+            res.status(200).json({ count: eventsCount });
+        } catch (err) {
+            res.status(500).json({ message: "Error while retrieving events count." });
         }
     }
 
