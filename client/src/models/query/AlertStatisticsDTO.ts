@@ -1,4 +1,4 @@
-export interface AletrStatisticsDTO {
+export interface AlertStatisticsDTO {
   date: string;
   count: number;
 }
