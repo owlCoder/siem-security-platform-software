@@ -69,22 +69,28 @@ export class StorageLogService implements IStorageLogService {
 
         const hours = 72;
 
-        await archiveEvents(
-            hours,
-            this.queryClient,
-            this.eventClient,
-            this.storageRepo
-        );
+        try {
 
-        await archiveAlerts(
-            hours,
-            this.queryClient,
-            this.correlationClient,
-            this.storageRepo
-        );
+            await archiveEvents(
+                hours,
+                this.queryClient,
+                this.eventClient,
+                this.storageRepo
+            );
 
-        await this.logger.log("Archive process finished.");
-        return true;
+            await archiveAlerts(
+                hours,
+                this.queryClient,
+                this.correlationClient,
+                this.storageRepo
+            );
+
+            await this.logger.log("Archive process finished.");
+            return true;
+        } catch (err) {
+            await this.logger.log("ERROR in archive process: " + (err as Error).message);
+            return false;
+        }
 
         /*
         // dobavljanje dogadjaja i pretnje
@@ -253,87 +259,115 @@ export class StorageLogService implements IStorageLogService {
                     valB = new Date(b.createdAt).getTime();
                     break;
 
-                case "size": 
+                case "size":
                     valA = a.fileSize;
                     valB = b.fileSize;
                     break;
-                
+
                 case "name":
                     valA = a.fileName;
                     valB = b.fileName;
                     break;
             }
 
-            if(valA < valB) return -1 * factor;
-            if(valA > valB) return 1 * factor;
-            return 0; 
+            if (valA < valB) return -1 * factor;
+            if (valA > valB) return 1 * factor;
+            return 0;
         });
         return allArchives;
     }
 
-    public async getStats(): Promise<ArchiveStatsDTO>{
-        const archives = await this.storageRepo.find();
+    public async getStats(): Promise<ArchiveStatsDTO> {
+        try {
 
-        const totalSize = archives.reduce((sum, a) => sum + a.fileSize, 0);
-        const lastArchive = archives.sort(
-            (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        )[0];
+            const archives = await this.storageRepo.find();
 
-        return {
-            totalSize,
-            retentionHours: 72,
-            lastArchiveName: lastArchive ? lastArchive.fileName : null
-        };
+            const totalSize = archives.reduce((sum, a) => sum + a.fileSize, 0);
+            const lastArchive = archives.sort(
+                (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            )[0];
+
+            return {
+                totalSize,
+                retentionHours: 72,
+                lastArchiveName: lastArchive ? lastArchive.fileName : null
+            };
+        } catch (err) {
+            await this.logger.log("ERROR fetching archive stats");
+            return {
+                totalSize: 0,
+                retentionHours: 72,
+                lastArchiveName: null
+            }
+        }
     }
 
     public async getArchiveFilePath(id: number): Promise<string | null> {
-        const log = await this.storageRepo.findOne({ where: {storageLogId: id}});
-        if(!log)
+        try {
+
+            const log = await this.storageRepo.findOne({ where: { storageLogId: id } });
+            if (!log)
+                return null;
+
+            const fullPath = path.join(ARCHIVE_DIR, log.fileName);
+            return fullPath;
+        } catch (err) {
+            await this.logger.log("ERROR getting archive file path for id=" + id);
             return null;
-        
-        const fullPath = path.join(ARCHIVE_DIR, log.fileName);
-        return fullPath;
+        }
     }
 
     public async getTopArchives(type: "events" | "alerts", limit: number): Promise<TopArchiveDTO[]> {
-        const archiveType = type === "events" ? ArchiveType.EVENT : ArchiveType.ALERT;
-        
-        const archives = await this.storageRepo.find({
-            where: {archiveType},
-            order: {recordCount: "DESC"},
-            take: limit
-        });
+        try {
 
-        return archives.map(a => ({
-            id: a.storageLogId,
-            fileName: a.fileName,
-            count: a.recordCount
-        }));
+            const archiveType = type === "events" ? ArchiveType.EVENT : ArchiveType.ALERT;
+
+            const archives = await this.storageRepo.find({
+                where: { archiveType },
+                order: { recordCount: "DESC" },
+                take: limit
+            });
+
+            return archives.map(a => ({
+                id: a.storageLogId,
+                fileName: a.fileName,
+                count: a.recordCount
+            }));
+        } catch (err) {
+            await this.logger.log("ERROR fetching top archives");
+            return []; //prazan niz, znaci nema podataka
+        }
     }
 
     public async getArchiveVolume(period: "daily" | "monthly" | "yearly"): Promise<ArchiveVolumeDTO[]> {
-        const archives = await this.storageRepo.find();
-        const volumeMap: Record<string, number> = {};
+        try {
 
-        archives.forEach(a => {
-            const date = new Date(a.createdAt);
-            let key: string;
+            const archives = await this.storageRepo.find();
+            const volumeMap: Record<string, number> = {};
 
-            switch(period){
-                case "daily":
-                    key = date.toISOString().split("T")[0];
-                    break;
-                case "monthly":
-                    key = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, "0")}`;
-                    break;
-                case "yearly":
-                    key = `${date.getFullYear()}`;
-                    break;
-            }
+            archives.forEach(a => {
+                const date = new Date(a.createdAt);
+                let key: string;
 
-            volumeMap[key] = (volumeMap[key] || 0) + a.recordCount;
-        });
+                switch (period) {
+                    case "daily":
+                        key = date.toISOString().split("T")[0];
+                        break;
+                    case "monthly":
+                        key = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}`;
+                        break;
+                    case "yearly":
+                        key = `${date.getFullYear()}`;
+                        break;
+                }
 
-        return Object.entries(volumeMap).map(([label, size]) => ({label, size})).sort((a, b) => a.label.localeCompare(b.label));
+                volumeMap[key] = (volumeMap[key] || 0) + a.recordCount;
+            });
+
+            return Object.entries(volumeMap).map(([label, size]) => ({ label, size })).sort((a, b) => a.label.localeCompare(b.label));
+        } catch (err) {
+            await this.logger.log("ERROR calculating archive volume.");
+            return []; //vracam opet prazan niz, jer se desila greska
+        }
     }
 }
