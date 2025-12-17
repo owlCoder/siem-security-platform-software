@@ -11,6 +11,8 @@ import { ArchiveDTO } from "../Domain/DTOs/ArchiveDTO";
 import { ArchiveStatsDTO } from "../Domain/DTOs/ArchiveStatsDTO";
 import { EventDTO } from "../Domain/DTOs/EventDTO";
 import { TopArchiveDTO } from "../Domain/DTOs/TopArchiveDTO";
+import { ParserEventDto } from "../Domain/DTOs/ParserEventDTO";
+import { ArchiveVolumeDTO } from "../Domain/DTOs/ArchiveVolumeDTO";
 
 export class GatewayService implements IGatewayService {
   private readonly authClient: AxiosInstance;
@@ -19,6 +21,7 @@ export class GatewayService implements IGatewayService {
   private readonly queryClient: AxiosInstance;
   private readonly siemAuthClient: AxiosInstance;
   private readonly storageLogClient: AxiosInstance;
+  private readonly parserEventClient: AxiosInstance;
 
   constructor() {
     const authBaseURL = process.env.AUTH_SERVICE_API;
@@ -27,6 +30,7 @@ export class GatewayService implements IGatewayService {
     const queryBaseURL = process.env.QUERY_SERVICE_API;
     const siemAuthBaseURL = process.env.SIEM_AUTH_SERVICE_API;
     const storageAuthBaseURL = process.env.STORAGE_LOG_SERVICE_API;
+    const parserEventURL = process.env.PARSER_SERVICE_API;
 
     this.authClient = axios.create({
       baseURL: authBaseURL,
@@ -64,6 +68,32 @@ export class GatewayService implements IGatewayService {
       headers: { "Content-Type": "application/json"},
       timeout: 5000,
     });
+    
+    this.parserEventClient = axios.create({
+      baseURL: parserEventURL,
+      headers: { "Content-Type": "application/json"},
+      timeout: 5000,
+    });
+  }
+  async log(eventMessage: string, eventSource: string): Promise<EventDTO> {
+    const response = await this.parserEventClient.post<EventDTO>("/parserEvents/log",{
+        eventMessage,
+        eventSource,
+      });
+    return response.data;
+  }
+  async getAllParserEvents(): Promise<ParserEventDto[]> {
+    console.log("aaaaaaaaaaaa\n");
+    const response = await this.parserEventClient.get<ParserEventDto[]>("/parserEvents");
+    return response.data;
+  }
+   async getParserEventById(id: number): Promise<ParserEventDto> {
+    const response = await this.parserEventClient.get<ParserEventDto>(`/parserEvents/${id}`);
+    return response.data;
+  }
+  async deleteById(id: number): Promise<boolean> {
+    const response = await this.parserEventClient.delete<boolean>(`/parserEvents/${id}`);
+    return response.data;
   }
 
   // Auth microservice

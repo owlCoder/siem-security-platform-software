@@ -100,7 +100,7 @@ export class GatewayController {
       this.authenticate,
       requireSysAdmin,
       this.getLastThreeEvents.bind(this)
-    );    
+    );
     this.router.get(
       "/siem/query/events",
       this.authenticate,
@@ -112,7 +112,7 @@ export class GatewayController {
       this.authenticate,
       requireSysAdmin,
       this.getEventsCount.bind(this)
-    );  
+    );
 
     // Storage
     this.router.get(
@@ -162,8 +162,56 @@ export class GatewayController {
       this.authenticate,
       this.getArchiveVolume.bind(this)
     );
+
+    //Parser
+    this.router.get("/parserEvents", this.getAllParserEvents.bind(this));
+    this.router.get("/parserEvents/:id",  this.getParserEvent.bind(this));
+    this.router.post("/parserEvents/log", this.authenticate, requireSysAdmin, this.log.bind(this));
+    this.router.delete("/parserEvents/:id", this.authenticate, requireSysAdmin, this.deleteParserEvent.bind(this));
   }
 
+  //Parser
+
+  private async getAllParserEvents(req: Request, res: Response): Promise<void> {
+    try {
+      console.log("Zahtjev za sve parser events\n");
+      const response = this.gatewayService.getAllParserEvents();
+      console.log(`Response\n${response}`);
+      res.status(200).json(response);
+    } catch (err) {
+      res.status(500).json({ message: (err as Error).message });
+    }
+  }
+  private async getParserEvent(req: Request, res: Response): Promise<void> {
+    try {
+      const id = Number(req.params.id);
+      console.log(`Zahtjev za jedan parser events ${id} \n`);
+      const response = this.gatewayService.getParserEventById(id);
+      console.log(`Response\n${response}`);
+      res.status(200).json(response);
+    } catch (err) {
+      res.status(500).json({ message: (err as Error).message });
+    }
+  }
+  private async log(req: Request, res: Response): Promise<void> {
+    try {
+      const rawMessage = req.body.message as string;
+      const source = req.body.source as string;
+      const response = this.gatewayService.log(rawMessage, source);
+      res.status(200).json(response);
+    } catch (err) {
+      res.status(500).json({ message: (err as Error).message });
+    }
+  }
+  private async deleteParserEvent(req: Request, res: Response): Promise<void> {
+    try {
+      const id = Number(req.params.id);
+      const response = this.gatewayService.deleteById(id);
+      res.status(200).json(response);
+    } catch (err) {
+      res.status(500).json({ message: (err as Error).message });
+    }
+  }
   private async login(req: Request, res: Response): Promise<void> {
     const data: LoginUserDTO = req.body;
     const result = await this.gatewayService.login(data);
@@ -359,7 +407,7 @@ export class GatewayController {
       res.status(200).json(results);
     } catch (err) {
       res.status(500).json({ message: (err as Error).message });
-    } 
+    }
   }
 
   private async getAllEvents(rew: Request, res: Response): Promise<void> {
@@ -385,50 +433,50 @@ export class GatewayController {
     try {
       const archives = await this.gatewayService.getAllArchives();
       res.status(200).json(archives);
-    } catch(err) {
+    } catch (err) {
       res.status(500).json({ message: (err as Error).message });
     }
   }
 
-  private async searchArchives(req: Request, res: Response){
+  private async searchArchives(req: Request, res: Response) {
     try {
       const archives = await this.gatewayService.searchArchives(req.query.q as string);
       res.status(200).json(archives);
-    } catch(err) {
-      res.status(500).json({ message: (err as Error).message});
+    } catch (err) {
+      res.status(500).json({ message: (err as Error).message });
     }
   }
 
   private async sortArchives(req: Request, res: Response) {
     try {
-      const {by, order} = req.query;
+      const { by, order } = req.query;
       const archives = await this.gatewayService.sortArchives(by as any, order as any);
       res.status(200).json(archives);
-    } catch(err) {
-      res.status(500).json({ message: (err as Error).message});
-    } 
+    } catch (err) {
+      res.status(500).json({ message: (err as Error).message });
+    }
   }
 
-  private async getArchiveStats(req: Request, res: Response){
-    try{
+  private async getArchiveStats(req: Request, res: Response) {
+    try {
       const stats = await this.gatewayService.getArchiveStats();
       res.status(200).json(stats);
     } catch (err) {
-      res.status(500).json( { message: (err as Error).message});
+      res.status(500).json({ message: (err as Error).message });
     }
   }
 
-  private async runArchiveProcess(req: Request, res: Response){
-    try{
+  private async runArchiveProcess(req: Request, res: Response) {
+    try {
       const result = await this.gatewayService.runArchiveProcess();
       res.status(201).json(result);
     } catch (err) {
-      res.status(500).json( { message : (err as Error).message });
+      res.status(500).json({ message: (err as Error).message });
     }
   }
 
-  private async downloadArchive(req: Request, res: Response){
-    try{
+  private async downloadArchive(req: Request, res: Response) {
+    try {
       const id = req.params.id;
 
       const fileBuffer = await this.gatewayService.downloadArchive(id);
@@ -438,7 +486,7 @@ export class GatewayController {
 
       res.status(200).send(fileBuffer); //ovde saljemo binarni sadrzaj fajla klijentu
     } catch (err) {
-      res.status(500).json( { message: (err as Error).message });
+      res.status(500).json({ message: (err as Error).message });
     }
   }
 
@@ -448,8 +496,8 @@ export class GatewayController {
       const limit = Number(req.query.limit) || 5;
       const result = await this.gatewayService.getTopArchives(type, limit);
       res.status(200).json(result);
-    } catch(err) {
-      res.status(500).json({ message: (err as Error).message});
+    } catch (err) {
+      res.status(500).json({ message: (err as Error).message });
     }
   }
 
@@ -459,7 +507,7 @@ export class GatewayController {
       const result = await this.gatewayService.getArchiveVolume(period);
       res.status(200).json(result);
     } catch (err) {
-      res.status(500).json({ message: (err as Error).message});
+      res.status(500).json({ message: (err as Error).message });
     }
   }
 
