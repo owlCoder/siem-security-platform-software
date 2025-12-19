@@ -8,7 +8,7 @@ import { DistributionDTO } from "../../models/query/DistributionDTO";
 import { TopArchiveDTO } from "../../models/storage/TopArchiveDTO";
 import { ArchiveVolumeDTO } from "../../models/storage/ArchiveVolumeDTO";
 
-import {StatisticsChart} from "../statistics/StatisticsChart";
+import StatisticsChart from "../statistics/StatisticsChart";
 import EventDistribution from "../statistics/EventDistribution";
 import TopArchives from "../statistics/TopArchives";
 import ArchiveVolume from "../statistics/ArchiveVolume";
@@ -20,6 +20,22 @@ const storageAPI = new StorageAPI();
 export default function Statistics() {
 
     const testData: DistributionDTO = {notifications: 35, warnings: 35, errors: 30};
+
+    const testEvent: EventStatisticsDTO[] = [
+    { date: "2025-12-10", count: 10 },
+    { date: "2025-12-11", count: 15 },
+    { date: "2025-12-12", count: 7 },
+    { date: "2025-12-13", count: 12 },
+    { date: "2025-12-14", count: 9 }
+    ];
+
+    const testAlert: AlertStatisticsDTO[] = [
+    { date: "2025-12-10", count: 8 },
+    { date: "2025-12-11", count: 5 },
+    { date: "2025-12-12", count: 13 },
+    { date: "2025-12-13", count: 7 },
+    { date: "2025-12-14", count: 6 }
+    ];
 
     const {token} = useAuth();
 
@@ -105,9 +121,11 @@ export default function Statistics() {
 */
     return (
         <div style={rectangleStyle}>
-            <div>
+            <div style={{width: "100%", height: 350}}>
                 <h3 style={headingStyle}>Statistics</h3>
-                <StatisticsChart/>
+                <StatisticsChart
+                    eventData={testEvent}
+                    alertData={testAlert}/>
             </div>
 
             <div style={sectionStyle}>
