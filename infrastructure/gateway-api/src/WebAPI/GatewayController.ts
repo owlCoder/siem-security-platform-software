@@ -85,6 +85,8 @@ export class GatewayController {
     // Query
     this.router.get(
       "/siem/query/search",
+      this.authenticate,
+      requireSysAdmin,
       this.searchEvents.bind(this)
     );
     this.router.get(
@@ -101,6 +103,8 @@ export class GatewayController {
     );
     this.router.get(
       "/siem/query/events",
+      this.authenticate,
+      requireSysAdmin,
       this.getAllEvents.bind(this)
     );
     this.router.get(
@@ -108,6 +112,24 @@ export class GatewayController {
       this.authenticate,
       requireSysAdmin,
       this.getEventsCount.bind(this)
+    );
+    this.router.get(
+      "/siem/query/infoCount",
+      this.authenticate,
+      requireSysAdmin,
+      this.getInfoCount.bind(this)
+    );
+    this.router.get( 
+      "/siem/query/warningCount",
+      this.authenticate,
+      requireSysAdmin,
+      this.getWarningCount.bind(this)
+    );  
+    this.router.get(
+      "/siem/query/errorCount",
+      this.authenticate,
+      requireSysAdmin,
+      this.getErrorCount.bind(this)
     );
 
     // Storage
@@ -436,6 +458,33 @@ export class GatewayController {
     } catch (err) {
       res.status(500).json({ message: (err as Error).message });
     }
+  }
+
+  private async getInfoCount(req: Request, res: Response): Promise<void> {
+    try {
+      const result = await this.gatewayService.getInfoCount();
+      res.status(200).json({ count: result });
+    } catch (err) {
+      res.status(500).json({ message: (err as Error).message });
+    }
+  }
+
+  private async getWarningCount(req: Request, res: Response): Promise<void> {
+    try {
+      const result = await this.gatewayService.getWarningCount();
+      res.status(200).json({ count: result });
+    } catch (err) {
+      res.status(500).json({ message: (err as Error).message });
+    }
+  }
+
+  private async getErrorCount(req: Request, res: Response): Promise<void> {
+    try {
+      const result = await this.gatewayService.getErrorCount();
+      res.status(200).json({ count: result });
+    } catch (err) {
+      res.status(500).json({ message: (err as Error).message });
+    } 
   }
 
   // Storage

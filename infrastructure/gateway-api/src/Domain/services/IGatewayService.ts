@@ -47,6 +47,9 @@ export interface IGatewayService {
   getLastThreeEvents(): Promise<EventDTO[]>;
   getAllEvents(): Promise<EventDTO[]>;
   getEventsCount(): Promise<number>;
+  getInfoCount(): Promise<number>;
+  getWarningCount(): Promise<number>;
+  getErrorCount(): Promise<number>;
   
 
   // Storage 

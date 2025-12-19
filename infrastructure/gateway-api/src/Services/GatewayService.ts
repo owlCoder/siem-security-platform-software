@@ -260,6 +260,26 @@ export class GatewayService implements IGatewayService {
     return response.data.count;
   }
 
+  async getInfoCount(): Promise<number> {
+    const response = await this.queryClient.get<{ count: number }>(
+      "/query/infoCount"
+    );
+    return response.data.count;
+  }
+
+  async getWarningCount(): Promise<number> {
+    const response = await this.queryClient.get<{ count: number }>(
+      "/query/warningCount"
+    );
+    return response.data.count;
+  }
+
+  async getErrorCount(): Promise<number> {
+    const response = await this.queryClient.get<{ count: number }>(
+      "/query/errorCount"
+    );
+    return response.data.count;
+  }
 
   // Storage 
   async getAllArchives(): Promise<ArchiveDTO[]> {
