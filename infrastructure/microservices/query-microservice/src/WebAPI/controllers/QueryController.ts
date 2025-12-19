@@ -21,6 +21,9 @@ export class QueryController {
         this.router.get("/query/lastThreeEvents", this.getLastThreeEvents.bind(this));
         this.router.get("/query/events", this.getAllEvents.bind(this));
         this.router.get("/query/eventsCount", this.getEventsCount.bind(this));
+        this.router.get("/query/infoCount", this.getInfoCount.bind(this));
+        this.router.get("/query/warningCount", this.getWarningCount.bind(this));
+        this.router.get("/query/errorCount", this.getErrorCount.bind(this));
     }
 
     private async addCacheEntry(req: Request, res: Response): Promise<void> {
@@ -81,10 +84,37 @@ export class QueryController {
 
     private async getEventsCount(req: Request, res: Response): Promise<void> {
         try {
-            const eventsCount = await this.queryRepositoryService.getEventsCount();
+            const eventsCount = this.queryRepositoryService.getEventsCount();
             res.status(200).json({ count: eventsCount });
         } catch (err) {
             res.status(500).json({ message: "Error while retrieving events count." });
+        }
+    }
+
+    private async getInfoCount(req: Request, res: Response): Promise<void> {
+        try {
+            const infoCount = this.queryRepositoryService.getInfoCount();
+            res.status(200).json({ count: infoCount });
+        } catch (err) {
+            res.status(500).json({ message: "Error while retrieving info count." });
+        }
+    }
+
+    private async getWarningCount(req: Request, res: Response): Promise<void> {
+        try {
+            const warningCount = this.queryRepositoryService.getWarningCount();
+            res.status(200).json({ count: warningCount });
+        } catch (err) {
+            res.status(500).json({ message: "Error while retrieving warning count." });
+        }   
+    }
+
+    private async getErrorCount(req: Request, res: Response): Promise<void> {
+        try {
+            const errorCount = this.queryRepositoryService.getErrorCount();
+            res.status(200).json({ count: errorCount });
+        } catch (err) {
+            res.status(500).json({ message: "Error while retrieving error count." });
         }
     }
 

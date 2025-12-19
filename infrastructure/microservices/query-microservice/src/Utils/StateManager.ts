@@ -10,13 +10,21 @@ const STATE_FILE_PATH = path.join(__dirname, "queryState.json");
 export function loadQueryState(): {
     lastProcessedId: number;
     invertedIndex: Map<string, Set<number>>,
-    eventTokenMap: Map<number, string[]>
+    eventTokenMap: Map<number, string[]>,
+    eventCount: number,
+    infoCount: number,
+    warningCount: number,
+    errorCount: number
 } {
     if (!fs.existsSync(STATE_FILE_PATH)) {
         return {
             lastProcessedId: 0,
             invertedIndex: new Map<string, Set<number>>(),
-            eventTokenMap: new Map<number, string[]>()
+            eventTokenMap: new Map<number, string[]>(),
+            eventCount: 0,
+            infoCount: 0,
+            warningCount: 0,
+            errorCount: 0
         };
     }
 
@@ -24,33 +32,45 @@ export function loadQueryState(): {
     const parsedData = JSON.parse(rawData);
 
     const invertedIndex = new Map<string, Set<number>>();
-    for (const key in Object.keys(parsedData.invertedIndex)) {
+    for (const key of Object.keys(parsedData.invertedIndex)) {
         invertedIndex.set(key, new Set(parsedData.invertedIndex[key]));
     }
 
     const eventTokenMap = new Map<number, string[]>();
-    for (const key in Object.keys(parsedData.eventTokenMap)) {
+    for (const key of Object.keys(parsedData.eventTokenMap)) {
         eventTokenMap.set(Number(key), parsedData.eventTokenMap[key]);
     }
 
     return {
         lastProcessedId: parsedData.lastProcessedId || 0,
         invertedIndex,
-        eventTokenMap
+        eventTokenMap,
+        eventCount: parsedData.eventCount || 0,
+        infoCount: parsedData.infoCount || 0,
+        warningCount: parsedData.warningCount || 0,
+        errorCount: parsedData.errorCount || 0
     };
 }
 
 export function saveQueryState(state: {
     lastProcessedId: number;
     invertedIndex: Map<string, Set<number>>,
-    eventTokenMap: Map<number, string[]>
+    eventTokenMap: Map<number, string[]>,
+    eventCount: number,
+    infoCount: number,
+    warningCount: number,
+    errorCount: number
 }) {
     const serialized = {
         lastProcessedId: state.lastProcessedId,
         invertedIndex: Object.fromEntries(
             Array.from(state.invertedIndex.entries())
                 .map(([key, value]) => [key, Array.from(value)])),
-        eventTokenMap: Object.fromEntries(state.eventTokenMap)    
+        eventTokenMap: Object.fromEntries(state.eventTokenMap),
+        eventCount: state.eventCount,
+        infoCount: state.infoCount,
+        warningCount: state.warningCount,
+        errorCount: state.errorCount   
     };
 
     fs.writeFileSync(STATE_FILE_PATH, JSON.stringify(serialized, null, 2), 'utf-8');

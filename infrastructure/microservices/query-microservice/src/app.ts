@@ -74,7 +74,11 @@ process.on('SIGINT', async () => {
     saveQueryState({
       lastProcessedId: queryRepositoryService.getLastProcessedId(),
       invertedIndex: queryRepositoryService.getInvertedIndex(),
-      eventTokenMap: queryRepositoryService.getEventIdToTokens()
+      eventTokenMap: queryRepositoryService.getEventIdToTokens(),
+      eventCount: queryRepositoryService.getEventsCount(),
+      infoCount: queryRepositoryService.getInfoCount(),
+      warningCount: queryRepositoryService.getWarningCount(),
+      errorCount: queryRepositoryService.getErrorCount()
     });
     loggerService.log("State saved. Exiting...");
     process.exit(0);

@@ -32,6 +32,10 @@ export class QueryRepositoryService implements IQueryRepositoryService {
     private invertedIndex: Map<string, Set<number>> = new Map();
     private eventIdToTokens: Map<number, string[]> = new Map();
     private lastProcessedId: number = 0;
+    private eventCount: number = 0;
+    private infoCount: number = 0;
+    private warningCount: number = 0;
+    private errorCount: number = 0;
     
     private indexingInProgress: boolean = false;
 
@@ -54,8 +58,22 @@ export class QueryRepositoryService implements IQueryRepositoryService {
         this.lastProcessedId = savedState.lastProcessedId;
         this.invertedIndex = savedState.invertedIndex;
         this.eventIdToTokens = savedState.eventTokenMap;
+        this.eventCount = savedState.eventCount;
+        this.infoCount = savedState.infoCount;
+        this.warningCount = savedState.warningCount;
+        this.errorCount = savedState.errorCount;
 
-        this.bootstrapIndex();
+        this.loggerService.log("Loaded query service state from file. Last processed ID: " + this.lastProcessedId);
+        //console.log("Inverted index size:", this.invertedIndex.size);
+        //console.log("Event ID to tokens map size:", this.eventIdToTokens.size);
+
+        if (this.invertedIndex.size === 0 || this.eventIdToTokens.size === 0 || this.lastProcessedId === 0
+            || this.eventCount === 0)
+        {
+            // pravi indeks od nule
+            this.bootstrapIndex();
+        }
+
         this.startIndexingWorker();
     }
 
@@ -107,6 +125,19 @@ export class QueryRepositoryService implements IQueryRepositoryService {
                 this.invertedIndex.set(token, new Set());
             }
             this.invertedIndex.get(token)!.add(event.id);
+        }
+
+        this.eventCount += 1;
+        switch (event.type) {
+            case "INFO":
+                this.infoCount += 1;
+                break;
+            case "WARNING":
+                this.warningCount += 1;
+                break;
+            case "ERROR":
+                this.errorCount += 1;
+                break;
         }
     }
 
@@ -198,18 +229,28 @@ export class QueryRepositoryService implements IQueryRepositoryService {
         return this.indexingInProgress;
     }
 
-    // brze je da se trazi iz baze
-    // proveriti!!!
-    public async getLastThreeEvents(): Promise<Event[]> {
-        const allEvents = await this.getAllEvents();
-        const sortedEvents = allEvents.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-        return sortedEvents.slice(0, 3);
+    public getEventsCount(): number {
+        return this.eventCount;
     }
 
-    public async getEventsCount(): Promise<number> {
-        const maxId = await this.getMaxId();
-        if (maxId === 0) return 0;
-        return maxId;
+    public getInfoCount(): number {
+        return this.infoCount;
+    }
+
+    public getWarningCount(): number {
+        return this.warningCount;
+    }
+
+    public getErrorCount(): number {
+        return this.errorCount;
+    }
+
+    public async getLastThreeEvents(): Promise<Event[]> {
+        const events = await this.eventRepository.find({
+            order: { timestamp: "DESC" },
+            take: 3
+        });
+        return events;
     }
 
     private async bootstrapIndex(): Promise<void> {
@@ -225,10 +266,12 @@ export class QueryRepositoryService implements IQueryRepositoryService {
             `Bootstrap indexing completed. Indexed ${allEvents.length} events.`
         );
 
+        /*
         saveQueryState({
             lastProcessedId: this.lastProcessedId,
             invertedIndex: this.invertedIndex,
             eventTokenMap: this.eventIdToTokens
         });
+        */
     }
 }

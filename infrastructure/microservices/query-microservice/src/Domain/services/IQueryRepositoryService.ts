@@ -16,5 +16,8 @@ export interface IQueryRepositoryService {
     //saveEvent(event: Event): Promise<Event>;
     //searchEvents(query: string): Promise<Event[]>;
     getLastThreeEvents(): Promise<Event[]>;
-    getEventsCount(): Promise<number>;
+    getEventsCount(): number;
+    getInfoCount(): number;
+    getWarningCount(): number;
+    getErrorCount(): number;
 }

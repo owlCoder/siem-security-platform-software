@@ -47,6 +47,9 @@ export class QueryService implements IQueryService {
         // query je npr. "type=info|date=20/10/2025" ili "type=info|host=server1|dateFrom=2025-11-20|dateTo=2025-11-22"
         // pozivamo parseQueryString da dobijemo parove kljuc-vrednost sa nazivom polja i vrednosti za pretragu
         const filters = parseQueryString(query);
+
+        console.log("Parsed Filters:", filters);
+
         const textQuery = filters["text"] || "";
         delete filters["text"];
 
@@ -54,7 +57,8 @@ export class QueryService implements IQueryService {
 
         // filtriramo sve evente na osnovu dobijenih id-eva iz indeksa
         const filteredEvents = allEvents.filter(event => !matchingIds || matchingIds.has(event.id));
-
+        console.log(`Events after text filter (${textQuery}):`, filteredEvents.length);
+        
         const result =  filteredEvents.filter(event => {
 
             for (const key of Object.keys(filters)) {
@@ -72,11 +76,9 @@ export class QueryService implements IQueryService {
                     continue;
                 }
                 
-                // za event proverava polja sa nazivom trenutnog key event[type] 
-                // da li sadrzi vrednost iz query stringa
-                const eventValue = (event as any)[key]?.toString().toLowerCase() || "";
-                if (!eventValue.includes(value)) {
-                    return false;
+                if (key === "type") {
+                    if (event.type.toLowerCase() !== value) return false;
+                    continue;
                 }
             }
 
