@@ -1,11 +1,14 @@
 import { Request, Response, Router } from "express";
 import { IGatewayService } from "../../Domain/services/IGatewayService";
 import { requireSysAdmin } from "../../Middlewares/authorization/AuthorizeMiddleware";
+import { ILogerService } from "../../Domain/services/ILogerService";
 
 export class AnalysisGatewayController {
   private readonly router: Router;
 
-  constructor(private readonly gatewayService: IGatewayService, private readonly authenticate: any) {
+  constructor(private readonly gatewayService: IGatewayService, 
+              private readonly authenticate: any,
+              private readonly loggerService:ILogerService) {
     this.router = Router();
     this.initializeRoutes();
   }
@@ -38,7 +41,7 @@ export class AnalysisGatewayController {
       const result = await this.gatewayService.analysisEngineNormalize(rawMessage);
       res.status(200).json(result);
     } catch (err) {
-      console.error("[AnalysisEngineError]", err);
+      this.loggerService.error(`[AnalysisEngineError] ${err}`);
       res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -65,7 +68,7 @@ export class AnalysisGatewayController {
       });
 
     } catch (err) {
-      console.error("[AnalysisEngineError]", err);
+      this.loggerService.error(`[AnalysisEngineError] ${err}`);
       res.status(500).json({ message: "Internal server error" });
     }
   }

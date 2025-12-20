@@ -1,14 +1,15 @@
 import axios, { AxiosInstance } from "axios";
 import { UserDTO } from "../../Domain/DTOs/UserDTO";
+import { serviceConfig } from "../../Infrastructure/config/ServiceConfig";
+import { defaultAxiosClient } from "../../Infrastructure/config/AxiosClient";
 
 export class UserGatewayService {
   private readonly client: AxiosInstance;
 
-  constructor(userBaseUrl?: string) {
+  constructor() {
     this.client = axios.create({
-      baseURL: userBaseUrl,
-      headers: { "Content-Type": "application/json" },
-      timeout: 5000,
+      baseURL: serviceConfig.user,
+      ...defaultAxiosClient
     });
   }
 

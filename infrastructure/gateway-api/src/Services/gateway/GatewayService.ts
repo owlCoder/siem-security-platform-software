@@ -1,25 +1,26 @@
-import { IGatewayService } from "../Domain/services/IGatewayService";
-import { LoginUserDTO } from "../Domain/DTOs/LoginUserDTO";
-import { RegistrationUserDTO } from "../Domain/DTOs/RegistrationUserDTO";
-import { AuthResponseType } from "../Domain/types/AuthResponse";
-import { UserDTO } from "../Domain/DTOs/UserDTO";
-import { AlertDTO } from "../Domain/DTOs/AlertDTO";
-import { AlertQueryDTO } from "../Domain/DTOs/AlertQueryDTO";
-import { PaginatedAlertsDTO } from "../Domain/DTOs/PaginatedAlertsDTO";
-import { ArchiveDTO } from "../Domain/DTOs/ArchiveDTO";
-import { ArchiveStatsDTO } from "../Domain/DTOs/ArchiveStatsDTO";
-import { EventDTO } from "../Domain/DTOs/EventDTO";
-import { TopArchiveDTO } from "../Domain/DTOs/TopArchiveDTO";
-import { ParserEventDto } from "../Domain/DTOs/ParserEventDTO";
-import { ArchiveVolumeDTO } from "../Domain/DTOs/ArchiveVolumeDTO";
-import { NormalizedEventDTO } from "../Domain/DTOs/NormalizedEventDTO";
-import { AuthGatewayService } from "./domains/AuthGatewayService";
-import { UserGatewayService } from "./domains/UserGatewayService";
-import { AlertGatewayService } from "./domains/AlertGatewayService";
-import { QueryGatewayService } from "./domains/QueryGatewayService";
-import { StorageGatewayService } from "./domains/StorageGatewayService";
-import { ParserGatewayService } from "./domains/ParserGatewayService";
-import { AnalysisGatewayService } from "./domains/AnalysisGatewayService";
+import { IGatewayService } from "../../Domain/services/IGatewayService";
+import { LoginUserDTO } from "../../Domain/DTOs/LoginUserDTO";
+import { RegistrationUserDTO } from "../../Domain/DTOs/RegistrationUserDTO";
+import { AuthResponseType } from "../../Domain/types/AuthResponse";
+import { UserDTO } from "../../Domain/DTOs/UserDTO";
+import { AlertDTO } from "../../Domain/DTOs/AlertDTO";
+import { AlertQueryDTO } from "../../Domain/DTOs/AlertQueryDTO";
+import { PaginatedAlertsDTO } from "../../Domain/DTOs/PaginatedAlertsDTO";
+import { ArchiveDTO } from "../../Domain/DTOs/ArchiveDTO";
+import { ArchiveStatsDTO } from "../../Domain/DTOs/ArchiveStatsDTO";
+import { EventDTO } from "../../Domain/DTOs/EventDTO";
+import { TopArchiveDTO } from "../../Domain/DTOs/TopArchiveDTO";
+import { ParserEventDto } from "../../Domain/DTOs/ParserEventDTO";
+import { ArchiveVolumeDTO } from "../../Domain/DTOs/ArchiveVolumeDTO";
+import { NormalizedEventDTO } from "../../Domain/DTOs/NormalizedEventDTO";
+import { AuthGatewayService } from "../domains/AuthGatewayService";
+import { UserGatewayService } from "../domains/UserGatewayService";
+import { AlertGatewayService } from "../domains/AlertGatewayService";
+import { QueryGatewayService } from "../domains/QueryGatewayService";
+import { StorageGatewayService } from "../domains/StorageGatewayService";
+import { ParserGatewayService } from "../domains/ParserGatewayService";
+import { AnalysisGatewayService } from "../domains/AnalysisGatewayService";
+import { serviceConfig } from "../../Infrastructure/config/ServiceConfig";
 
 /**
  * Facade that delegates to domain-specific gateway services.
@@ -35,22 +36,13 @@ export class GatewayService implements IGatewayService {
   private readonly analysisService: AnalysisGatewayService;
 
   constructor() {
-    const authBaseURL = process.env.AUTH_SERVICE_API;
-    const userBaseURL = process.env.USER_SERVICE_API;
-    const alertBaseURL = process.env.ALERT_SERVICE_API;
-    const queryBaseURL = process.env.QUERY_SERVICE_API;
-    const siemAuthBaseURL = process.env.SIEM_AUTH_SERVICE_API;
-    const storageAuthBaseURL = process.env.STORAGE_LOG_SERVICE_API;
-    const parserEventURL = process.env.PARSER_SERVICE_API;
-    const analysisEngineURL = process.env.ANALYSIS_ENGINE_SERVICE_API;
-
-    this.authService = new AuthGatewayService(authBaseURL, siemAuthBaseURL);
-    this.userService = new UserGatewayService(userBaseURL);
-    this.alertService = new AlertGatewayService(alertBaseURL);
-    this.queryService = new QueryGatewayService(queryBaseURL);
-    this.storageService = new StorageGatewayService(storageAuthBaseURL);
-    this.parserService = new ParserGatewayService(parserEventURL);
-    this.analysisService = new AnalysisGatewayService(analysisEngineURL);
+    this.authService = new AuthGatewayService();
+    this.userService = new UserGatewayService();
+    this.alertService = new AlertGatewayService();
+    this.queryService = new QueryGatewayService();
+    this.storageService = new StorageGatewayService();
+    this.parserService = new ParserGatewayService();
+    this.analysisService = new AnalysisGatewayService();
   }
 
   // Parser

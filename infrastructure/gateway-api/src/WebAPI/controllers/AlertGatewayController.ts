@@ -3,11 +3,14 @@ import axios from "axios";
 import { AlertQueryDTO } from "../../Domain/DTOs/AlertQueryDTO";
 import { IGatewayService } from "../../Domain/services/IGatewayService";
 import { requireSysAdmin } from "../../Middlewares/authorization/AuthorizeMiddleware";
+import { ILogerService } from "../../Domain/services/ILogerService";
 
 export class AlertGatewayController {
   private readonly router: Router;
 
-  constructor(private readonly gatewayService: IGatewayService, private readonly authenticate: any) {
+  constructor(private readonly gatewayService: IGatewayService, 
+              private readonly authenticate: any,
+              private readonly loggerService:ILogerService) {
     this.router = Router();
     this.initializeRoutes();
   }
@@ -71,7 +74,7 @@ export class AlertGatewayController {
       const userId = req.user?.user_id || "unknown";
       const username = req.user?.username || "unknown";
 
-      console.log(`\x1b[36m[Gateway]\x1b[0m SSE connection established for SysAdmin: ${username}`);
+      this.loggerService.log(`\x1b[36m[Gateway]\x1b[0m SSE connection established for SysAdmin: ${username}`);
 
       const response = await axios.get(`${alertServiceURL}/alerts/notifications/stream`, {
         params: { clientId: `sysadmin_${userId}` },
@@ -82,11 +85,11 @@ export class AlertGatewayController {
       response.data.pipe(res);
 
       req.on("close", () => {
-        console.log(`\x1b[36m[Gateway]\x1b[0m SSE connection closed for ${username}`);
+        this.loggerService.log(`\x1b[36m[Gateway]\x1b[0m SSE connection closed for ${username}`);
         response.data.destroy();
       });
     } catch (err) {
-      console.error(`\x1b[31m[Gateway]\x1b[0m SSE proxy error:`, err);
+      this.loggerService.error(`\x1b[31m[Gateway]\x1b[0m SSE proxy error:${err}`);
       if (!res.headersSent) {
         res.status(500).json({ error: "Failed to connect to alert service" });
       }

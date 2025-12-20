@@ -3,15 +3,16 @@ import { ArchiveDTO } from "../../Domain/DTOs/ArchiveDTO";
 import { ArchiveStatsDTO } from "../../Domain/DTOs/ArchiveStatsDTO";
 import { TopArchiveDTO } from "../../Domain/DTOs/TopArchiveDTO";
 import { ArchiveVolumeDTO } from "../../Domain/DTOs/ArchiveVolumeDTO";
+import { defaultAxiosClient } from "../../Infrastructure/config/AxiosClient";
+import { serviceConfig } from "../../Infrastructure/config/ServiceConfig";
 
 export class StorageGatewayService {
   private readonly client: AxiosInstance;
 
-  constructor(storageBaseUrl?: string) {
+  constructor() {
     this.client = axios.create({
-      baseURL: storageBaseUrl,
-      headers: { "Content-Type": "application/json" },
-      timeout: 5000,
+      baseURL: serviceConfig.storage,
+      ...defaultAxiosClient
     });
   }
 

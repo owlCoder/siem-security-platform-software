@@ -5,16 +5,16 @@ import { requireSysAdmin } from "../../Middlewares/authorization/AuthorizeMiddle
 export class ParserGatewayController {
   private readonly router: Router;
 
-  constructor(private readonly gatewayService: IGatewayService, private readonly authenticate: any) {
+  constructor(private readonly gatewayService: IGatewayService) {
     this.router = Router();
     this.initializeRoutes();
   }
 
   private initializeRoutes(): void {
-    this.router.get("/parserEvents", this.authenticate, requireSysAdmin, this.getAllParserEvents.bind(this));
-    this.router.get("/parserEvents/:id", this.authenticate, requireSysAdmin, this.getParserEvent.bind(this));
-    this.router.post("/parserEvents/log", this.authenticate, requireSysAdmin, this.log.bind(this));
-    this.router.delete("/parserEvents/:id", this.authenticate, requireSysAdmin, this.deleteParserEvent.bind(this));
+    this.router.get("/parserEvents", this.getAllParserEvents.bind(this));
+    this.router.get("/parserEvents/:id", this.getParserEvent.bind(this));
+    this.router.post("/parserEvents/log", this.log.bind(this));
+    this.router.delete("/parserEvents/:id", this.deleteParserEvent.bind(this));
   }
 
   private async getAllParserEvents(req: Request, res: Response): Promise<void> {

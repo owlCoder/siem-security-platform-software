@@ -2,22 +2,22 @@ import axios, { AxiosInstance } from "axios";
 import { LoginUserDTO } from "../../Domain/DTOs/LoginUserDTO";
 import { RegistrationUserDTO } from "../../Domain/DTOs/RegistrationUserDTO";
 import { AuthResponseType } from "../../Domain/types/AuthResponse";
+import { defaultAxiosClient } from "../../Infrastructure/config/AxiosClient";
+import { serviceConfig } from "../../Infrastructure/config/ServiceConfig";
 
 export class AuthGatewayService {
   private readonly client: AxiosInstance;
   private readonly siemAuthClient: AxiosInstance;
 
-  constructor(authBaseUrl?: string, siemAuthBaseUrl?: string) {
+  constructor() {
     this.client = axios.create({
-      baseURL: authBaseUrl,
-      headers: { "Content-Type": "application/json" },
-      timeout: 5000,
+      baseURL: serviceConfig.auth,
+      ...defaultAxiosClient
     });
 
     this.siemAuthClient = axios.create({
-      baseURL: siemAuthBaseUrl,
-      headers: { "Content-Type": "application/json" },
-      timeout: 5000,
+      baseURL: serviceConfig.siemAuth,
+      ...defaultAxiosClient
     });
   }
 

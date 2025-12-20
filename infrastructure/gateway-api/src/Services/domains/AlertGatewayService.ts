@@ -2,15 +2,16 @@ import axios, { AxiosInstance } from "axios";
 import { AlertDTO } from "../../Domain/DTOs/AlertDTO";
 import { AlertQueryDTO } from "../../Domain/DTOs/AlertQueryDTO";
 import { PaginatedAlertsDTO } from "../../Domain/DTOs/PaginatedAlertsDTO";
+import { defaultAxiosClient } from "../../Infrastructure/config/AxiosClient";
+import { serviceConfig } from "../../Infrastructure/config/ServiceConfig";
 
 export class AlertGatewayService {
   private readonly client: AxiosInstance;
 
-  constructor(alertBaseUrl?: string) {
+  constructor() {
     this.client = axios.create({
-      baseURL: alertBaseUrl,
-      headers: { "Content-Type": "application/json" },
-      timeout: 10000,
+      baseURL: serviceConfig.alert,
+      ...defaultAxiosClient
     });
   }
 

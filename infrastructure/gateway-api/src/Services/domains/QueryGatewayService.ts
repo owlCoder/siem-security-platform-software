@@ -1,14 +1,15 @@
 import axios, { AxiosInstance } from "axios";
 import { EventDTO } from "../../Domain/DTOs/EventDTO";
+import { defaultAxiosClient } from "../../Infrastructure/config/AxiosClient";
+import { serviceConfig } from "../../Infrastructure/config/ServiceConfig";
 
 export class QueryGatewayService {
   private readonly client: AxiosInstance;
 
-  constructor(queryBaseUrl?: string) {
+  constructor() {
     this.client = axios.create({
-      baseURL: queryBaseUrl,
-      headers: { "Content-Type": "application/json" },
-      timeout: 5000,
+      baseURL: serviceConfig.query,
+      ...defaultAxiosClient
     });
   }
 

@@ -1,14 +1,15 @@
 import axios, { AxiosInstance } from "axios";
 import { NormalizedEventDTO } from "../../Domain/DTOs/NormalizedEventDTO";
+import { serviceConfig } from "../../Infrastructure/config/ServiceConfig";
+import { defaultAxiosClient } from "../../Infrastructure/config/AxiosClient";
 
 export class AnalysisGatewayService {
   private readonly client: AxiosInstance;
 
-  constructor(baseUrl?: string) {
+  constructor() {
     this.client = axios.create({
-      baseURL: baseUrl,
-      headers: { "Content-Type": "application/json" },
-      timeout: 5000,
+      baseURL: serviceConfig.analysisEngine,
+      ...defaultAxiosClient
     });
   }
 
