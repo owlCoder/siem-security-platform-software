@@ -10,17 +10,13 @@ import { getTimeGroup } from "../Utils/TimeGroup";
 import { ILogerService } from "../Domain/services/ILogerService";
 import util from "util";
 import { ArchiveStatsDTO } from "../Domain/DTOs/ArchiveStatsDTO";
-import { archiveEvents } from "../Utils/ArchiveEvents";
-import { archiveAlerts } from "../Utils/ArchiveAlerts";
 import { TopArchiveDTO } from "../Domain/DTOs/TopArchiveDTO";
 import { ArchiveVolumeDTO } from "../Domain/DTOs/ArchiveVolumeDTO";
 import { ArchiveType } from "../Domain/enums/ArchiveType";
+import { CorrelationDTO } from "../Domain/DTOs/CorrelationDTO";
+import { ARCHIVE_DIR, TEMP_DIR, ARCHIVE_RETENTION_HOURS } from "../Domain/constants/ArchiveConstants";
 
-//da bi izvrsio komandu asinhrono, arhiviranje se odvija u pozadi
 const execSync = util.promisify(exec);
-
-const ARCHIVE_DIR = process.env.ARCHIVE_PATH || path.join(__dirname, "../../archives");
-const TEMP_DIR = path.join(ARCHIVE_DIR, "tmp");
 
 export class StorageLogService implements IStorageLogService {
     private readonly queryClient: AxiosInstance;
@@ -67,176 +63,144 @@ export class StorageLogService implements IStorageLogService {
     public async runArchiveProcess(): Promise<Boolean> {
         await this.logger.log("Starting archive process...");
 
-        const hours = 72;
+        const eventsOk = await this.archiveEvents();
+        const alertsOk = await this.archiveAlerts();
 
+        await this.logger.log(`Archive process result: events:${eventsOk}, alerts=${alertsOk}`);
+
+        return eventsOk && alertsOk;
+    }
+
+    public async archiveEvents(): Promise<boolean> {
         try {
+            await this.logger.log("Archiving events started...");
 
-            await archiveEvents(
-                hours,
-                this.queryClient,
-                this.eventClient,
-                this.storageRepo
-            );
-
-            await archiveAlerts(
-                hours,
-                this.queryClient,
-                this.correlationClient,
-                this.storageRepo
-            );
-
-            await this.logger.log("Archive process finished.");
-            return true;
-        } catch (err) {
-            await this.logger.log("ERROR in archive process: " + (err as Error).message);
-            return false;
-        }
-
-        /*
-        // dobavljanje dogadjaja i pretnje
-        //getOldEvents(int hours) : List<Event>
-        //dobavljanje podataka ide od queryClient
-        let eventsToArchive: EventDTO[];
-        try {
-            await this.logger.log(`Fetching events older than ${hours} hours.`);
-            eventsToArchive = (await this.queryClient.get<EventDTO[]>(
-                "/query/oldEvents",
-                { params: { hours } }
+            const events = (await this.queryClient.get<EventDTO[]>("/query/oldEvents", 
+                { params: {ARCHIVE_RETENTION_HOURS} }
             )).data;
 
-            await this.logger.log(`Fetched ${eventsToArchive.length} events to archive`);
-
-            if (eventsToArchive.length === 0) {
-                await this.logger.log("No events to archive. Exiting process.");
-                return false;
+            if (events.length === 0){
+                await this.logger.log("No events to archive.");
+                return true;
             }
 
-        } catch (err) {
-            await this.logger.log("ERROR fetching old events: " + err);
-            return false;
-        }
+            const groups: Record<string, string[]> = {};
 
-        const groups: Record<string, string[]> = {};
+            for (const e of events) {
+                const line = `EVENT | ID = ${e.id} | TYPE = ${e.type} | SOURCE = ${e.source} | ${e.description} | ${e.timestamp.toISOString()}`;
 
-        for (const e of eventsToArchive) {
-            const key = getTimeGroup(e.timestamp);
-            if (!groups[key]) groups[key] = [];
+                const key = getTimeGroup(e.timestamp);
+                if(!groups[key])
+                    groups[key] = [];
+                
+                groups[key].push(line);
+            }
 
-            groups[key].push(`EVENT | ID=${e.id} | TYPE=${e.type} | SOURCE=${e.source} | ${e.description} | ${e.timestamp}`);
-        }
+            const txtFiles: string[] = [];
 
-        await this.logger.log("Events grouped into time slots.");
-
-        // generisanje txt fajlova
-        const txtFiles: string[] = [];
-
-        try {
-            for (const [slot, lines] of Object.entries(groups)) {
+            for(const [slot, content] of Object.entries(groups)){
                 const name = `logs_${slot}.txt`;
-                const filePath = path.join(TEMP_DIR, name);
-
-                writeFileSync(filePath, lines.join("\n"));
+                writeFileSync(path.join(TEMP_DIR, name), content.join("\n"));
                 txtFiles.push(name);
             }
 
-            await this.logger.log(`Generated ${txtFiles.length} .txt files in tmp directory.`);
-        } catch (err) {
-            await this.logger.log("ERROR generating txt files: " + err);
-            return false;
-        }
+            const tarName = `events_${new Date().toISOString().replace(/[:.]/g, "_")}.tar`;
+            const tarPath = path.join(ARCHIVE_DIR, tarName);
 
+            await execSync(`tar -cf "${tarPath}" -C "${TEMP_DIR}" ${txtFiles.join(" ")}`);
+            
+            txtFiles.forEach(f => 
+                unlinkSync(path.join(TEMP_DIR, f))
+            );
 
-        // kreiranje tar arhive
-        const tarName = `logs_${new Date().toISOString().replace(/[:.]/g, "_")}.tar`;
-        const tarPath = path.join(ARCHIVE_DIR, tarName);
-        
-        try {
-            const cmd = `tar -cf $"${tarPath}" -C "${TEMP_DIR}" ${txtFiles.join(" ")}`;
-            await execSync(cmd);
-
-            await this.logger.log(`Created tar archive: ${tarName}`);
-        }
-        catch(err){
-            await this.logger.log("ERROR creating tar archive: " + err);
-            return false;
-        }
-
-        let stats: any;
-        try{
-            stats = statSync(tarPath);
-        } catch(err) {
-            await this.logger.log("ERROR reading tar file stats");
-            return false;
-        }
-
-        try {
-            await execSync(`tar -cf ${tarPath} -C ${TEMP_DIR} ${txtFiles.join(" ")}`);
-            await this.logger.log(`Created tar archive: ${tarName}`);
-        } catch (err) {
-            await this.logger.log("ERROR creating tar archive!");
-            return false;
-        }
-
-        // upis u bazu
-        try {
             const stats = statSync(tarPath);
 
-            const entry = this.storageRepo.create({
+            await this.storageRepo.save(this.storageRepo.create({
                 fileName: tarName,
-                eventCount: eventsToArchive.length,
+                archiveType: ArchiveType.EVENT,
+                recordCount: events.length,
                 fileSize: stats.size
-            });
+            }));
 
-            await this.storageRepo.save(entry);
-            await this.logger.log("Archive entry saved to DB.");
+            await this.logger.log(`Deleting ${events.length} events from Event service`);
+
+            await this.eventClient.delete("/events/old", 
+                { data: events.map(e => e.id)}
+            );
+
+            await this.logger.log(`Archived ${events.length} events.`);
+            return true;
+
         } catch (err) {
-            await this.logger.log("ERROR saving archive entry to DB!");
+            await this.logger.log("ERROR archiving events: " + (err as Error).message);
             return false;
         }
+    }
 
-        // brisanje temp fajlova
+    public async archiveAlerts(): Promise<boolean> {
         try {
-            for (const f of txtFiles) {
-                try {
-                    unlinkSync(path.join(TEMP_DIR, f));
-                } catch (err) {
-                    await this.logger.log(`WARNING: Failed to delete temp file ${f}`);
-                    //posto je warning mislim da ne treba return false
-                }
+            await this.logger.log("Archiving alerts started...");
+            
+            const alerts = (await this.queryClient.get<CorrelationDTO[]>("/query/oldAlerts",
+                { params: {ARCHIVE_RETENTION_HOURS} }
+            )).data;
+
+            if (alerts.length === 0) {
+                await this.logger.log("No alerts to archive.");
+                return true;
             }
-            await this.logger.log("Temporary files cleaned.");
-        } catch (err) {
-            await this.logger.log("ERROR cleaning temp files: " + err);
-        }
 
-        // salje se Event Collector Service-u
-        try {
-            await this.eventClient.delete(
-                "/events/old",
-                { data: eventsToArchive.map(e => e.id) }
+            const groups: Record<string, string[]> = {};
+
+            for (const a of alerts) {
+                const line = `ALERT | ID = ${a.id} | SOURCE = ${a.source} | ${a.timestamp.toISOString()}`;
+
+                const key = getTimeGroup(a.timestamp);
+                if(!groups[key])
+                    groups[key] = [];
+                
+                groups[key].push(line);
+            }
+
+            const txtFiles: string[] = [];
+
+            for(const [slot, content] of Object.entries(groups)){
+                const name = `logs_${slot}.txt`;
+                writeFileSync(path.join(TEMP_DIR, name), content.join("\n"));
+                txtFiles.push(name);
+            }
+
+            const tarName = `alerts_${new Date().toISOString().replace(/[:.]/g, "_")}.tar`;
+            const tarPath = path.join(ARCHIVE_DIR, tarName);
+
+            await execSync(`tar -cf "${tarPath}" -C "${TEMP_DIR}" ${txtFiles.join(" ")}`);
+            
+            txtFiles.forEach(f => 
+                unlinkSync(path.join(TEMP_DIR, f))
             );
-            await this.logger.log("Old events deleted from Event Collector Service.");
+
+            const stats = statSync(tarPath);
+
+            await this.storageRepo.save(this.storageRepo.create({
+                fileName: tarName,
+                archiveType: ArchiveType.ALERT,
+                recordCount: alerts.length,
+                fileSize: stats.size
+            }));
+
+            await this.logger.log(`Deleting ${alerts.length} events from Analysis Engine service`);
+
+            await this.correlationClient.delete("/AnalysisEngine/correlations/deleteByEventIds",
+                { data: alerts.map(a => a.id)}
+            );
+
+            await this.logger.log(`Archived ${alerts.length} alerts.`);
+            return true;
+
         } catch (err) {
-            await this.logger.log("ERROR deleting old events from Event Collector!");
+            await this.logger.log("ERROR archiving alerts: " + (err as Error).message);
             return false;
         }
-
-        //salje se Analysis Engine Service-u
-        try {
-            await this.correlationClient.delete(
-                "/AnalysisEngine/correlations/deleteByEventIds",
-                { data: eventsToArchive.map(c => c.id) }
-            );
-            await this.logger.log("Correlation records deleted in Analysis Engine.");
-        } catch (err) {
-            await this.logger.log("ERROR deleting correlations from Analysis Engine.");
-            return false;
-        }
-
-        await this.logger.log("Archive process completed successfully.");
-
-        return true;
-        */
     }
 
     public async searchArchives(query: string): Promise<StorageLog[]> {

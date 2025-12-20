@@ -11,7 +11,7 @@ export interface IStorageAPI {
     order: "asc" | "desc"
   ): Promise<ArchiveDTO[]>;
   getStats(): Promise<ArchiveStatsDTO>;
-  downloadArchive(id: number): Promise<ArrayBuffer>;
+  downloadArchive(id: number, token: string): Promise<ArrayBuffer>;
   getTopArchives(
     type: "events" | "alerts",
     limit: number,

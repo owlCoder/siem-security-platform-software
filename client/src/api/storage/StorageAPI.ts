@@ -24,7 +24,7 @@ export class StorageAPI implements IStorageAPI {
 
     async searchArchives(query: string): Promise<ArchiveDTO[]> {
         const response = await this.client.get<ArchiveDTO[]>("/storageLog/search", {
-            params: {q: query},
+            params: {q: query}
         });
         return response.data;
     }
@@ -41,13 +41,16 @@ export class StorageAPI implements IStorageAPI {
         return response.data;
     }
 
-    async downloadArchive(id: number): Promise<ArrayBuffer> {
+    async downloadArchive(id: number, token: string): Promise<ArrayBuffer> {
         const response = await this.client.get(`/storageLog/file/${id}`, {
-            responseType: "blob"
+            responseType: "blob",
+            headers: { Authorization: `Bearer ${token}` }
         });
         return response.data;
     }
 
+
+    //STATISTICS METODA
     async getTopArchives(type: "events" | "alerts", limit: number, token: string): Promise<TopArchiveDTO[]> {
         const response = await this.client.get<TopArchiveDTO[]>("/storageLog/top", {
             params: {type, limit},
@@ -56,6 +59,7 @@ export class StorageAPI implements IStorageAPI {
         return response.data;
     }
 
+    //STATISTICS METODA
     async getArchiveVolume(period: "daily" | "monthly" | "yearly", token: string): Promise<ArchiveVolumeDTO[]>{
        const response = await this.client.get<ArchiveVolumeDTO[]>("/storageLog/volume", {
             params: {period},
