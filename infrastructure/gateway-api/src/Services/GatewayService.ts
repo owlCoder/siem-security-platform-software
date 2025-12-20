@@ -151,7 +151,7 @@ export class GatewayService implements IGatewayService {
         valid: boolean;
         isSysAdmin: boolean;
         user: { user_id: number; username: string; role: number };
-      }>("auth/validate");
+      }>("auth/validate", { token });
 
       if (!response.data.success || !response.data.valid) {
         return { valid: false, error: "Token validation failed." };
@@ -319,7 +319,7 @@ export class GatewayService implements IGatewayService {
   }
 
   async getTopArchives(type: "events" | "alerts", limit: number): Promise<TopArchiveDTO[]> {
-    const response = await this.storageLogClient.get<TopArchiveDTO[]>("/storageLove/top", {
+    const response = await this.storageLogClient.get<TopArchiveDTO[]>("/storageLog/top", {
       params: { type, limit }
     });
     return response.data;
@@ -335,21 +335,21 @@ export class GatewayService implements IGatewayService {
 
   //Analysis Engine
   async analysisEngineNormalize(rawMessage: string): Promise<NormalizedEventDTO> {
-    const response = await this.analysisEngineClient.post<NormalizedEventDTO>(
-      "/analysisEngine/normalize",
+    const response = await this.analysisEngineClient.post<{ eventData: NormalizedEventDTO }>(
+      "/AnalysisEngine/processEvent",
       {
         message: rawMessage,
       }
     );
 
-    return response.data;
+    return response.data.eventData;
   }
 
 
  async analysisEngineDeleteCorrelationsByEventIds(eventIds: number[]): Promise<number> {
     const response = await this.analysisEngineClient.post<{
         deletedCount: number;
-    }>("/correlations/delete-by-event-ids", {
+    }>("/AnalysisEngine/correlations/deleteByEventIds", {
         eventIds,
     });
 

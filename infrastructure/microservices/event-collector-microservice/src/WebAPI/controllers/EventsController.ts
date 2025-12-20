@@ -19,7 +19,7 @@ export class EventsController {
         this.router.get("/events/health", this.healthCheck.bind(this));
         this.router.get("/events", this.getAllEvents.bind(this));
         this.router.get("/events/:id", this.getEventById.bind(this));
-        this.router.get("/events/fromId1toId2",this.getEventsFromId1ToId2.bind(this))
+        this.router.get("/events/from/:fromId/to/:toId",this.getEventsFromId1ToId2.bind(this))
         this.router.get("/events/sortedEventsByDate",this.getSortedEventsByDate.bind(this))
         this.router.get("/events/percentages",this.getEventPercentagesByEvent.bind(this))
         this.router.post("/events", this.createEvent.bind(this));

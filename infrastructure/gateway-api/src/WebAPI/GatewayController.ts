@@ -188,17 +188,17 @@ export class GatewayController {
     this.router.delete("/parserEvents/:id", this.authenticate, requireSysAdmin, this.deleteParserEvent.bind(this));
 
     //Analysis Engine
-    this.router.get(
-      "/analysis-engine/normalize",
+    this.router.post(
+      "/analysis-engine/process",
       this.authenticate,
       requireSysAdmin,
-       this.gatewayService.analysisEngineNormalize.bind(this));
+       this.analysisEngineNormalize.bind(this));
 
-    this.router.get(
-      "/analysis-engine/deleteCorrelationsByEventIds",
+    this.router.post(
+      "/analysis-engine/correlations/delete",
       this.authenticate,
       requireSysAdmin,
-       this.gatewayService.analysisEngineDeleteCorrelationsByEventIds.bind(this));
+       this.analysisEngineDeleteCorrelationsByEventIds.bind(this));
   }
 
   //Parser
@@ -442,7 +442,7 @@ export class GatewayController {
     }
   }
 
-  private async getAllEvents(rew: Request, res: Response): Promise<void> {
+  private async getAllEvents(req: Request, res: Response): Promise<void> {
     try {
       const results = await this.gatewayService.getAllEvents();
       res.status(200).json(results);
