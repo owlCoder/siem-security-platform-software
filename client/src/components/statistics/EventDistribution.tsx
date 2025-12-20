@@ -1,6 +1,8 @@
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { DistributionDTO } from "../../models/query/DistributionDTO"
-import React from "react";
+import React, { useRef } from "react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 type EventDistributionProps = {
     data: DistributionDTO;
@@ -81,9 +83,70 @@ export default function EventDistribution({data}: EventDistributionProps){
         fontWeight: 700
     }
 
+    const printRef = useRef<HTMLDivElement | null>(null);
+
+    const handleDownload = async () => {
+        try{
+            if(!printRef.current){
+                return;
+            }
+
+            const bg = window.getComputedStyle(printRef.current).backgroundColor || "#ffffff";
+            const canvas = await html2canvas(printRef.current, {scale: 2, backgroundColor: bg});
+            const imgData = canvas.toDataURL("image/png");
+
+            // pie chart
+            const doc = new jsPDF({unit: "mm", format: "a4", compress: true});
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = 10;
+            let cursorY = margin;
+
+            doc.setFontSize(14);
+            doc.text("Event distribution", margin, cursorY + 6);
+            cursorY += 10;
+
+            const imgProps = (doc as any).getImageProperties(imgData);
+            const pdfImgW = pageWidth - margin * 2;
+            const pdfImgH = (imgProps.height * pdfImgW) / imgProps.width;
+
+            if(cursorY + pdfImgH > pageHeight - margin){
+                doc.addPage();
+                cursorY = margin;
+            }
+            doc.addImage(imgData, "PNG", margin, cursorY, pdfImgW, pdfImgH);
+            cursorY += pdfImgH + 8;
+
+            // data
+            doc.setFontSize(10);
+            doc.text("Event ditribution(per type):", margin, cursorY + 4);
+            cursorY += 6;
+
+            doc.setFontSize(9);
+            const lines = [
+                `Notifications: ${data.notifications}%`,
+                `Warnings: ${data.warnings}%`,
+                `Errors: ${data.errors}%`,
+            ];
+
+            for(const line of lines){
+                if(cursorY + 6 > pageHeight - margin){
+                    doc.addPage();
+                    cursorY = margin;
+                }
+                doc.text(line, margin + 4, cursorY + 4);
+                cursorY += 6;
+            }
+
+            doc.save("event-distribution.pdf");
+        } catch(err){
+            console.error("PDF generation failed", err);
+        }
+    }
+
     return(
         <div style={containerStyle}>
-            <div style={chartContainerStyle}>
+            <div ref={printRef} style={chartContainerStyle}>
                 <ResponsiveContainer width="100%" height={250}>
                     <PieChart>
                         <Pie
@@ -111,8 +174,22 @@ export default function EventDistribution({data}: EventDistributionProps){
                         </div>
                     ))}
                 </div>
-
             </div>
+
+            <div>
+                    <button
+                        onClick={handleDownload}
+                        style={{
+                            padding: "6px 10px",
+                            borderRadius: 8,
+                            border: "none",
+                            background: "#0078d4",
+                            color: "#ffffff",
+                            cursor: "pointer"
+                        }}>
+                            Download PDF
+                    </button> 
+                </div>
         </div>
     );
 }
