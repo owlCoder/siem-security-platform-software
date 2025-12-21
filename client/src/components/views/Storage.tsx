@@ -18,6 +18,49 @@ export default function Storage() {
     const [stats, setStats] = useState<ArchiveStatsDTO | null>(null);
     //const [isLoading, setIsLoading] = useState(true);
 
+    const mockArchives: ArchiveDTO[] = [
+        {
+            id: 1,
+            fileName: "logs_2024-12-01.tar",
+            eventCount: 1200,
+            fileSize: 5242880, 
+            createdAt: "2024-12-01T10:15:00Z",
+            downloadUrl: ""
+        },
+        {
+            id: 2,
+            fileName: "logs_2024-12-02.tar",
+            eventCount: 340,
+            fileSize: 2097152, 
+            createdAt: "2024-12-02T12:40:00Z",
+            downloadUrl: ""
+        },
+        {
+            id: 3,
+            fileName: "logs_2024-12-03.tar",
+            eventCount: 980,
+            fileSize: 7340032, 
+            createdAt: "2024-12-03T09:05:00Z",
+            downloadUrl: ""
+        },
+        {
+            id: 4,
+            fileName: "logs_2024-12-04.tar",
+            eventCount: 120,
+            fileSize: 1048576, 
+            createdAt: "2024-12-04T18:22:00Z",
+            downloadUrl: ""
+        },
+        {
+            id: 5,
+            fileName: "logs_2024-12-05.tar",
+            eventCount: 1560,
+            fileSize: 9437184, 
+            createdAt: "2024-12-05T07:50:00Z",
+            downloadUrl: ""
+        }
+    ];
+
     useEffect(() => {
         if(!token) return;
 
@@ -65,19 +108,12 @@ export default function Storage() {
     }
 
     useEffect(() => {
-        setArchives([{
-            id: 1,
-            fileName: "test_archive.tar",
-            fileSize: 123456,
-            eventCount: 10,
-            createdAt: new Date().toISOString(),
-            downloadUrl: ""
-        }]);
+        setArchives(mockArchives);
 
         setStats({
-            totalSize: 123456,
+            totalSize: mockArchives.reduce((s, a) => s + a.fileSize, 0),
             retentionHours: 72,
-            lastArchiveName: "test_archive.tar"
+            lastArchiveName: mockArchives[0].fileName
         });
 
         //setIsLoading(false);
