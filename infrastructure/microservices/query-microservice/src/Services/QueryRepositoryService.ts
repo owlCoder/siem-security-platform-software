@@ -78,12 +78,9 @@ export class QueryRepositoryService implements IQueryRepositoryService {
     }
 
     async findByKey(key: string): Promise<CacheEntry> {
-        const response = await this.cacheRepository.findBy({key: key});
-        if(!response){
-                this.loggerService.log(`findByKey error fetching key ${key}`);
-                return emptyCacheEntry;
-                }
-        return response[0];
+        const response = await this.cacheRepository.findOne({ where: { key } });
+        if(!response) return emptyCacheEntry;
+        return response;
     }
     
     async addEntry(entry: CacheEntryDTO): Promise<CacheEntry> {
@@ -162,6 +159,7 @@ export class QueryRepositoryService implements IQueryRepositoryService {
         const resultIds: Set<number> = new Set();
 
         for (const token of tokens) {
+            token.trim().toLowerCase();
             const ids = this.invertedIndex.get(token);
             if (ids) {
                 ids.forEach(id => resultIds.add(id));
