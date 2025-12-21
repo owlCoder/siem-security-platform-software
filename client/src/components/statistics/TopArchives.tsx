@@ -7,7 +7,6 @@ type TopArchivesProps = {
     onTypeChange: (type: "events" | "alerts") => void;
 };
 
-
 export default function TopArchives( {data, type, onTypeChange}: TopArchivesProps) {
     const containerStyle: React.CSSProperties = {
         display: 'flex',

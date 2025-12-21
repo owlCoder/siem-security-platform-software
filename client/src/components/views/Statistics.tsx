@@ -38,11 +38,11 @@ export default function Statistics() {
     ];
 
     const testTopArchives: TopArchiveDTO[] = [
-    { id: 1, fileName: "logs_2025_12_14_22_00.tar", eventCount: 120 },
-    { id: 2, fileName: "auth_logs_2025_12_14.tar", eventCount: 95 },
-    { id: 3, fileName: "system_events_2025_12_13.tar", eventCount: 78 },
-    { id: 4, fileName: "app_errors_2025_12_12.tar", eventCount: 54 },
-    { id: 5, fileName: "network_2025_12_11.tar", eventCount: 33 }
+    { id: 1, fileName: "logs_2025_12_14_22_00.tar", count: 120 },
+    { id: 2, fileName: "auth_logs_2025_12_14.tar", count: 95 },
+    { id: 3, fileName: "system_events_2025_12_13.tar", count: 78 },
+    { id: 4, fileName: "app_errors_2025_12_12.tar", count: 54 },
+    { id: 5, fileName: "network_2025_12_11.tar", count: 33 }
     ];
 
     const testArchiveVolume: ArchiveVolumeDTO[] = [

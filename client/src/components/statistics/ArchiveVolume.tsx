@@ -40,20 +40,6 @@ export default function ArchiveVolume({ data, period, onPeriodChange }: ArchiveV
         transition: 'all 0.2s ease'
     });
 
-    const downloadButtonStyle: React.CSSProperties = {
-        padding: '8px 20px',
-        borderRadius: '8px',
-        border: 'none',
-        backgroundColor: '#0078d4',
-        color: '#ffffff',
-        cursor: 'pointer',
-        fontSize: '14px',
-        fontWeight: 600,
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px'
-    };
-
     const chartContainerStyle: React.CSSProperties = {
         width: '100%',
         height: '350px',
@@ -68,10 +54,6 @@ export default function ArchiveVolume({ data, period, onPeriodChange }: ArchiveV
         color: '#c5c5c5',
         fontSize: '14px'
     };
-
-    const handleDownload = () => {
-        // implementirati download
-    }
     
     const CustomTooltip = ({active, payload}: any) => {
         if(active && payload && payload.length) {
@@ -115,16 +97,12 @@ export default function ArchiveVolume({ data, period, onPeriodChange }: ArchiveV
                             Yearly
                     </button>
                 </div>
-
-                <button style={downloadButtonStyle} onClick={handleDownload}>
-                    Download report
-                </button>
             </div>
 
             {data.length > 0 ? (
                 <div style={chartContainerStyle}>
                     <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0}}>
+                        <BarChart data={data} margin={{ top: 10, right: 30, left: 10, bottom: 0}}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#313338"/>
                             <XAxis
                                 dataKey="label"
@@ -132,7 +110,7 @@ export default function ArchiveVolume({ data, period, onPeriodChange }: ArchiveV
                                 style={{fontSize: '12px'}}
                             />
                             <YAxis
-                                dataKey="label"
+                                type="number"
                                 stroke="#c5c5c5"
                                 label={{value: 'MB', angle: -90, position: 'insideLeft', fill: '#c5c5c5'}}
                             />
