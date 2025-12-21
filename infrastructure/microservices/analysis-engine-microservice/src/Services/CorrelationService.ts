@@ -1,7 +1,7 @@
 import { In, Repository } from "typeorm";
 import axios, { AxiosInstance } from "axios";
-import { ICorrelationService } from "../Domain/services/ICorrelationService";
-import { ILLMChatAPIService } from "../Domain/services/ILLMChatAPIService";
+import { ICorrelationService } from "../Domain/Services/ICorrelationService";
+import { ILLMChatAPIService } from "../Domain/Services/ILLMChatAPIService";
 import { Correlation } from "../Domain/models/Correlation";
 import { CorrelationEventMap } from "../Domain/models/CorrelationEventMap";
 import { CorrelationDTO } from "../Domain/types/CorrelationDTO";

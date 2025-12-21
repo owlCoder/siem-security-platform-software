@@ -6,9 +6,9 @@ export interface IEventsService {
     getAll(): Promise<EventDTO[]>;
     getById(id: number): Promise<EventDTO>;
     deleteById(id: number): Promise<boolean>;
-    deleteOldEvents(expiredIds:Number[]): Promise<boolean>;
+    deleteOldEvents(expiredIds: number[]): Promise<boolean>;
     getMaxId():Promise<EventDTO>;
     getEventsFromId1ToId2(fromId: number, toId: number): Promise<EventDTO[]>
     getSortedEventsByDate(): Promise<EventDTO[]>
-    getEventPercentagesByEvent(): Promise<Number[]>
+    getEventPercentagesByEvent(): Promise<number[]>
 }

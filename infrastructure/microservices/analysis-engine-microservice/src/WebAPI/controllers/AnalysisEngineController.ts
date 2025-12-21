@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
-import { ICorrelationService } from "../../Domain/services/ICorrelationService";
-import { ILLMChatAPIService } from "../../Domain/services/ILLMChatAPIService";
+import { ICorrelationService } from "../../Domain/Services/ICorrelationService";
+import { ILLMChatAPIService } from "../../Domain/Services/ILLMChatAPIService";
 
 export class AnalysisEngineController {
 

@@ -21,7 +21,7 @@ export class EventsService implements IEventsService {
         });
         return ArraytoDTO(events);
     }
-    async getEventPercentagesByEvent(): Promise<Number[]> {
+    async getEventPercentagesByEvent(): Promise<number[]> {
         const total = await this.eventRepository.count();
 
         if (total === 0) {
@@ -85,14 +85,15 @@ export class EventsService implements IEventsService {
     }
 
     async deleteOldEvents(oldIds: number[]): Promise<boolean> {
-        var deletedOnes = 0;
+        let deleted = 0;
+
         for (const id of oldIds) {
-            var sucessfulDelete = await this.deleteById(id);
-            if (sucessfulDelete) {
-                deletedOnes++
+            const successfulDelete = await this.deleteById(id);
+            if (successfulDelete) {
+                deleted++;
             }
         }
-        return deletedOnes > 0
+        return deleted > 0;
     }
 
     async getMaxId(): Promise<EventDTO> {

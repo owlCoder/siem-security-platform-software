@@ -1,6 +1,6 @@
-import { ILogerService } from "../Domain/services/ILoggerService";
+import { ILoggerService } from "../Domain/services/ILoggerService";
 
-export class LogerService implements ILogerService {
+export class LoggerService implements ILoggerService {
     constructor() {
         console.log("\x1b[35m[Logger@EventCollector]\x1b[0m Service started");
     }

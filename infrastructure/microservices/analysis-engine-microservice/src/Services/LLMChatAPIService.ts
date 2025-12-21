@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios";
 import dotenv from "dotenv";
-import { ILLMChatAPIService } from "../Domain/services/ILLMChatAPIService";
+import { ILLMChatAPIService } from "../Domain/Services/ILLMChatAPIService";
 import { ChatMessage } from "../Domain/types/ChatMessage";
 import { EventDTO } from "../Domain/types/EventDTO";
 import { CorrelationDTO } from "../Domain/types/CorrelationDTO";
