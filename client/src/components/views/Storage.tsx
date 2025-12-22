@@ -13,7 +13,6 @@ const storageAPI = new StorageAPI();
 export default function Storage() {
 
     const { token } = useAuth();
-
     const [archives, setArchives] = useState<ArchiveDTO[]>([]);
     const [stats, setStats] = useState<ArchiveStatsDTO | null>(null);
     //const [isLoading, setIsLoading] = useState(true);
@@ -85,6 +84,18 @@ export default function Storage() {
         fetchData();
     }, [token]);
 
+     useEffect(() => {
+        setArchives(mockArchives);
+
+        setStats({
+            totalSize: mockArchives.reduce((s, a) => s + a.fileSize, 0),
+            retentionHours: 72,
+            lastArchiveName: mockArchives[0].fileName
+        });
+
+        //setIsLoading(false);
+    }, []);
+
     const handleSearchArchives = async (query: string) => {
         if(!token) return;
 
@@ -106,18 +117,6 @@ export default function Storage() {
             console.error(err);
         }
     }
-
-    useEffect(() => {
-        setArchives(mockArchives);
-
-        setStats({
-            totalSize: mockArchives.reduce((s, a) => s + a.fileSize, 0),
-            retentionHours: 72,
-            lastArchiveName: mockArchives[0].fileName
-        });
-
-        //setIsLoading(false);
-    }, []);
 
     // if(isLoading) return <div>Loading storage...</div>
 
