@@ -2,20 +2,11 @@ import { Repository, Timestamp } from "typeorm";
 import { EventDTO } from "../Domain/DTOs/EventDTO";
 import { ParserEvent } from "../Domain/models/ParserEvent";
 import { IParserService } from "../Domain/services/IParserService";
-import axios, { Axios, AxiosError, AxiosInstance } from "axios";
 import { EventType } from "../Domain/enums/EventType";
-import { parseLoginMessage } from "../Utils/Regex/LoginMessageParser";
-import { parsePermissionChangeMessage } from "../Utils/Regex/PermissionChangeParser";
-import { parseDbAccessMessage } from "../Utils/Regex/DbAccessParser";
-import { parseRateLimitMessage } from "../Utils/Regex/RateLimitParser";
-import { parseBruteForceMessage } from "../Utils/Regex/BruteForceParser";
-import { parseSqlInjectionMessage } from "../Utils/Regex/SqlInjectionParser";
-import { parseServiceConfigurationChangeMessage } from "../Utils/Regex/ServiceConfigurationChangeParser";
-import { pareseResourceExplotationMessage } from "../Utils/Regex/ResourceExplotationParser";
-import { parseFileChangeMessage } from "../Utils/Regex/FileChangeParser";
-import { parseNetworkAnomalyMessage } from "../Utils/Regex/NetworkAnomalyParser";
 import { ILogerService } from "../Domain/services/ILogerService";
 import { createAxiosClient } from "../Utils/Client/AxiosClient";
+import { EVENT_PARSERS } from "../Domain/constants/EventParsers";
+import { AxiosInstance } from "axios";
 
 export class ParserService implements IParserService {
     private readonly analysisEngineClient: AxiosInstance;
@@ -55,47 +46,12 @@ export class ParserService implements IParserService {
     }
 
     private normalizeEventWithRegexes(message: string): EventDTO {
-        let parseResult;
+        for (const parser of EVENT_PARSERS) {
+            const result = parser(message);
 
-        parseResult = parseLoginMessage(message);
-        if (parseResult.doesMatch)
-            return parseResult.event!;
-
-        parseResult = parsePermissionChangeMessage(message);
-        if (parseResult.doesMatch)
-            return parseResult.event!;
-
-        parseResult = parseDbAccessMessage(message);
-        if (parseResult.doesMatch)
-            return parseResult.event!;
-
-        parseResult = parseRateLimitMessage(message);
-        if (parseResult.doesMatch)
-            return parseResult.event!;
-
-        parseResult = parseBruteForceMessage(message);
-        if (parseResult.doesMatch)
-            return parseResult.event!;
-
-        parseResult = parseSqlInjectionMessage(message);
-        if (parseResult.doesMatch)
-            return parseResult.event!;
-
-        parseResult = parseServiceConfigurationChangeMessage(message);
-        if (parseResult.doesMatch)
-            return parseResult.event!;
-
-        parseResult = pareseResourceExplotationMessage(message);
-        if (parseResult.doesMatch)
-            return parseResult.event!;
-
-        parseResult = parseFileChangeMessage(message);
-        if (parseResult.doesMatch)
-            return parseResult.event!;
-
-        parseResult = parseNetworkAnomalyMessage(message);
-        if (parseResult.doesMatch)
-            return parseResult.event!;
+            if (result.doesMatch)
+                return result.event!;
+        }
 
         const event: EventDTO = {
             id: -1,
@@ -103,7 +59,6 @@ export class ParserService implements IParserService {
 
         return event;
     }
-
 
     private async normalizeEventWithLlm(message: string): Promise<EventDTO> {
         const requestBody = {
