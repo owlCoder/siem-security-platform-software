@@ -40,10 +40,11 @@ export default function RecentAlertsTable({
 
   const containerStyle: React.CSSProperties = {
     background: "#1f1f1f",
-    borderRadius: "14px",
+    borderRadius: "14px 14px 0 0",
     overflow: "hidden",
     boxShadow: "0 2px 8px rgba(0,0,0,0.5)",
     border: "1px solid #333",
+    borderBottom: "none",
   };
 
   const tableStyle: React.CSSProperties = {
