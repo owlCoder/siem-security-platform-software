@@ -44,7 +44,7 @@ export class EventsController {
             res.status(201).json(created);
         } catch (err) {
             const message = (err as Error).message;
-            this.logger.log(`Error while creating event: ${message}`);
+            await this.logger.log(`Error while creating event: ${message}`);
             res.status(500).json({ message });
         }
     }
@@ -55,7 +55,7 @@ export class EventsController {
             res.status(200).json(events);
         } catch (err) {
             const message = (err as Error).message;
-            this.logger.log(`Error while getting events: ${message}`);
+            await this.logger.log(`Error while getting events: ${message}`);
             res.status(500).json({ message });
         }
     }
@@ -99,7 +99,7 @@ export class EventsController {
             res.status(200).json({ success: anyDeleted });
         } catch (err) {
             const message = (err as Error).message;
-            this.logger.log(`Error while deleting old events: ${message}`);
+            await this.logger.log(`Error while deleting old events: ${message}`);
             res.status(500).json({ message });
         }
     }
@@ -115,7 +115,7 @@ export class EventsController {
         }
         catch (err) {
             const message = (err as Error).message;
-            this.logger.log(`Error while creating event: ${message}`);
+            await this.logger.log(`Error while creating event: ${message}`);
             res.status(500).json({ message });
         }
     }
@@ -131,7 +131,7 @@ export class EventsController {
         }
         catch (err) {
             const message = (err as Error).message;
-            this.logger.log(`Error while getting events from range: ${message}`);
+            await this.logger.log(`Error while getting events from range: ${message}`);
             res.status(500).json({ message });
         }
     }
@@ -142,7 +142,7 @@ export class EventsController {
             res.status(200).json(events);
         } catch (err) {
             const message = (err as Error).message;
-            this.logger.log(`Error while getting sorted events by date: ${message}`);
+            await this.logger.log(`Error while getting sorted events by date: ${message}`);
             res.status(500).json({ message });
         }
     }
@@ -154,7 +154,7 @@ export class EventsController {
         }
         catch (err) {
             const message = (err as Error).message;
-            this.logger.log(`Error while getting percentages for each event type: ${message}`);
+            await this.logger.log(`Error while getting percentages for each event type: ${message}`);
             res.status(500).json({ message });
         }
     }

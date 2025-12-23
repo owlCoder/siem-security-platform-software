@@ -23,9 +23,9 @@ export default function AllEventsTable({ events, sortType, searchText }: Argumen
         } else if (sortType === 2) {
             copy.sort((a, b) => b.source.localeCompare(a.source));
         } else if (sortType === 3) {
-            copy.sort((a, b) => a.time.localeCompare(b.time));
+            copy.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
         } else if (sortType === 4) {
-            copy.sort((a, b) => b.time.localeCompare(a.time));
+            copy.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
         } else if (sortType === 5) {
             copy.sort((a, b) => a.type.localeCompare(b.type));
         } else if (sortType === 6) {

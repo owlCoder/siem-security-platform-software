@@ -66,7 +66,7 @@ export default function EventTableRow({ e, index }: RowProps) {
                 onMouseLeave={() => setHoveredRow(null)}
             >
                 <td style={eventIdStyle}>{e.source}</td>
-                <td style={tdStyle}>{e.time}</td>
+                <td style={tdStyle}>{new Date(e.time).toLocaleString("en-GB")}</td>
                 <td style={tdStyle}>
                     <span style={{ ...badgeBase, ...badgeColors[e.type] }}>
                         {e.type}

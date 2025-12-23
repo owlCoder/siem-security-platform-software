@@ -3,6 +3,7 @@ import { IParserService } from "../../Domain/services/IParserService";
 import { IParserRepositoryService } from "../../Domain/services/IParserRepositoryService";
 import { ILogerService } from "../../Domain/services/ILogerService";
 import { ValidateInputParameters } from "../validators/ParserValidator";
+import { validateEventId } from "../validators/EventIdValidator";
 export class ParserController {
     private readonly router: Router;
 
@@ -33,7 +34,7 @@ export class ParserController {
                 return;
             }
 
-            this.logger.log(`Raw log message from "${source}": ${rawMessage}`)
+            await this.logger.log(`Raw log message from "${source}": ${rawMessage}`)
 
             const response = await this.parserService.normalizeAndSaveEvent(rawMessage, source);
             if (response.id === -1) {
@@ -42,18 +43,18 @@ export class ParserController {
             }
             res.status(200).json(response);
         } catch (err) {
-            this.logger.log("Parser service error while trying to log event. Erorr: " + err);
+            await this.logger.log("Parser service error while trying to log event. Erorr: " + err);
             res.status(500).json({ message: "Service error: Failed to log event." });
         }
     }
 
     private async getAllParserEvents(req: Request, res: Response): Promise<void> {
         try {
-            this.logger.log(`Fetching all parser events`);
+            await this.logger.log(`Fetching all parser events`);
             const response = await this.parserRepositoryService.getAll();
             res.status(200).json(response);
         } catch (err) {
-            this.logger.log("Parser service error while trying to fetch parser events. Erorr: " + err);
+            await this.logger.log("Parser service error while trying to fetch parser events. Erorr: " + err);
             res.status(500).json({ message: "Service error: Failed to fetch parser events." });
         }
     }
@@ -61,11 +62,14 @@ export class ParserController {
     private async getParserEvent(req: Request, res: Response): Promise<void> {
         try {
             const id = Number(req.params.id);
-            if (isNaN(id)) {
-                res.status(400).json({ message: "Invalid ID" });
+
+            const validate = validateEventId(id);
+            if (!validate.success) {
+                res.status(400).json({ success: validate.success, message: validate.message });
                 return;
             }
-            this.logger.log(`Fetching parser event with ID: ${id}`);
+            
+            await this.logger.log(`Fetching parser event with ID: ${id}`);
 
             const response = await this.parserRepositoryService.getParserEventById(id);
             if (response.parser_id === -1) {
@@ -74,7 +78,7 @@ export class ParserController {
             }
             res.status(200).json(response);
         } catch (err) {
-            this.logger.log("Parser service error while trying to fetch parser event. Erorr: " + err);
+            await this.logger.log("Parser service error while trying to fetch parser event. Erorr: " + err);
             res.status(500).json({ message: "Service error: Failed to fetch parser event." });
         }
     }
@@ -82,11 +86,14 @@ export class ParserController {
     private async deleteParserEvent(req: Request, res: Response): Promise<void> {
         try {
             const id = Number(req.params.id)
-            if (isNaN(id)) {
-                res.status(400).json({ message: "Invalid ID" });
+
+            const validate = validateEventId(id);
+            if (!validate.success) {
+                res.status(400).json({ success: validate.success, message: validate.message });
                 return;
             }
-            this.logger.log(`Deleting parser event with ID: ${id}`);
+
+            await this.logger.log(`Deleting parser event with ID: ${id}`);
 
             const response = await this.parserRepositoryService.deleteById(id);
             if (!response) {
@@ -95,7 +102,7 @@ export class ParserController {
             }
             res.status(200).json({ success: true });
         } catch (err) {
-            this.logger.log("Parser service error while trying to delete parser event. Erorr: " + err);
+            await this.logger.log("Parser service error while trying to delete parser event. Erorr: " + err);
             res.status(500).json({ message: "Service error: Failed to delete parser event." });
         }
     }

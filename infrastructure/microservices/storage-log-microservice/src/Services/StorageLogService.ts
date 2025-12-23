@@ -39,7 +39,6 @@ export class StorageLogService implements IStorageLogService {
         mkdirSync(ARCHIVE_DIR, { recursive: true });
         mkdirSync(TEMP_DIR, { recursive: true });
 
-        this.logger.log("Storage Log Service initialized.");
     }
 
     public async getArchives(): Promise<StorageLog[]> {

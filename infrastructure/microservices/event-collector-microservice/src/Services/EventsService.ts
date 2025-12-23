@@ -6,7 +6,7 @@ import { Between } from "typeorm"
 import { EventType } from "../Domain/enums/EventType";
 import { toDTO } from "../Utils/Converters/ConvertToDTO";
 import { ArraytoDTO } from "../Utils/Converters/ConvertEventArrayToDTOarray";
-import { DistributionDTO } from "../Domain/models/DIstributionDTO";
+import { DistributionDTO } from "../Domain/DTOs/DIstributionDTO";
 
 export class EventsService implements IEventsService {
     constructor(
