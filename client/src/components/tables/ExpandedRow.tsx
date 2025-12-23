@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { ParserAPI } from "../../api/parser/ParserAPI";
 import { EventRow } from "../../types/events/EventRow";
 
 interface ExpandedProps { //move into a right folders(types)
@@ -6,6 +8,25 @@ interface ExpandedProps { //move into a right folders(types)
 }
 
 export function ExpandedRow({ expanded, e }: ExpandedProps) {
+    //const { token } = useAuth();
+    const token = "token";      // TODO: DELETE AFTER TESTING!
+    const parserApi = new ParserAPI();      // TODO: GET API AS ARGUMENT INSTEAD OF INITIALIZING IT LIKE THIS
+    const [rawMsg, setRawMsg] = useState<string>();
+
+    useEffect(() => {
+        //if (!token) return;       // TODO: DELETE COMMENT AFTER TESTING!
+
+        const loadEventRawMessage = async () => {
+            try {
+                setRawMsg((await parserApi.getParserEventById(e.id, token)).text_before_parsing);
+            } catch (err) {
+                console.error(err);
+                setRawMsg("Currently not available.");
+            }
+        };
+
+        void loadEventRawMessage();
+    }, [token]);
 
     const expandedContainerStyle = (expanded: boolean): React.CSSProperties => ({
         overflow: "hidden",                             //pomjerice se styles kasnije kad zavrsimo u poseban fajl
@@ -26,7 +47,7 @@ export function ExpandedRow({ expanded, e }: ExpandedProps) {
     };
 
     const labelStyle: React.CSSProperties = {
-        width: "16%", // w-1/6
+        width: "11%", // w-1/6
         fontWeight: 600,
         color: "#d1d5db",
         padding: "10px"
@@ -58,20 +79,15 @@ export function ExpandedRow({ expanded, e }: ExpandedProps) {
                         <div style={expandedContentStyle}>
                             <h4 style={detailsHeaderStyle}>Details</h4>
 
-                            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)" }}>
-                                <div style={detailRowStyle}>
-                                    <span style={labelStyle}>Source:</span>
-                                    <span style={valueStyle}>{e.source}</span>
-                                </div>
-
+                            <div style={{ display: "grid" }}>
                                 <div style={detailRowStyle}>
                                     <span style={labelStyle}>Description:</span>
-                                    <span style={{ ...valueStyle, marginLeft: "25px" }}>{e.description}</span>
+                                    <span style={{ ...valueStyle, marginBottom: "20px" }}>{e.description}</span>
                                 </div>
 
                                 <div style={detailRowStyle}>
-                                    <span style={labelStyle}>Type:</span>
-                                    <span style={{ ...valueStyle, marginLeft: "-15px" }}>{e.type}</span>
+                                    <span style={labelStyle}>Raw message:</span>
+                                    <span style={{ ...valueStyle }}>{rawMsg}</span>
                                 </div>
                             </div>
 
