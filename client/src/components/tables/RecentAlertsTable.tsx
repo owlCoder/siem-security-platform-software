@@ -1,4 +1,3 @@
-import React from "react";
 import { AlertDTO } from "../../models/alerts/AlertDTO";
 import { AlertSeverity } from "../../enums/AlertSeverity";
 import { AlertStatus } from "../../enums/AlertStatus";
@@ -12,11 +11,11 @@ interface RecentAlertsTableProps {
   onUpdateStatus: (id: number, status: string) => void;
 }
 
-export default function RecentAlertsTable({ 
-  alerts, 
+export default function RecentAlertsTable({
+  alerts,
   onSelectAlert,
 }: RecentAlertsTableProps) {
-  
+
   const getSeverityColor = (severity: AlertSeverity) => {
     switch (severity) {
       case AlertSeverity.CRITICAL: return "#ff4b4b";
@@ -38,90 +37,37 @@ export default function RecentAlertsTable({
     }
   };
 
-  const containerStyle: React.CSSProperties = {
-    background: "#1f1f1f",
-    borderRadius: "14px 14px 0 0",
-    overflow: "hidden",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.5)",
-    border: "1px solid #333",
-    borderBottom: "none",
-  };
-
-  const tableStyle: React.CSSProperties = {
-    width: "100%",
-    borderCollapse: "collapse",
-    fontFamily: "Segoe UI, sans-serif",
-    fontSize: "14px",
-  };
-
-  const theadStyle: React.CSSProperties = {
-    background: "#2a2a2a",
-  };
-
-  const thStyle: React.CSSProperties = {
-    padding: "14px 16px",
-    textAlign: "left",
-    color: "#d0d0d0",
-    fontWeight: 600,
-    fontSize: "13px",
-    borderBottom: "1px solid #3a3a3a",
-    textTransform: "uppercase",
-    letterSpacing: "0.5px",
-  };
-
-  const tdStyle: React.CSSProperties = {
-    padding: "14px 16px",
-    borderBottom: "1px solid #2d2d2d",
-    color: "#dcdcdc",
-  };
-
-  const rowStyle: React.CSSProperties = {
-    cursor: "pointer",
-    transition: "background 0.2s",
-  };
-
-  const badgeStyle = (color: string): React.CSSProperties => ({
-    padding: "5px 10px",
-    borderRadius: "8px",
-    fontSize: "12px",
-    fontWeight: 600,
-    display: "inline-block",
-    background: `${color}22`,
-    color: color,
-    border: `1px solid ${color}44`,
-  });
-
   return (
-    <div style={containerStyle}>
-      <table style={tableStyle}>
-        <thead style={theadStyle}>
+    <div className="bg-[#1f1f1f] rounded-[14px] overflow-hidden shadow-md border border-[#333]">
+      <table className="w-full border-collapse font-sans text-[14px]">
+        <thead className="bg-[#2a2a2a]">
           <tr>
-            <th style={thStyle}></th>
-            <th style={thStyle}>Title</th>
-            <th style={thStyle}>Severity</th>
-            <th style={thStyle}>Status</th>
-            <th style={thStyle}>Source</th>
-            <th style={thStyle}>Created At</th>
-            <th style={thStyle}>Actions</th>
+            <th className="px-4 py-3 text-left text-[#d0d0d0] font-semibold text-[13px] border-b border-[#3a3a3a] uppercase tracking-[0.5px]"></th>
+            <th className="px-4! py-3! text-left text-[#d0d0d0] font-semibold text-[13px] border-b border-[#3a3a3a] uppercase tracking-[0.5px]">Title</th>
+            <th className="px-4! py-3! text-left text-[#d0d0d0] font-semibold text-[13px] border-b border-[#3a3a3a] uppercase tracking-[0.5px]">Severity</th>
+            <th className="px-4! py-3! text-left text-[#d0d0d0] font-semibold text-[13px] border-b border-[#3a3a3a] uppercase tracking-[0.5px]">Status</th>
+            <th className="px-4! py-3! text-left text-[#d0d0d0] font-semibold text-[13px] border-b border-[#3a3a3a] uppercase tracking-[0.5px]">Source</th>
+            <th className="px-4! py-3! text-left text-[#d0d0d0] font-semibold text-[13px] border-b border-[#3a3a3a] uppercase tracking-[0.5px]">Created At</th>
+            <th className="px-4! py-3! text-left text-[#d0d0d0] font-semibold text-[13px] border-b border-[#3a3a3a] uppercase tracking-[0.5px]">Actions</th>
           </tr>
         </thead>
 
         <tbody>
           {alerts.length === 0 ? (
             <tr>
-              <td colSpan={7} style={{ ...tdStyle, textAlign: "center", padding: "40px", color: "#a6a6a6" }}>
+              <td colSpan={7} className="px-10 py-10 text-center border-b border-[#2d2d2d] text-[#a6a6a6]">
                 No alerts found
               </td>
             </tr>
           ) : (
             alerts.map((alert) => (
-              <tr 
-                key={alert.id} 
-                style={rowStyle}
+              <tr
+                key={alert.id}
+                className="cursor-pointer transition-colors duration-200"
                 onMouseEnter={(e) => e.currentTarget.style.background = "#2a2a2a"}
                 onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
               >
-                <td style={tdStyle}>
+                <td className="px-4! py-3! border-b border-[#2d2d2d] text-[#dcdcdc]">
                   {alert.severity === AlertSeverity.CRITICAL || alert.severity === AlertSeverity.HIGH ? (
                     <PiWarningOctagonFill color={getSeverityColor(alert.severity)} size={20} />
                   ) : (
@@ -129,25 +75,39 @@ export default function RecentAlertsTable({
                   )}
                 </td>
 
-                <td style={{ ...tdStyle, maxWidth: "300px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <td className="px-4! py-3! border-b border-[#2d2d2d] text-[#dcdcdc] max-w-[300px] overflow-hidden overflow-ellipsis shitespace-nowrap">
                   {alert.title}
                 </td>
 
-                <td style={tdStyle}>
-                  <span style={badgeStyle(getSeverityColor(alert.severity))}>
+                <td className="px-4 py-3 border-b border-[#2d2d2d]">
+                  <span
+                    className="px-2.5! py-1.5! rounded-[8px] text-[12px] font-semibold inline-block border ml-3!"
+                    style={{
+                      backgroundColor: `${getSeverityColor(alert.severity)}22`,
+                      color: getSeverityColor(alert.severity),
+                      borderColor: `${getSeverityColor(alert.severity)}44`,
+                    }}
+                  >
                     {alert.severity}
                   </span>
                 </td>
 
-                <td style={tdStyle}>
-                  <span style={badgeStyle(getStatusColor(alert.status))}>
+                <td className="px-4 py-3 border-b border-[#2d2d2d]">
+                  <span
+                    className="px-2.5! py-1.5! rounded-[8px] text-[12px] font-semibold inline-block border ml-3!"
+                    style={{
+                      backgroundColor: `${getStatusColor(alert.status)}22`,
+                      color: getStatusColor(alert.status),
+                      borderColor: `${getStatusColor(alert.status)}44`,
+                    }}
+                  >
                     {alert.status}
                   </span>
                 </td>
 
-                <td style={tdStyle}>{alert.source}</td>
+                <td className="px-4! py-3! border-b border-[#2d2d2d] text-[#dcdcdc]">{alert.source}</td>
 
-                <td style={tdStyle}>
+                <td className="px-4! py-3! border-b border-[#2d2d2d] text-[#dcdcdc]">
                   {new Date(alert.createdAt).toLocaleString('en-US', {
                     month: 'short',
                     day: 'numeric',
@@ -156,20 +116,10 @@ export default function RecentAlertsTable({
                   })}
                 </td>
 
-                <td style={{ ...tdStyle, textAlign: "center" }}>
+                <td className="px-4! py-3! border-b border-[#2d2d2d] text-[#dcdcdc] text-center">
                   <button
                     onClick={() => onSelectAlert(alert.id)}
-                    style={{
-                      background: "transparent",
-                      border: "1px solid #60a5fa",
-                      color: "#60a5fa",
-                      padding: "6px 12px",
-                      borderRadius: "6px",
-                      cursor: "pointer",
-                      fontSize: "12px",
-                      fontWeight: 600,
-                      transition: "all 0.2s",
-                    }}
+                    className="bg-transparent border! border-blue-400 text-blue-400 px-3! py-1.5! rounded-[6px]! cursor-pointer text-[12px]! font-semibold transition-all duration-200"
                     onMouseEnter={(e) => {
                       e.currentTarget.style.background = "#60a5fa22";
                     }}
@@ -177,7 +127,7 @@ export default function RecentAlertsTable({
                       e.currentTarget.style.background = "transparent";
                     }}
                   >
-                    <PiInfoBold size={14} style={{ marginRight: "4px", verticalAlign: "middle" }} />
+                    <PiInfoBold size={14} className="mr-1 align-middle" />
                     Details
                   </button>
                 </td>

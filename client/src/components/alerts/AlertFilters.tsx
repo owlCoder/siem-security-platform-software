@@ -33,61 +33,14 @@ export const AlertFilters: React.FC<AlertFiltersProps> = ({ onSearch }) => {
     }
   };
 
-  const filterRowStyle: React.CSSProperties = {
-    display: "grid",
-    gridTemplateColumns: "repeat(4, 1fr)", 
-    gap: "12px",
-    marginBottom: "16px",
-  };
-
-  const searchRowStyle: React.CSSProperties = {
-    display: "flex",
-    gap: "12px",
-    marginBottom: "24px",
-  };
-
-  const selectStyle: React.CSSProperties = {
-    width: "100%",
-    padding: "8px 12px",
-    borderRadius: "8px",
-    border: "1px solid rgba(255, 255, 255, 0.12)",
-    background: "rgba(0, 0, 0, 0.3)",
-    color: "#fff",
-    fontSize: "13px",
-    outline: "none",
-  };
-
-  const searchInputStyle: React.CSSProperties = {
-    flex: 1,
-    padding: "8px 12px",
-    borderRadius: "8px",
-    border: "1px solid rgba(255, 255, 255, 0.12)",
-    background: "rgba(0, 0, 0, 0.3)",
-    color: "#fff",
-    fontSize: "13px",
-    outline: "none",
-  };
-
-  const searchButtonStyle: React.CSSProperties = {
-    padding: "8px 24px",
-    borderRadius: "8px",
-    border: "none",
-    background: "#60cdff",
-    color: "#000",
-    fontSize: "13px",
-    fontWeight: 600,
-    cursor: "pointer",
-    transition: "all 0.2s",
-  };
-
   return (
     <>
-      <div style={filterRowStyle}>
+      <div className="grid grid-cols-4 gap-3 mb-4!">
         {/* Severity Filter */}
-        <select 
-          value={severity || ""} 
+        <select
+          value={severity || ""}
           onChange={(e) => setSeverity(e.target.value as AlertSeverity || undefined)}
-          style={selectStyle}
+          className="w-full px-3! py-2! rounded-lg border border-[rgba(255,255,255,0.12)] bg-[rgba(0,0,0,0.3)]! text-white text-[13px] outline-none"
         >
           <option value="">All Severities</option>
           <option value={AlertSeverity.LOW}>Low</option>
@@ -97,10 +50,10 @@ export const AlertFilters: React.FC<AlertFiltersProps> = ({ onSearch }) => {
         </select>
 
         {/* Status Filter */}
-        <select 
-          value={status || ""} 
+        <select
+          value={status || ""}
           onChange={(e) => setStatus(e.target.value as AlertStatus || undefined)}
-          style={selectStyle}
+          className="w-full px-3! py-2! rounded-lg border border-[rgba(255,255,255,0.12)] bg-[rgba(0,0,0,0.3)]! text-white text-[13px] outline-none"
         >
           <option value="">All Statuses</option>
           <option value={AlertStatus.ACTIVE}>Active</option>
@@ -111,10 +64,10 @@ export const AlertFilters: React.FC<AlertFiltersProps> = ({ onSearch }) => {
         </select>
 
         {/* Sort By */}
-        <select 
-          value={sortBy} 
+        <select
+          value={sortBy}
           onChange={(e) => setSortBy(e.target.value as any)}
-          style={selectStyle}
+          className="w-full px-3! py-2! rounded-lg border border-[rgba(255,255,255,0.12)] bg-[rgba(0,0,0,0.3)]! text-white text-[13px] outline-none"
         >
           <option value="createdAt">Date & Time</option>
           <option value="severity">Severity</option>
@@ -122,29 +75,29 @@ export const AlertFilters: React.FC<AlertFiltersProps> = ({ onSearch }) => {
         </select>
 
         {/* Sort Order */}
-        <select 
-          value={sortOrder} 
+        <select
+          value={sortOrder}
           onChange={(e) => setSortOrder(e.target.value as any)}
-          style={selectStyle}
+          className="w-full px-3! py-2! rounded-lg border border-[rgba(255,255,255,0.12)] bg-[rgba(0,0,0,0.3)]! text-white text-[13px] outline-none"
         >
           <option value="DESC">Descending ⬇</option>
           <option value="ASC">Ascending ⬆</option>
         </select>
       </div>
 
-      <div style={searchRowStyle}>
+      <div className="flex gap-3 mb-6!">
         <input
           type="text"
           placeholder="Search by source..."
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
           onKeyPress={handleKeyPress}
-          style={searchInputStyle}
+          className="flex-1 px-3! py-2! rounded-lg border border-[rgba(255,255,255,0.12)] bg-[rgba(0,0,0,0.3)]! text-white text-[13px] outline-none"
         />
 
-        <button 
+        <button
           onClick={handleSearch}
-          style={searchButtonStyle}
+          className="px-6! py-2! rounded-lg! bg-[#007a55]! text-white text-[13px] font-semibold cursor-pointer transition-all duration-200"
           onMouseEnter={(e) => {
             e.currentTarget.style.background = "#5db9ea";
             e.currentTarget.style.transform = "translateY(-2px)";

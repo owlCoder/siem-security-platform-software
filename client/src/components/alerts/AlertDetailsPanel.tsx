@@ -10,10 +10,10 @@ interface AlertDetailsPanelProps {
   onResolve: (id: number, resolvedBy: string) => void;
 }
 
-export default function AlertDetailsPanel({ 
-  alert: alertData, 
-  onClose, 
-  onResolve 
+export default function AlertDetailsPanel({
+  alert: alertData,
+  onClose,
+  onResolve
 }: AlertDetailsPanelProps) {
   const [resolvedBy, setResolvedBy] = useState("");
 
