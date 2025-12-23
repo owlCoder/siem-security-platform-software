@@ -6,14 +6,7 @@ import { EventDTO } from "../../models/events/EventDTO";
 import { EventType } from "../../enums/EventType";
 import DropDownMenu from "../events/DropDownMenu";
 import { QueryAPI } from "../../api/query/QueryAPI";
-
-interface EventRow { 
-    id: number;
-    source: string;
-    time: string;
-    type: EventType;
-    description:string;
-}
+import { EventRow } from "../../types/events/EventRow";
 
 export default function Events() {
     /*const eventss: EventRow[] = [
@@ -21,7 +14,9 @@ export default function Events() {
             { id: 2, source: "Auth Service", time: "01:25:49   22/11/2025", type: EventType.WARNING, description: "Multiple failed login attempts" },
             { id: 3, source: "Database", time: "21:03:11   20/11/2025", type: EventType.ERROR, description: "Database connection lost" },
         ];*/
-    const { token } = useAuth();
+    //const { token } = useAuth();
+    const token = "token";      // TODO: DELETE AFTER TESTING!
+
     const [searchText, setSearchText] = useState("");
     const [dateFrom, setDateFrom] = useState<string>("");
     const [dateTo, setDateTo] = useState<string>("");
@@ -50,7 +45,7 @@ export default function Events() {
         display: "flex",
         justifyContent: "right",
         marginInlineEnd: "10px",
-        gap:"12px"
+        gap: "12px"
     };
 
     const elementsStyle: React.CSSProperties = {
@@ -60,22 +55,22 @@ export default function Events() {
         borderRadius: "15px",
         padding: "4px",
         height: "40px",
-        fontWeight:500
+        fontWeight: 500
     };
 
     const searchInputStyle: React.CSSProperties = {
-        ...elementsStyle, 
-        width: "200px",  
+        ...elementsStyle,
+        width: "200px",
     };
 
     const dateInputStyle: React.CSSProperties = {
-        ...elementsStyle, 
-        width: "200px",  
+        ...elementsStyle,
+        width: "200px",
     };
 
     const selectStyle: React.CSSProperties = {
-        ...elementsStyle, 
-        width: "200px",  
+        ...elementsStyle,
+        width: "200px",
         marginLeft: "15px"
     };
 
@@ -92,7 +87,7 @@ export default function Events() {
         width: "100%",
         alignItems: "center",
     };
-    
+
 
     const rightSideStyle: React.CSSProperties = {
         display: "flex",
@@ -152,21 +147,21 @@ export default function Events() {
             console.error("No auth token available.");
             return;
         }
-        
+
         try {
             setIsLoading(true);
             setError(null);
 
             const api = new QueryAPI();
-            
+
             // pravi se query za search
             // npr: text=server
             let query =
                 searchText && searchText.trim() !== ""
                     ? `text=${searchText}`
                     : "";
-                
-            
+
+
             // dodaje se dateFrom
             if (dateFrom && dateFrom.trim() !== "") {
                 const fromDate = new Date(dateFrom);
@@ -183,7 +178,7 @@ export default function Events() {
             if (eventType && eventType !== "all") {
                 query += query ? `|type=${eventType.toUpperCase()}` : `type=${eventType.toUpperCase()}`;
             }
-            
+
             const data: EventDTO[] = await api.getEventsByQuery(query, token);
             const mapped = data.map(mapEventDTOToRow);
 
@@ -197,7 +192,7 @@ export default function Events() {
     };
 
     useEffect(() => {
-        if (!token) return;
+        //if (!token) return;       // TODO: DELETE COMMENT AFTER TESTING!
 
         const loadAllEvents = async () => {
             try {
@@ -206,7 +201,7 @@ export default function Events() {
 
                 const api = new QueryAPI();
 
-                const data: EventDTO[] = await api.getAllEvents(token); 
+                const data: EventDTO[] = await api.getAllEvents(token);
                 const mapped = data.map(mapEventDTOToRow);
                 setEvents(mapped);
             } catch (err) {
@@ -222,10 +217,10 @@ export default function Events() {
 
     return (
         <div style={eventDivStyle}>
-            <h2 style={{ marginTop: '3px', padding:"5px", margin: "10px" }}>Events</h2>
+            <h2 style={{ marginTop: '3px', padding: "5px", margin: "10px" }}>Events</h2>
 
             <div style={firstRowStyle}>
-                <div  style={{display:"grid",gridTemplateRows:"repeat(2,1fr)"}}>
+                <div style={{ display: "grid", gridTemplateRows: "repeat(2,1fr)" }}>
                     <label >Date from:</label>
                     <input
                         style={dateInputStyle}
@@ -234,7 +229,7 @@ export default function Events() {
                         onChange={(e) => setDateFrom(e.target.value)}
                     />
                 </div>
-                <div style={{display:"grid",gridTemplateRows:"repeat(2,1fr)"}}>
+                <div style={{ display: "grid", gridTemplateRows: "repeat(2,1fr)" }}>
                     <label >Date to:</label>
                     <input
                         style={dateInputStyle}
@@ -257,30 +252,30 @@ export default function Events() {
                         style={elementsStyle}
                         onClick={() => loadEventsWithQuery()}
                         onMouseEnter={(e) => Object.assign(e.currentTarget.style, liHoverStyle)}
-                          onMouseLeave={(e) => Object.assign(e.currentTarget.style,downloadStyle)}
+                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, downloadStyle)}
                     >
                         Search
                     </button>
                 </div>
                 <div style={rightSideStyle}>
                     <div>
-                    <select 
-                        style={selectStyle} 
-                        value={eventType} 
-                        onChange={(e) => setEventType(e.target.value)}
-                         onMouseEnter={(e) => Object.assign(e.currentTarget.style, liHoverStyle)}
-                          onMouseLeave={(e) => Object.assign(e.currentTarget.style,selectStyle)}>
+                        <select
+                            style={selectStyle}
+                            value={eventType}
+                            onChange={(e) => setEventType(e.target.value)}
+                            onMouseEnter={(e) => Object.assign(e.currentTarget.style, liHoverStyle)}
+                            onMouseLeave={(e) => Object.assign(e.currentTarget.style, selectStyle)}>
                             <option value="all">All types</option>
                             <option value="info">Informations</option>
                             <option value="warning">Warnings</option>
                             <option value="error">Errors</option>
-                    </select>
-                </div>
-                    <DropDownMenu OnSortTypeChange={(value:number)=>setSortType(value)}/>
+                        </select>
+                    </div>
+                    <DropDownMenu OnSortTypeChange={(value: number) => setSortType(value)} />
                     <button
                         style={downloadStyle}
-                         onMouseEnter={(e) => Object.assign(e.currentTarget.style, liHoverStyle)}
-                          onMouseLeave={(e) => Object.assign(e.currentTarget.style,downloadStyle)}
+                        onMouseEnter={(e) => Object.assign(e.currentTarget.style, liHoverStyle)}
+                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, downloadStyle)}
                     >
                         Download report <FiDownload size={20} />
                     </button>

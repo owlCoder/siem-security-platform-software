@@ -1,12 +1,5 @@
-import { EventType } from "../../enums/EventType";
+import { EventRow } from "../../types/events/EventRow";
 
-interface EventRow { //move into a right folders(types)
-    id: number;
-    source: string;
-    time: string;
-    type: EventType;
-    description: string;
-}
 interface ExpandedProps { //move into a right folders(types)
     expanded: boolean;
     e: EventRow;
@@ -36,7 +29,7 @@ export function ExpandedRow({ expanded, e }: ExpandedProps) {
         width: "16%", // w-1/6
         fontWeight: 600,
         color: "#d1d5db",
-        padding:"10px"
+        padding: "10px"
     };
 
     const valueStyle: React.CSSProperties = {
@@ -45,7 +38,7 @@ export function ExpandedRow({ expanded, e }: ExpandedProps) {
         border: "1px solid #4b5563", // border-gray-600
         borderRadius: "15px",
         padding: "10px",
-        paddingLeft:"10px",
+        paddingLeft: "10px",
         color: "#e5e7eb", // gray-200
     };
 
@@ -73,12 +66,12 @@ export function ExpandedRow({ expanded, e }: ExpandedProps) {
 
                                 <div style={detailRowStyle}>
                                     <span style={labelStyle}>Description:</span>
-                                    <span style={{...valueStyle,marginLeft:"25px"}}>{e.description}</span>
+                                    <span style={{ ...valueStyle, marginLeft: "25px" }}>{e.description}</span>
                                 </div>
 
                                 <div style={detailRowStyle}>
                                     <span style={labelStyle}>Type:</span>
-                                    <span style={{...valueStyle,marginLeft:"-15px"}}>{e.type}</span>
+                                    <span style={{ ...valueStyle, marginLeft: "-15px" }}>{e.type}</span>
                                 </div>
                             </div>
 

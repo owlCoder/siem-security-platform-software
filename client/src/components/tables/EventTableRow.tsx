@@ -1,16 +1,9 @@
 import { useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import { ExpandedRow } from "./ExpandedRow";
-import { EventType } from "../../enums/EventType";
 import React from "react";
+import { EventRow } from "../../types/events/EventRow";
 
-interface EventRow {  //at the end,move into a right folders(types) 
-    id: number;
-    source: string;
-    time: string;
-    type: EventType;
-    description: string;
-}
 interface RowProps {   //at the end,move into a right folders(types) 
     e: EventRow;
     index: number;

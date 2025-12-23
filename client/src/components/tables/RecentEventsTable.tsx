@@ -1,15 +1,7 @@
-import { EventType } from "../../enums/EventType";
-
-interface EventRow {  //at the end,move into a right folders(types) 
-    id: number;
-    source: string;
-    time: string;
-    type: EventType;
-    description:string;
-}
-
 // Inline styles for now, will be in CSS later
 // types, interfaces and classes will be moved too
+
+import { EventRow } from "../../types/events/EventRow";
 
 export default function RecentEventsTable({ events }: { events: EventRow[] }) {
     const containerStyle: React.CSSProperties = {
@@ -19,7 +11,7 @@ export default function RecentEventsTable({ events }: { events: EventRow[] }) {
         boxShadow: "0 2px 8px rgba(0,0,0,0.5)",
         marginTop: "12px",
         border: "1px solid #333",
-        margin:"10px"
+        margin: "10px"
     };
 
     const tableStyle: React.CSSProperties = {

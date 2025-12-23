@@ -1,14 +1,6 @@
 import { useEffect, useState } from "react";
 import EventTableRow from "./EventTableRow";
-import { EventType } from "../../enums/EventType";
-
-interface EventRow {
-    id: number;
-    source: string;
-    time: string;
-    type: EventType;
-    description:string;
-}
+import { EventRow } from "../../types/events/EventRow";
 
 // Inline styles for now, will be in CSS later
 // types, interfaces and classes will be moved too
@@ -86,9 +78,9 @@ export default function AllEventsTable({ events, sortType, searchText }: Argumen
 
                 <tbody>
                     {sortedEvents.map((e, index) => (
-                        <EventTableRow 
-                            key={e.id} 
-                            e={e} 
+                        <EventTableRow
+                            key={e.id}
+                            e={e}
                             index={index} />
                     ))}
                 </tbody>
