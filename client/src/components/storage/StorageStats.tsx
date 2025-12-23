@@ -9,7 +9,7 @@ type Props = {
 
 export default function StorageStats({stats} : Props){
     return (
-        <div style={{display: "flex", gap: "16px"}}>
+        <div style={{display: "flex", gap: "16px",padding:"5px"}}>
             <StatCard
                 title="Total archive size"
                 value= { stats.totalSize }    

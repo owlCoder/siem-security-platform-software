@@ -13,7 +13,8 @@ export default function StorageTable({ archives }: Props) {
         borderRadius: "14px",
         boxShadow: "0 2px 8px rgba(0,0,0,0.5)",
         overflow: "hidden",
-        marginTop: "20px"
+        marginTop: "20px",
+        margin:"5px"
     };
 
     const tableStyle: React.CSSProperties = {
