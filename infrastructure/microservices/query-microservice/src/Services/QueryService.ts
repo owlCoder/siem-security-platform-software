@@ -1,11 +1,8 @@
 import { IQueryService } from "../Domain/services/IQueryService";
 import { IQueryRepositoryService } from "../Domain/services/IQueryRepositoryService";
-import { Event } from "../Domain/models/Event";
 import { parseQueryString } from "../Utils/ParseQuery";
 import { EventDTO } from "../Domain/DTOs/EventDTO";
 import { PdfGenerator } from "../Utils/PdfGenerator";
-import { CacheEntry } from "../Domain/models/CacheEntry";
-import { text } from "stream/consumers";
 import { EventType } from "../Domain/enums/EventType";
 
 // princip pretrage:
@@ -52,13 +49,23 @@ export class QueryService implements IQueryService {
         // pozivamo parseQueryString da dobijemo parove kljuc-vrednost sa nazivom polja i vrednosti za pretragu
         const filters = parseQueryString(query);
 
-        const textQuery = filters["text"].trim().toLowerCase() || "";
-        delete filters["text"];
+        const textQuery = filters["text"] || "";
 
-        const matchingIds = textQuery ? this.queryRepositoryService.getIdsForTokens(textQuery) : null;
+        let filteredEvents = allEvents;
 
-        // filtriramo sve evente na osnovu dobijenih id-eva iz indeksa
-        const filteredEvents = allEvents.filter(event => !matchingIds || matchingIds.has(event.id));
+        if (textQuery !== "") {
+            textQuery.trim().toLowerCase();
+            const matchingIds = this.queryRepositoryService.findEvents(textQuery);
+
+            // ako postoji text filter i nema poklapanja to znaci da nema rezultata
+            if (matchingIds.size === 0) {
+                filteredEvents = [];
+            } else {
+                filteredEvents = allEvents.filter(event =>
+                    matchingIds.has(event.id)
+                );
+            }
+        }
         
         const result =  filteredEvents.filter(event => {
 
