@@ -101,7 +101,7 @@ export default function Events() {
         backgroundColor: "#9ca3af", // gray-400
     };
 
-    const formatTime = (iso: string): string => {
+    /*const formatTime = (iso: string): string => {     DELETE IF WE DON`T USE LATER
         const date = new Date(iso);
         if (Number.isNaN(date.getTime())) return iso;
 
@@ -116,7 +116,7 @@ export default function Events() {
 
         // isti stil kao pre: "HH:MM:SS   DD/MM/YYYY"
         return `${hours}:${minutes}:${seconds}   ${day}/${month}/${year}`;
-    };
+    };*/
 
     const mapEventDTOToRow = (e: EventDTO): EventRow => {
         let type: EventRow["type"];
@@ -136,7 +136,7 @@ export default function Events() {
         return {
             id: e.id,
             source: e.source.toString(),
-            time: formatTime(e.timestamp),
+            time: e.timestamp,
             type,
             description: e.description.toString(),
         };
@@ -203,6 +203,7 @@ export default function Events() {
 
                 const data: EventDTO[] = await api.getAllEvents(token);
                 const mapped = data.map(mapEventDTOToRow);
+                console.log("aaaaaaaa ",mapped[0].time)
                 setEvents(mapped);
             } catch (err) {
                 console.error(err);

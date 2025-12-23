@@ -2,7 +2,7 @@ import { ILoggerService } from "../Domain/Services/ILoggerService";
 
 export class LoggerService implements ILoggerService {
     constructor() {
-        console.log(`\x1b[35m[Logger@1.45.4]\x1b[0m Service started`);
+        console.log(`\x1b[35m[Logger@CorrelationService]\x1b[0m Service started`);
     }
 
     async info(message: string, meta?: Record<string, any>): Promise<void> {

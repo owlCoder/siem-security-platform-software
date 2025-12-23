@@ -37,7 +37,7 @@ export class ParserService implements IParserService {
         const responseEvent = (await this.eventClient.post<EventDTO>("/events", event)).data;    // Saving to the Events table (calling event-collector)
 
         if (responseEvent.id === -1)
-            this.logger.log("Failed to save event to the database. Event: " + event);
+           await this.logger.log("Failed to save event to the database. Event: " + event);
 
         const parserEvent: ParserEvent = { parserId: 0, eventId: responseEvent.id, textBeforeParsing: eventMessage, timestamp: timeOfEvent }
         await this.parserEventRepository.insert(parserEvent);   // Saving to the Parser table
@@ -70,7 +70,7 @@ export class ParserService implements IParserService {
         // Extract LLM-generated event JSON
         const eventData = response.data?.eventData;
         if (!eventData || eventData.description === "__NORMALIZATION_FAILED__") {
-            this.logger.log("LLM failed to normalize event. Raw message: " + message);
+           await this.logger.log("LLM failed to normalize event. Raw message: " + message);
 
             const event: EventDTO = {
                 id: -1,

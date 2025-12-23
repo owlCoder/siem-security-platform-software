@@ -7,7 +7,7 @@ export class RecurringCorrelationJob implements IRecurringJob {
     constructor(private readonly correlationService: ICorrelationService, private readonly loggerService: ILoggerService) { }
 
     async execute(): Promise<void> {
-        this.loggerService.info(`[RecurringCorrelationJob@1.0.0][Executing recurring correlation job...`);
+        await this.loggerService.info(`[RecurringCorrelationJob@1.0.0][Executing recurring correlation job...`);
         await this.correlationService.findCorrelations();
     }
 }   

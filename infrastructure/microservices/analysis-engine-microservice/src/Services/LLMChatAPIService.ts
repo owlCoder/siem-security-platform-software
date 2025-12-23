@@ -56,7 +56,7 @@ export class LLMChatAPIService implements ILLMChatAPIService {
     const event = parseEventDTO(raw);
 
     if (!event) {
-      this.loggerService.warn("[LLM] Normalization failed schema validation", raw);
+      await this.loggerService.warn("[LLM] Normalization failed schema validation", raw);
       return this.emptyEvent();
     }
 
@@ -68,7 +68,7 @@ export class LLMChatAPIService implements ILLMChatAPIService {
   // =========================================================
   async sendCorrelationPrompt(rawMessage: string): Promise<CorrelationDTO[]> {
     if (!rawMessage || rawMessage.trim().length === 0) {
-      this.loggerService.warn("[LLM] Correlation skipped: empty input");
+      await this.loggerService.warn("[LLM] Correlation skipped: empty input");
       return [];
     }
 
@@ -145,7 +145,7 @@ export class LLMChatAPIService implements ILLMChatAPIService {
       } catch (err) {
         const axErr = err as AxiosError;
 
-        this.loggerService.warn("[LLM] Request failed", {
+        await this.loggerService.warn("[LLM] Request failed", {
           attempt,
           status: axErr.response?.status,
           message: axErr.message,
@@ -156,7 +156,7 @@ export class LLMChatAPIService implements ILLMChatAPIService {
       }
     }
 
-    this.loggerService.error("[LLM] All retries exhausted");
+    await this.loggerService.error("[LLM] All retries exhausted");
     return null;
   }
 

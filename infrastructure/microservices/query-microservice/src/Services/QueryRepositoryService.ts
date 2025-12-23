@@ -260,7 +260,7 @@ export class QueryRepositoryService implements IQueryRepositoryService {
 
         this.lastProcessedId = Math.max(...allEvents.map(e => e.id));
 
-        this.loggerService.log(
+        await this.loggerService.log(
             `Bootstrap indexing completed. Indexed ${allEvents.length} events.`
         );
 

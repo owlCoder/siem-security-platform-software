@@ -25,14 +25,13 @@ export class CorrelationService implements ICorrelationService {
     private readonly llmChatApiService: ILLMChatAPIService,
     private readonly loggerService: ILoggerService
   ) {
-    this.loggerService.info(`[CorrelationService] started`);
 
     this.queryClient = createAxiosClient(process.env.QUERY_SERVICE_API ?? "");
     this.alertClient = createAxiosClient(process.env.ALERT_SERVICE_API ?? "");
   }
 
   async findCorrelations(): Promise<void> {
-    this.loggerService.info(`[CorrelationService] Finding correlations`);
+    await this.loggerService.info(`[CorrelationService] Finding correlations`);
 
     // 1. Fetch events (external → untrusted)
     let events: unknown;
@@ -40,7 +39,7 @@ export class CorrelationService implements ICorrelationService {
       const res = await this.queryClient.get(this.queryEventsPath);
       events = res.data;
     } catch (err) {
-      this.loggerService.error(`[CorrelationService] Failed to fetch events`, err);
+      await this.loggerService.error(`[CorrelationService] Failed to fetch events`, err);
       return;
     }
 
@@ -51,12 +50,12 @@ export class CorrelationService implements ICorrelationService {
         JSON.stringify(events, null, 2)
       );
     } catch (err) {
-      this.loggerService.error(`[CorrelationService] LLM analysis failed`, err);
+      await this.loggerService.error(`[CorrelationService] LLM analysis failed`, err);
       return;
     }
 
     if (candidates.length === 0) {
-      this.loggerService.info(`[CorrelationService] No correlation candidates returned`);
+      await this.loggerService.info(`[CorrelationService] No correlation candidates returned`);
       return;
     }
 
@@ -72,9 +71,9 @@ export class CorrelationService implements ICorrelationService {
 
         await this.sendCorrelationAlert(candidate);
 
-        this.loggerService.info(`[CorrelationService] Correlation stored (ID=${correlationId})`);
+        await this.loggerService.info(`[CorrelationService] Correlation stored (ID=${correlationId})`);
       } catch (err) {
-        this.loggerService.error(`[CorrelationService] Failed to process candidate`, err);
+        await this.loggerService.error(`[CorrelationService] Failed to process candidate`, err);
       }
     }
   }

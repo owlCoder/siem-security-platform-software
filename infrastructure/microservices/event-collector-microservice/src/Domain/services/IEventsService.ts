@@ -1,6 +1,5 @@
 import { EventDTO } from "../DTOs/EventDTO";
-import { DistributionDTO } from "../models/DIstributionDTO";
-import { Event } from "../models/Event";
+import { DistributionDTO } from "../DTOs/DIstributionDTO";
 
 export interface IEventsService {
     createEvent(event: EventDTO): Promise<EventDTO>;

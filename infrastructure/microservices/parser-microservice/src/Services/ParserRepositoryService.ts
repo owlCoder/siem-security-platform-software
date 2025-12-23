@@ -19,7 +19,7 @@ export class ParserRepositoryService implements IParserRepositoryService {
     async getParserEventById(id: number): Promise<ParserEventDTO> {
         const event = await this.parserEventRepository.findOne({ where: { parserId: id } });
         if (!event) {
-            this.logger.log("Failed to read ParserEvent with ID: " + id);
+            await this.logger.log("Failed to read ParserEvent with ID: " + id);
 
             const parserEvent: ParserEventDTO = {
                 parser_id: -1,
