@@ -7,7 +7,7 @@ import RecentAlertsTable from "../tables/RecentAlertsTable";
 import { AlertQueryDTO } from "../../models/alerts/AlertQueryDTO";
 import AlertDetailsPanel from "../alerts/AlertDetailsPanel";
 import AlertToast from "../alerts/AlertToast";
-import { AlertSSEService } from "../../sse/AlertSSEService";
+import { AlertSSEService } from "../../services/AlertSSEService";
 import { useAuth } from "../../hooks/useAuthHook";
 import { AlertDTO } from "../../models/alerts/AlertDTO";
 

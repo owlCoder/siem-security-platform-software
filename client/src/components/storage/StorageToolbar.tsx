@@ -25,6 +25,7 @@ export default function StorageToolBar({ onSearch, onSort }: Props) {
     const toolBarWrapper: React.CSSProperties = {
         display: "flex",
         justifyContent: "flex-end",
+        padding:"5px",
         margin: "16px 0"
     };
 

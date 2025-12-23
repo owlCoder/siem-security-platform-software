@@ -22,7 +22,7 @@ export default function Storage() {
             id: 1,
             fileName: "logs_2024-12-01.tar",
             eventCount: 1200,
-            fileSize: 5242880, 
+            fileSize: 5242880,
             createdAt: "2024-12-01T10:15:00Z",
             downloadUrl: ""
         },
@@ -30,7 +30,7 @@ export default function Storage() {
             id: 2,
             fileName: "logs_2024-12-02.tar",
             eventCount: 340,
-            fileSize: 2097152, 
+            fileSize: 2097152,
             createdAt: "2024-12-02T12:40:00Z",
             downloadUrl: ""
         },
@@ -38,7 +38,7 @@ export default function Storage() {
             id: 3,
             fileName: "logs_2024-12-03.tar",
             eventCount: 980,
-            fileSize: 7340032, 
+            fileSize: 7340032,
             createdAt: "2024-12-03T09:05:00Z",
             downloadUrl: ""
         },
@@ -46,7 +46,7 @@ export default function Storage() {
             id: 4,
             fileName: "logs_2024-12-04.tar",
             eventCount: 120,
-            fileSize: 1048576, 
+            fileSize: 1048576,
             createdAt: "2024-12-04T18:22:00Z",
             downloadUrl: ""
         },
@@ -54,19 +54,19 @@ export default function Storage() {
             id: 5,
             fileName: "logs_2024-12-05.tar",
             eventCount: 1560,
-            fileSize: 9437184, 
+            fileSize: 9437184,
             createdAt: "2024-12-05T07:50:00Z",
             downloadUrl: ""
         }
     ];
 
     useEffect(() => {
-        if(!token) return;
+        if (!token) return;
 
         const fetchData = async () => {
             //setIsLoading(true);
 
-            try{
+            try {
                 const [archivesData, statsData] = await Promise.all([
                     storageAPI.getAllArchives(),
                     storageAPI.getStats()
@@ -84,7 +84,7 @@ export default function Storage() {
         fetchData();
     }, [token]);
 
-     useEffect(() => {
+    useEffect(() => {
         setArchives(mockArchives);
 
         setStats({
@@ -97,9 +97,9 @@ export default function Storage() {
     }, []);
 
     const handleSearchArchives = async (query: string) => {
-        if(!token) return;
+        if (!token) return;
 
-        try{
+        try {
             const data = await storageAPI.searchArchives(query);
             setArchives(data);
         } catch (err) {
@@ -108,23 +108,33 @@ export default function Storage() {
     }
 
     const handleSortArchives = async (by: "date" | "size" | "name", order: "asc" | "desc") => {
-        if(!token) return;
+        if (!token) return;
 
-        try{
+        try {
             const data = await storageAPI.sortArchives(by, order);
             setArchives(data);
         } catch (err) {
             console.error(err);
         }
     }
-
+    const storageDivStyle: React.CSSProperties = {
+        border: "2px solid #282A28",
+        backgroundColor: "transparent",
+        borderRadius: "14px",
+        borderColor: "#282A28",
+    };
     // if(isLoading) return <div>Loading storage...</div>
 
     return (
         <>
-            {stats && <StorageStats stats={stats}/>}
-            <StorageToolBar onSearch={handleSearchArchives} onSort={handleSortArchives} />
-            <StorageTable archives={archives}/>
+            <div style={storageDivStyle}>
+                <h2 style={{ marginTop: '3px', padding: "5px", margin: "10px" }}>Storage</h2>
+                <div style={{padding:"5px"}}>
+                {stats && <StorageStats stats={stats} />}
+                <StorageToolBar onSearch={handleSearchArchives} onSort={handleSortArchives} />
+                <StorageTable archives={archives} />
+                </div>
+            </div>
         </>
     );
 }
