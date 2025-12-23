@@ -7,20 +7,35 @@ import RecentAlertsTable from "../tables/RecentAlertsTable";
 import { AlertQueryDTO } from "../../models/alerts/AlertQueryDTO";
 import AlertDetailsPanel from "../alerts/AlertDetailsPanel";
 import AlertToast from "../alerts/AlertToast";
+import { Pagination } from "../common/Pagination";
+import { AlertSSEService } from "../../services/AlertSSEService";
+import { DesktopNotificationService } from "../../services/DesktopNotificationService";
 import { useAuth } from "../../hooks/useAuthHook";
 import { AlertDTO } from "../../models/alerts/AlertDTO";
-import { AlertSSEService } from "../../services/AlertSSEService";
 
 const alertAPI = new AlertAPI();
+const desktopNotification = new DesktopNotificationService();
 
 export default function Alerts() {
   const { token } = useAuth();
-  const { alerts, isLoading, searchAlerts, resolveAlert, updateStatus, addAlert, updateAlert } = useAlerts(alertAPI);
+  const { 
+    alerts, 
+    isLoading, 
+    pagination,
+    searchAlerts, 
+    resolveAlert, 
+    updateStatus, 
+    addAlert, 
+    updateAlert 
+  } = useAlerts(alertAPI);
+  
   const [selectedAlertId, setSelectedAlertId] = useState<number | null>(null);
   const [toastAlert, setToastAlert] = useState<AlertDTO | null>(null);
   const [sseConnected, setSseConnected] = useState(false);
+  const [sseService, setSseService] = useState<AlertSSEService | null>(null);
+  const [currentQuery, setCurrentQuery] = useState<AlertQueryDTO>({ page: 1, limit: 10 });
 
-  /*const testAlerts: AlertDTO[] = [
+    /*const testAlerts: AlertDTO[] = [
     {
       id: 1,
       title: "Database Connection Lost",
@@ -61,6 +76,18 @@ export default function Alerts() {
 
   //const activeAlerts = testAlerts; TEST
 
+
+  // Request desktop notification permission on mount
+  useEffect(() => {
+    desktopNotification.requestPermission().then((granted) => {
+      if (granted) {
+        console.log("Desktop notifications enabled");
+      } else {
+        console.warn("Desktop notifications denied");
+      }
+    });
+  }, []);
+
   // Initialize SSE connection
   useEffect(() => {
     if (!token) return;
@@ -70,26 +97,32 @@ export default function Alerts() {
 
     // Register callbacks
     service.onNewAlert((alert) => {
-      console.log("New alert received:", alert);
+      console.log("🆕 New alert received:", alert);
       addAlert(alert);
       setToastAlert(alert);
+      
+      // Show desktop notification for critical/high alerts
+      desktopNotification.showAlertNotification(alert, () => {
+        setSelectedAlertId(alert.id);
+      });
     });
 
     service.onAlertUpdate((alert, updateType) => {
-      console.log(`Alert updated (${updateType}):`, alert);
+      console.log(`🔄 Alert updated (${updateType}):`, alert);
       updateAlert(alert);
     });
 
     service.onConnectionStatus((connected) => {
-      console.log(`SSE connection status: ${connected ? "Connected" : "Disconnected"}`);
+      console.log(`📡 SSE connection status: ${connected ? "Connected" : "Disconnected"}`);
       setSseConnected(connected);
     });
 
     service.onError((error) => {
-      console.error("SSE error:", error);
+      console.error("❌ SSE error:", error);
     });
 
     service.connect();
+    setSseService(service);
 
     // Cleanup on unmount
     return () => {
@@ -98,7 +131,21 @@ export default function Alerts() {
   }, [token]);
 
   const handleSearch = (query: AlertQueryDTO) => {
-    searchAlerts(query);
+    const fullQuery = { ...query, page: 1 };
+    setCurrentQuery(fullQuery);
+    searchAlerts(fullQuery);
+  };
+
+  const handlePageChange = (page: number) => {
+    const newQuery = { ...currentQuery, page };
+    setCurrentQuery(newQuery);
+    searchAlerts(newQuery);
+  };
+
+  const handlePageSizeChange = (limit: number) => {
+    const newQuery = { ...currentQuery, page: 1, limit };
+    setCurrentQuery(newQuery);
+    searchAlerts(newQuery);
   };
 
   const handleSelectAlert = (id: number) => {
@@ -134,84 +181,89 @@ export default function Alerts() {
     ? new Date(lastAlert.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
     : "--:--";
 
-  const selectedAlert = selectedAlertId
+  const selectedAlert = selectedAlertId 
     ? alerts.find(a => a.id === selectedAlertId) || null
     : null;
-
-  {/*const selectedAlert = selectedAlertId
+  
+    /*const selectedAlert = selectedAlertId
     ? activeAlerts.find(a => a.id === selectedAlertId) || null
-    : null; // NEW - TEST */}
+    : null; // NEW - TEST */
 
   return (
-    <>
-      {/*<style>
-        {`
-          @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-          }
-        `}
-      </style> it should work without*/}
-
-      <div className="border-2 border-[#282A28] bg-transparent rounded-[14px] p-6! relative">
-        <div className="flex justify-between items-center mb-[24px]!">
-          <h2 className="m-0">Alert Dashboard</h2>
-
+  <>
+    <div className="border-2 border-[#282A28] bg-transparent rounded-[14px] p-6! relative">
+      <div className="flex justify-between items-center mb-[24px]!">
+        <h2 className="m-0">Alert Dashboard</h2>
+        
+        <div className="flex items-center">
+          {/* SSE STATUS */}
           <div className={`flex items-center gap-2 px-3! py-1.5! rounded-[8px] text-[12px] font-semibold
-    ${sseConnected
+            ${sseConnected
               ? "bg-[rgba(74,222,128,0.15)] text-[#4ade80] border border-[rgba(74,222,128,0.3)]"
               : "bg-[rgba(239,68,68,0.15)] text-[#f87171] border border-[rgba(239,68,68,0.3)]"
             }`}>
             <div
-              className={`w-2 h-2 rounded-full ${sseConnected ? "bg-[#4ade80] animate-pulse" : "bg-[#f87171] animate-none"
-                }`}
+              className={`w-2 h-2 rounded-full ${sseConnected ? "bg-[#4ade80] animate-pulse" : "bg-[#f87171] animate-none"}`}
             ></div>
             {sseConnected ? "Live Updates Active" : "Connecting..."}
           </div>
+
+          {/* DESKTOP NOTIFICATIONS */}
+          {desktopNotification.canShowNotifications() && (
+            <div className="ml-3 flex items-center gap-2 rounded-[8px] border border-[rgba(96,165,250,0.3)] bg-[rgba(96,165,250,0.15)] px-3! py-1.5! text-[12px] text-[#60a5fa]">
+              🔔 Desktop Notifications Enabled
+            </div>
+          )}
         </div>
-
-        <AlertStatistics alerts={alerts} lastAlertTime={lastAlertTime} />
-        {/* <AlertStatistics alerts={activeAlerts} lastAlertTime={lastAlertTime} /> {/* NEW - TEST */}
-
-        <AlertFilters onSearch={handleSearch} />
-
-        {isLoading && (
-          <div className="text-center p-10">
-            <div className="spinner"></div>
-          </div>
-        )}
-
-        <RecentAlertsTable
-          alerts={alerts}
-          onSelectAlert={handleSelectAlert}
-          onResolve={handleResolve}
-          onUpdateStatus={handleUpdateStatus}
-        />
-
-        {/*<RecentAlertsTable
-          alerts={activeAlerts}
-          onSelectAlert={handleSelectAlert}
-          onResolve={handleResolve}
-          onUpdateStatus={handleUpdateStatus}
-        /> {/* NEW - TEST*/}
-
-
-        {selectedAlert && (
-          <AlertDetailsPanel
-            alert={selectedAlert}
-            onClose={handleCloseDetails}
-            onResolve={handleResolve}
-          />
-        )}
-
-        {toastAlert && (
-          <AlertToast
-            alert={toastAlert}
-            onClose={handleCloseToast}
-            onViewDetails={handleViewDetailsFromToast}
-          />
-        )}
       </div>
-    </>
-  );
+
+      <AlertStatistics alerts={alerts} lastAlertTime={lastAlertTime} />
+      <AlertFilters onSearch={handleSearch} />
+      
+      {isLoading && (
+        <div className="text-center p-10">
+          <div className="spinner"></div>
+        </div>
+      )}
+
+      {!isLoading && (
+        <>
+          <RecentAlertsTable
+            alerts={alerts}
+            onSelectAlert={handleSelectAlert}
+            onResolve={handleResolve}
+            onUpdateStatus={handleUpdateStatus}
+          />
+
+          {pagination && (
+            <Pagination
+              currentPage={pagination.page}
+              totalPages={pagination.totalPages}
+              pageSize={pagination.limit}
+              totalItems={pagination.total}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+            />
+          )}
+        </>
+      )}
+
+      {selectedAlert && (
+        <AlertDetailsPanel
+          alert={selectedAlert}
+          onClose={handleCloseDetails}
+          onResolve={handleResolve}
+        />
+      )}
+
+      {toastAlert && (
+        <AlertToast
+          alert={toastAlert}
+          onClose={handleCloseToast}
+          onViewDetails={handleViewDetailsFromToast}
+        />
+      )}
+    </div>
+  </>
+);
 }
