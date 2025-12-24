@@ -144,16 +144,17 @@ export default function Events() {
             <div className="flex justify-start gap-[16px] ml-[10px]!">
                 <div className="flex gap-[20px]! items-center mt-[40px]!">
                     <input
-                        className="flex-1 px-3! py-2! h-[40px]! rounded-[15px]! w-[400px] border border-[rgba(255,255,255,0.12)] bg-[rgba(0,0,0,0.3)]! text-white text-[13px] outline-none"
+                        className="flex-1 px-3! py-2! h-[40px]! rounded-[15px]! w-[400px] border border-[rgba(255,255,255,0.12)] bg-[#2d2d2d]! text-white text-[13px] outline-none"
                         placeholder="Type..."
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}
                     />
+
                 </div>
                 <div className="grid grid-rows-2">
                     <label>Type:</label>
                     <select
-                        className="border border-[rgba(255,255,255,0.12)] bg-[rgba(0,0,0,0.3)]! text-white! w-[200px]! rounded-[15px]! p-[4px]! h-[40px]! font-semibold"
+                        className="border border-[rgba(255,255,255,0.12)] bg-[#2d2d2d]! hover:bg-[#9ca3af]! text-white! w-[200px]! rounded-[15px]! p-[4px]! h-[40px]! font-semibold"
                         value={eventType}
                         onChange={(e) => setEventType(e.target.value)}
                     >
@@ -166,8 +167,8 @@ export default function Events() {
                 <div className="grid grid-rows-2">
                     <label >Date from:</label>
                     <input
-                        className="bg-[#d0d0d0] text-[#000] w-[200px] rounded-[15px] p-[4px]! h-[40px] font-semibold"
-                        type="datetime-local"
+                        className="border border-[rgba(255,255,255,0.12)] bg-[#2d2d2d]! text-white text-[#000] w-[200px] rounded-[15px] p-[4px]! h-[40px] font-semibold"
+                        type="date"
                         value={dateFrom}
                         onChange={(e) => setDateFrom(e.target.value)}
                     />
@@ -175,8 +176,8 @@ export default function Events() {
                 <div className="grid grid-rows-2">
                     <label >Date to:</label>
                     <input
-                        className="bg-[#d0d0d0] text-[#000] w-[200px] rounded-[15px] p-[4px]! h-[40px] font-semibold"
-                        type="datetime-local"
+                        className="border border-[rgba(255,255,255,0.12)] bg-[#2d2d2d]! text-white w-[200px] rounded-[15px] p-[4px]! h-[40px] font-semibold"
+                        type="date"
                         value={dateTo}
                         onChange={(e) => setDateTo(e.target.value)}
                     />
@@ -204,14 +205,8 @@ export default function Events() {
 
 
             <div className="m-[10px]!">
-                {/*isLoading && (
-                    <div className="mb-[8px]! text-white">
-                        Loading events...
-                    </div>
-                )*/}
-
                 {error && !isLoading && (
-                    <div className="text-red">
+                    <div className="text-red-400 text-[14px] ml-1!">
                         {error}
                     </div>
                 )}

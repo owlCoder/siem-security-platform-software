@@ -28,66 +28,23 @@ export function ExpandedRow({ expanded, e }: ExpandedProps) {
         void loadEventRawMessage();
     }, [token]);
 
-    const expandedContainerStyle = (expanded: boolean): React.CSSProperties => ({
-        overflow: "hidden",                             //pomjerice se styles kasnije kad zavrsimo u poseban fajl
-        transition: "height 0.3s ease",
-        backgroundColor: "#292929", // gray-700
-        height: expanded ? "200px" : "0px",
-    });
-
-    const expandedContentStyle: React.CSSProperties = {
-        display: "flex",
-        flexDirection: "column",
-        gap: "10px",
-    };
-
-    const detailRowStyle: React.CSSProperties = {
-        display: "flex",
-        justifyContent: "center",
-    };
-
-    const labelStyle: React.CSSProperties = {
-        width: "11%", // w-1/6
-        fontWeight: 600,
-        color: "#d1d5db",
-        padding: "10px"
-    };
-
-    const valueStyle: React.CSSProperties = {
-        width: "330px", // w-4/6
-        backgroundColor: "#1f1f1f", // gray-800
-        border: "1px solid #4b5563", // border-gray-600
-        borderRadius: "15px",
-        padding: "10px",
-        paddingLeft: "10px",
-        color: "#e5e7eb", // gray-200
-    };
-
-    const detailsHeaderStyle: React.CSSProperties = {
-        textAlign: "center",
-        fontSize: "22px",
-        fontWeight: 500,
-        marginBottom: "15px",
-        marginTop: "5px",
-        color: "white",
-    };
     return (
         <>
             <tr>
-                <td colSpan={4} style={{ padding: 0 }}>
-                    <div style={expandedContainerStyle(expanded)}>
-                        <div style={expandedContentStyle}>
-                            <h4 style={detailsHeaderStyle}>Details</h4>
+                <td colSpan={4} >
+                    <div className={`overflow-hidden bg-[#292929] transition-[height] duration-300 ease-in-out ${expanded ? "h-[200px]" : "h-0"}`}>
+                        <div className="flex! flex-col! gap-[20px]!">
+                            <h4 className="text-center text-[22px]! font-[500] text-white mt-[5px]! mb-[15px]!" >Details</h4>
 
-                            <div style={{ display: "grid" }}>
-                                <div style={detailRowStyle}>
-                                    <span style={labelStyle}>Description:</span>
-                                    <span style={{ ...valueStyle, marginBottom: "20px" }}>{e.description}</span>
+                            <div className="grid" >
+                                <div className="flex justify-center">
+                                    <span className="w-[111px] font-[600] text-[#d1d5db] p-[10px]!">Description:</span>
+                                    <span className="w-[330px] bg-[#1f1f1f] border-1 border-solid border-[#4b5563] rounded-[15px]! p-[10px]! pl-[10px]! text-white mb-[20px]!">{e.description}</span>
                                 </div>
 
-                                <div style={detailRowStyle}>
-                                    <span style={labelStyle}>Raw message:</span>
-                                    <span style={{ ...valueStyle }}>{rawMsg}</span>
+                                <div className="flex justify-center">
+                                    <span className="w-[111px] font-[600] text-[#d1d5db] p-[10px]!">Raw message:</span>
+                                    <span className="w-[330px] bg-[#1f1f1f] border-1 border-solid border-[#4b5563] rounded-[15px]! p-[10px]! pl-[10px]! text-white ">{rawMsg}</span>
                                 </div>
                             </div>
 

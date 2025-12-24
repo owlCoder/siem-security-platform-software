@@ -21,7 +21,13 @@ export class EventCollectorGatewayController{
             this.authenticate,
             requireSysAdmin,
             this.getAllEvents.bind(this)
-          );
+        );
+        this.router.get(
+           "/siem/events/topSource",
+          //  this.authenticate, TODO WHEN IMPLEMENT AUTHENTICATE WITH TOKEN
+          //  requireSysAdmin,
+           this.getTopSourceEvent.bind(this)
+        );
 
            this.router.get(
             "/siem/events/sortedEventsByDate",
@@ -65,12 +71,6 @@ export class EventCollectorGatewayController{
             this.deleteEvent.bind(this)
           );
 
-          this.router.get(
-             "/siem/events/topSource",
-             this.authenticate,
-             requireSysAdmin,
-             this.getTopSourceEvent.bind(this)
-          );
         }
 
 
@@ -135,7 +135,7 @@ export class EventCollectorGatewayController{
 
     private async getMaxId(req: Request, res: Response): Promise<void> {
         try {
-            const created = await this.gatewayService.getMaxId();
+            //const created = await this.gatewayService.getMaxId();
             
                 res.status(404).json({ message: "Event with this ID not found" })
             

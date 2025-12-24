@@ -7,4 +7,5 @@ export const serviceConfig = {
   storage: process.env.STORAGE_LOG_SERVICE_API!,
   parser: process.env.PARSER_SERVICE_API!,
   analysisEngine: process.env.ANALYSIS_ENGINE_SERVICE_API!,
+  event:process.env.EVENT_SERVICE_API!,
 } as const;

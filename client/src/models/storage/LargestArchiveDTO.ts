@@ -1,4 +1,4 @@
 export interface LargestArchiveDTO {
-    fileName: string;
+    archiveName: string;
     size: number;
 }

@@ -15,6 +15,7 @@ import { AnalysisGatewayController } from './WebAPI/controllers/AnalysisGatewayC
 import { createAuthMiddleware } from './Middlewares/authentification/AuthMiddleware';
 import { LogerService } from './Services/output/LogerService';
 import { ILogerService } from './Domain/services/ILogerService';
+import { EventCollectorGatewayController } from './WebAPI/controllers/EventCollectorGatewayController';
 
 
 const app = express();
@@ -54,6 +55,7 @@ app.use('/api/v1', new UserGatewayController(gatewayService, authenticate).getRo
 app.use('/api/v1', new AlertGatewayController(gatewayService, authenticate,loggerService).getRouter());
 app.use('/api/v1', new QueryGatewayController(gatewayService, authenticate).getRouter());
 app.use('/api/v1', new StorageGatewayController(gatewayService, authenticate).getRouter());
+app.use('/api/v1', new EventCollectorGatewayController(gatewayService, authenticate,loggerService).getRouter());
 app.use('/api/v1', new ParserGatewayController(gatewayService).getRouter());
 app.use('/api/v1', new AnalysisGatewayController(gatewayService, authenticate,loggerService).getRouter());
 

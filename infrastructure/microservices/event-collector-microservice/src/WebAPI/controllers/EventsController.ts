@@ -21,9 +21,9 @@ export class EventsController {
         this.router.get("/events", this.getAllEvents.bind(this));
         this.router.get("/events/sortedEventsByDate", this.getSortedEventsByDate.bind(this))
         this.router.get("/events/percentages", this.getEventPercentagesByEvent.bind(this))
+        this.router.get("/events/topSource",this.getTopSourceEvent.bind(this))
         this.router.get("/events/:id", this.getEventById.bind(this));
         this.router.get("/events/from/:fromId/to/:toId", this.getEventsFromId1ToId2.bind(this))
-        this.router.get("/events/topSource",this.getTopSourceEvent.bind(this))
         this.router.post("/events", this.createEvent.bind(this));
         this.router.delete("/events/:id", this.deleteEvent.bind(this));
         this.router.delete("/events/old", this.deleteOldEvents.bind(this));

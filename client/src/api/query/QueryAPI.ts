@@ -5,6 +5,7 @@ import { EventStatisticsDTO } from "../../models/query/EventStatisticsDTO";
 import { AlertStatisticsDTO } from "../../models/query/AlertStatisticsDTO";
 import { DistributionDTO } from "../../models/query/DistributionDTO";
 import { CountResponseDTO } from "../../models/query/CountResponseDTO";
+import { TopSourceDTO } from "../../models/events/TopSourceDTO";
 
 export class QueryAPI implements IQueryAPI {
   private readonly client: AxiosInstance;
@@ -18,6 +19,12 @@ export class QueryAPI implements IQueryAPI {
           "Content-Type": "application/json",
         },
       });
+  }
+  async getTopEventSource(token: string): Promise<TopSourceDTO> {
+    const response = await this.client.get<TopSourceDTO>("/siem/events/topSource", { //CHANGE ROUTE WITH QUERY 
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
   }
 
   async getAllEvents(token: string): Promise<EventDTO[]> {

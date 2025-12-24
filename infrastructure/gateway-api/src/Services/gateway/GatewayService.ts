@@ -22,6 +22,9 @@ import { ParserGatewayService } from "../domains/ParserGatewayService";
 import { AnalysisGatewayService } from "../domains/AnalysisGatewayService";
 import { serviceConfig } from "../../Infrastructure/config/ServiceConfig";
 import { LargestArchiveDTO } from "../../Domain/DTOs/LargestArchiveDTO";
+import { DistributionDTO } from "../../Domain/DTOs/DistributionDTO";
+import { TopSourceDTO } from "../../Domain/DTOs/TopSourceDTO";
+import { EventCollectorGatewayService } from "../domains/EventCollectorGatewayService";
 
 /**
  * Facade that delegates to domain-specific gateway services.
@@ -35,7 +38,7 @@ export class GatewayService implements IGatewayService {
   private readonly storageService: StorageGatewayService;
   private readonly parserService: ParserGatewayService;
   private readonly analysisService: AnalysisGatewayService;
-
+  private readonly eventService: EventCollectorGatewayService;
   constructor() {
     this.authService = new AuthGatewayService();
     this.userService = new UserGatewayService();
@@ -44,6 +47,34 @@ export class GatewayService implements IGatewayService {
     this.storageService = new StorageGatewayService();
     this.parserService = new ParserGatewayService();
     this.analysisService = new AnalysisGatewayService();
+    this.eventService=new EventCollectorGatewayService();
+  }
+  async createEvent(event: EventDTO): Promise<EventDTO> {
+    return await this.eventService.createEvent(event);
+  }
+  async getAll(): Promise<EventDTO[]> {
+    return await this.eventService.getAllEvents();
+  }
+  async getById(id: number): Promise<EventDTO> {
+    return await this.eventService.getEventById(id);
+  }
+  async deleteOldEvents(expiredIds: number[]): Promise<boolean> {
+    return await this.eventService.deleteOldEvents(expiredIds);
+  }
+  /*async getMaxId(): Promise<EventDTO> {
+    return await this.eventService.get(id); //dodati funkciju u event gateway service i event microservice
+  }*/
+ async getEventsFromId1ToId2(fromId: number, toId: number): Promise<EventDTO[]> {
+    return await this.eventService.getEventsFromId1ToId2(fromId,toId);
+  }
+  async getSortedEventsByDate(): Promise<EventDTO[]> {
+    return await this.eventService.getSortedEventsByDate();
+  }
+  async getEventPercentagesByEvent(): Promise<DistributionDTO> {
+    return await this.eventService.getEventPercentagesByEvent();
+  }
+  async getTopSourceEvent(): Promise<TopSourceDTO> {
+    return await this.eventService.getTopSourceEvent();
   }
 
   // Parser

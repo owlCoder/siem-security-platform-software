@@ -70,11 +70,12 @@ export default function Dashboard() {
                 getMostEventType(infoCount,errorCount,warningCount);
                 console.log("Ucitani events");
                 const archive=await storageApi.getLargestArchive(token);
-                setMostWeightArchive(archive.fileName);
+                console.log("Arhiva largest ",archive)
+                setMostWeightArchive(archive.archiveName);
                 setMostWeightArchiveValue(archive.size);       
-                //const event=await eventApi.getTopEvent() response={name,value}
-                //setTopEvent(event.name);
-                //setTopEventValue(event.value);          set when create method in event service for this
+                const event=await api.getTopEventSource(token);
+                setTopEvent(event.source!);
+                setTopEventValue(event.count!);      
             } catch (error) {
                 console.error("Error fetching data:", error);
             }

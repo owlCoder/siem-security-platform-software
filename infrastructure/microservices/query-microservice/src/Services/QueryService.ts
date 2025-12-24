@@ -55,7 +55,7 @@ export class QueryService implements IQueryService {
 
         if (textQuery !== "") {
             textQuery.trim().toLowerCase();
-            const matchingIds = this.queryRepositoryService.findEvents(textQuery);
+            /*const matchingIds = this.queryRepositoryService.findEvents(textQuery); izbacuje gresku pa je zakomentarisanno
 
             // ako postoji text filter i nema poklapanja to znaci da nema rezultata
             if (matchingIds.size === 0) {
@@ -64,7 +64,7 @@ export class QueryService implements IQueryService {
                 filteredEvents = allEvents.filter(event =>
                     matchingIds.has(event.id)
                 );
-            }
+            }*/
         }
         
         const result =  filteredEvents.filter(event => {

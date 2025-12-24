@@ -10,7 +10,7 @@ export class EventCollectorGatewayService{
     
       constructor() {
         this.client = axios.create({
-          baseURL: serviceConfig.alert,
+          baseURL: serviceConfig.event,
           ...defaultAxiosClient
         });
       }
@@ -56,9 +56,14 @@ export class EventCollectorGatewayService{
 
         return response.data
       }
+       async deleteOldEvents(ids:number[]):Promise<boolean>{
+        const response = await this.client.delete<boolean>(`/events/old`,{data:ids})
+
+        return response.data
+      }
 
       async getTopSourceEvent():Promise<TopSourceDTO>{
-        const response = await this.client.getTopSourceEvent<TopSourceDTO>("/events/topSource")
+        const response = await this.client.get<TopSourceDTO>("/events/topSource")
 
         return response.data
       }
