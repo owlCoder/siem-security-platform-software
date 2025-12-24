@@ -128,11 +128,23 @@ export default function Events() {
     return (
         <div className="bg-transparent border-2 border-solid rounded-[14px] border-[#282A28]">
             <h2 className="mt-[3px]! p-[5px]! m-[10px]!" >Events</h2>
+            <div className="flex justify-end me-[10px]!" >
+                <div className={`flex w-[150px]! items-center gap-2 px-3! py-1.5! rounded-[8px] text-[12px] font-semibold
+            ${!isLoading
+                        ? "bg-[rgba(74,222,128,0.15)] text-[#4ade80] border border-[rgba(74,222,128,0.3)]"
+                        : "bg-[rgba(239,68,68,0.15)] text-[#f87171] border border-[rgba(239,68,68,0.3)]"
+                    }`}>
+                    <div
+                        className={`w-2 h-2 rounded-[14px]! ${!isLoading ? "bg-[#4ade80] animate-pulse" : "bg-[#f87171] animate-none"}`}
+                    ></div>
+                    {!isLoading ? "Live Updates Active" : "Connecting..."}
+                </div>
 
-            <div className="flex justify-start gap-[14px] ml-[10px]!">
+            </div>
+            <div className="flex justify-start gap-[16px] ml-[10px]!">
                 <div className="flex gap-[20px]! items-center mt-[40px]!">
                     <input
-                        className="bg-[#d0d0d0] text-black w-[200px] rounded-[15px]! p-[4px] h-[40px] font-semibold"
+                        className="flex-1 px-3! py-2! h-[40px]! rounded-[15px]! w-[400px] border border-[rgba(255,255,255,0.12)] bg-[rgba(0,0,0,0.3)]! text-white text-[13px] outline-none"
                         placeholder="Type..."
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}
@@ -141,7 +153,7 @@ export default function Events() {
                 <div className="grid grid-rows-2">
                     <label>Type:</label>
                     <select
-                        className="bg-[#d0d0d0]! text-black! w-[200px]! rounded-[15px]! p-[4px]! h-[40px] font-semibold"
+                        className="border border-[rgba(255,255,255,0.12)] bg-[rgba(0,0,0,0.3)]! text-white! w-[200px]! rounded-[15px]! p-[4px]! h-[40px]! font-semibold"
                         value={eventType}
                         onChange={(e) => setEventType(e.target.value)}
                     >
@@ -170,7 +182,7 @@ export default function Events() {
                     />
                 </div>
                 <button
-                    className="bg-[#d0d0d0] text-black w-[200px] rounded-[15px]! p-[4px] h-[40px] mt-[40px]! font-semibold hover:bg-[#9ca3af]"
+                    className="bg-[#007a55] text-color w-[200px] rounded-[15px]! p-[4px] h-[40px] mt-[40px]! font-semibold hover:bg-[#9ca3af]"
                     onClick={loadEventsWithQuery}
                 >
                     Search
@@ -179,12 +191,12 @@ export default function Events() {
             </div>
             <div className="flex justify-end items-center mt-4! me-[10px]!">
 
-                <div className="flex gap-[10px] items-center">
+                <div className="flex gap-[16px] items-center">
 
 
-                    <DropDownMenu OnSortTypeChange={(value: number) => setSortType(value)} />
+                    <DropDownMenu OnSortTypeChange={(value: number) => setSortType(value)} sortName1="Source" sortName2="Date and Time" sortName3="Type" />
 
-                    <button className="bg-[#d0d0d0] text-black w-[200px] h-[40px] rounded-[15px]! font-semibold flex items-center justify-center gap-2 hover:bg-[#9ca3af]">
+                    <button className="bg-[#007a55] text-white w-[200px] h-[40px] rounded-[15px]! font-semibold flex items-center justify-center gap-2 hover:bg-[#9ca3af]">
                         Download report <FiDownload size={20} />
                     </button>
                 </div>
@@ -192,14 +204,14 @@ export default function Events() {
 
 
             <div className="m-[10px]!">
-                {isLoading && (
+                {/*isLoading && (
                     <div className="mb-[8px]! text-white">
                         Loading events...
                     </div>
-                )}
+                )*/}
 
                 {error && !isLoading && (
-                    <div className="mb-[8px]! text-red">
+                    <div className="text-red">
                         {error}
                     </div>
                 )}

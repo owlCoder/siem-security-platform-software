@@ -1,6 +1,7 @@
 import { ArchiveDTO } from "../../models/storage/ArchiveDTO";
 import { ArchiveStatsDTO } from "../../models/storage/ArchiveStatsDTO";
 import { ArchiveVolumeDTO } from "../../models/storage/ArchiveVolumeDTO";
+import { LargestArchiveDTO } from "../../models/storage/LargestArchiveDTO";
 import { TopArchiveDTO } from "../../models/storage/TopArchiveDTO";
 
 export interface IStorageAPI {
@@ -11,6 +12,7 @@ export interface IStorageAPI {
     order: "asc" | "desc"
   ): Promise<ArchiveDTO[]>;
   getStats(): Promise<ArchiveStatsDTO>;
+  getLargestArchive(token:string):Promise<LargestArchiveDTO>;
   downloadArchive(id: number, token: string): Promise<ArrayBuffer>;
   getTopArchives(
     type: "events" | "alerts",

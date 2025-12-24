@@ -49,12 +49,16 @@ export default function AllEventsTable({ events, sortType, searchText }: Argumen
                 </thead>
 
                 <tbody>
-                    {sortedEvents.map((e, index) => (
+                    {sortedEvents.length == 0 ? (<tr>
+                        <td colSpan={7} className="px-10 py-10 text-center border-b border-[#2d2d2d] text-[#a6a6a6]">
+                            No events found
+                        </td>
+                    </tr>) : (sortedEvents.map((e, index) => (
                         <EventTableRow
                             key={e.id}
                             e={e}
                             index={index} />
-                    ))}
+                    )))}
                 </tbody>
             </table>
         </div>

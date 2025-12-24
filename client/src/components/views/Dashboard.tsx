@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { QueryAPI } from "../../api/query/QueryAPI";
 import { useAuth } from "../../hooks/useAuthHook";
 import { EventRow } from "../../types/events/EventRow";
+import { StorageAPI } from "../../api/storage/StorageAPI";
 
 export default function Dashboard() {
     /* const events: EventRow[] = [
@@ -46,6 +47,7 @@ export default function Dashboard() {
         const fetchData = async () => {
             //if (!token) return;           // TODO: DELETE COMMENT AFTER TESTING
             const api = new QueryAPI();
+            const storageApi = new StorageAPI();
             try {
                 const recentEvents = await api.getLastThreeEvents(token);
                 const mappedEvents: EventRow[] = recentEvents.map(event => ({
@@ -67,9 +69,9 @@ export default function Dashboard() {
                 setErrorCount(errorCount);
                 getMostEventType(infoCount,errorCount,warningCount);
                 console.log("Ucitani events");
-                //const archive=await storageApi.getMostWeightArchive() response={name,value}
-                //setMostWeightArchive(archive.name);
-                //setMostWeightArchiveVale(archive.value);          set when create method in storage service for this
+                const archive=await storageApi.getLargestArchive(token);
+                setMostWeightArchive(archive.fileName);
+                setMostWeightArchiveValue(archive.size);       
                 //const event=await eventApi.getTopEvent() response={name,value}
                 //setTopEvent(event.name);
                 //setTopEventValue(event.value);          set when create method in event service for this

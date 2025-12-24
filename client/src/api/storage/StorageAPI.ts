@@ -1,6 +1,7 @@
 import { ArchiveDTO } from "../../models/storage/ArchiveDTO";
 import { ArchiveStatsDTO } from "../../models/storage/ArchiveStatsDTO";
 import { ArchiveVolumeDTO } from "../../models/storage/ArchiveVolumeDTO";
+import { LargestArchiveDTO } from "../../models/storage/LargestArchiveDTO";
 import { TopArchiveDTO } from "../../models/storage/TopArchiveDTO";
 import { IStorageAPI } from "./IStorageAPI";
 import axios, { AxiosInstance } from "axios";
@@ -15,6 +16,12 @@ export class StorageAPI implements IStorageAPI {
                 "Content-Type": "application/json"
             },
         });
+    }
+    async getLargestArchive(token: string): Promise<LargestArchiveDTO> {
+        const response = await this.client.get(`/storageLog/largest`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        return response.data;
     }
 
     async getAllArchives(): Promise<ArchiveDTO[]> {

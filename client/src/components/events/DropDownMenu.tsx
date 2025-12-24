@@ -2,9 +2,12 @@ import { useState } from "react";
 
 interface DropDownMenuProps {
     OnSortTypeChange: (value: number) => void;
+    sortName1:string;
+    sortName2:string;
+    sortName3:string;
 }
 
-export default function DropDownMenu({ OnSortTypeChange }: DropDownMenuProps) {
+export default function DropDownMenu({ OnSortTypeChange,sortName1,sortName2,sortName3 }: DropDownMenuProps) {
     const [open, setOpen] = useState(false);
     const [sortText, setSortText] = useState("Sort by");
     const [arrow, setArrow] = useState(false);
@@ -16,77 +19,20 @@ export default function DropDownMenu({ OnSortTypeChange }: DropDownMenuProps) {
         setOpen(false);
     };
 
-    /* ================= STYLES ================= */
-
-    const buttonStyle: React.CSSProperties = {
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        backgroundColor: "#d0d0d0",
-        color: "#000",
-        borderRadius: "15px",
-        width: "200px",
-        height: "40px",
-        padding: "8px 12px",
-        cursor: "pointer",
-        border: "none",
-    };
-
-    const dropdownStyle: React.CSSProperties = {
-        position: "absolute",
-        top: "210px",
-        zIndex: 10,
-        backgroundColor: "#d0d0d0",
-        borderRadius: "15px",
-        boxShadow: "0 6px 14px rgba(0,0,0,0.25)",
-        width: "200px",
-    };
-
-    const ulStyle: React.CSSProperties = {
-        padding: "8px",
-        fontSize: "14px",
-        fontWeight: 500,
-        listStyle: "none",
-        margin: 0,
-    };
-
-    const liStyle: React.CSSProperties = {
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        height: "40px",
-        padding: "4px 8px",
-        color: "#000",
-        cursor: "pointer",
-        borderBottom: "1px solid #000",
-    };
-
-    const liHoverStyle: React.CSSProperties = {
-        backgroundColor: "#9ca3af", // gray-400
-    };
-
-    /* ================= JSX ================= */
-
     return (
         <div>
             <button
                 type="button"
-                style={buttonStyle}
-                onClick={() => setOpen(!open)}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#9ca3af")}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#d0d0d0")}
-            >
-                <span style={{ display: "inline-flex", alignItems: "center", gap: "2px" }}>
+                className="inline-flex items-center justify-between bg-[#d0d0d0] hover:bg-[#9ca3af]! text-black rounded-[15px]! w-[200px]! h-[40px]! cursor-pointer outline-none"
+                onClick={() => setOpen(!open)}>
+                <span  className="inline-flex items-center gap-2">
                     {sortText}
                     {sortText !== "Sort by" && (
                         <svg
                             width="14"
                             height="14"
                             viewBox="0 0 16 16"
-                            style={{
-                                transform: arrow ? "rotate(0deg)" : "rotate(180deg)",
-                                transition: "transform 0.2s ease"
-                            }}
+                            className={`transition-transform duration-300 ease-in-out will-change-transform ${arrow ? "rotate-0" : "rotate-180"}`}
                             fill="currentColor"
                         >
                             <path d="M6 8L2 8L2 6L8 0L14 6L14 8L10 8L10 16L6 16L6 8Z" />
@@ -110,17 +56,13 @@ export default function DropDownMenu({ OnSortTypeChange }: DropDownMenuProps) {
             </button>
 
             {open && (
-                <div style={dropdownStyle}>
-                    <ul style={ulStyle}>
-                        <li style={liStyle}>Sort by</li>
+                <div className="absolute top-[220px]! bg-[#d0d0d0] rounded-[15px]! w-[200px]! z-10">
+                    <ul className="p-[6px]! list-none! text-[14px] font-[500] m-0">
 
                         <li
-                            style={liStyle}
-                            onClick={(e) => sortChange(e.currentTarget.innerText, 1)}
-                            onMouseEnter={(e) => Object.assign(e.currentTarget.style, liHoverStyle)}
-                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-                        >
-                            <span>Source</span>
+                           onClick={() => sortChange(sortName1, 1)}
+                           className="flex justify-between items-center h-[40px] px-[8px]! py-[4px]! text-black cursor-pointer border-b border-black hover:bg-[#9ca3af]!">
+                            <span>{sortName1}</span>
                             <span><svg
                                 width="14"
                                 height="14"
@@ -134,12 +76,9 @@ export default function DropDownMenu({ OnSortTypeChange }: DropDownMenuProps) {
                         </li>
 
                         <li
-                            style={liStyle}
-                            onClick={(e) => sortChange(e.currentTarget.innerText, 2)}
-                            onMouseEnter={(e) => Object.assign(e.currentTarget.style, liHoverStyle)}
-                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-                        >
-                            <span>Source</span>
+                        onClick={() => sortChange(sortName1, 2)}
+                            className="flex justify-between items-center h-[40px] px-[8px]! py-[4px]! text-black cursor-pointer border-b border-black hover:bg-[#9ca3af]!">
+                            <span>{sortName1}</span>
                             <span>
                                 <svg
                                     width="14"
@@ -154,12 +93,9 @@ export default function DropDownMenu({ OnSortTypeChange }: DropDownMenuProps) {
                         </li>
 
                         <li
-                            style={liStyle}
-                            onClick={(e) => sortChange(e.currentTarget.innerText, 3)}
-                            onMouseEnter={(e) => Object.assign(e.currentTarget.style, liHoverStyle)}
-                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-                        >
-                            <span>Date and time</span>
+                        onClick={() => sortChange(sortName2, 3)}
+                            className="flex justify-between items-center h-[40px] px-[8px]! py-[4px]! text-black cursor-pointer border-b border-black hover:bg-[#9ca3af]!">
+                            <span>{sortName2}</span>
                             <span><svg
                                 width="14"
                                 height="14"
@@ -173,12 +109,9 @@ export default function DropDownMenu({ OnSortTypeChange }: DropDownMenuProps) {
                         </li>
 
                         <li
-                            style={liStyle}
-                            onClick={(e) => sortChange(e.currentTarget.innerText, 4)}
-                            onMouseEnter={(e) => Object.assign(e.currentTarget.style, liHoverStyle)}
-                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-                        >
-                            <span>Date and time</span>
+                        onClick={() => sortChange(sortName2, 4)}
+                           className="flex justify-between items-center h-[40px] px-[8px]! py-[4px]! text-black cursor-pointer border-b border-black hover:bg-[#9ca3af]!">
+                            <span>{sortName2}</span>
                             <span>
                                 <svg
                                     width="14"
@@ -193,12 +126,9 @@ export default function DropDownMenu({ OnSortTypeChange }: DropDownMenuProps) {
                         </li>
 
                         <li
-                            style={liStyle}
-                            onClick={(e) => sortChange(e.currentTarget.innerText, 5)}
-                            onMouseEnter={(e) => Object.assign(e.currentTarget.style, liHoverStyle)}
-                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-                        >
-                            <span>Type</span>
+                        onClick={() => sortChange(sortName3, 5)}
+                            className="flex justify-between items-center h-[40px] px-[8px]! py-[4px]! text-black cursor-pointer border-b border-black hover:bg-[#9ca3af]!">
+                            <span>{sortName3}</span>
                             <span><svg
                                 width="14"
                                 height="14"
@@ -212,14 +142,9 @@ export default function DropDownMenu({ OnSortTypeChange }: DropDownMenuProps) {
                         </li>
 
                         <li
-                            style={liStyle}
-                            onClick={(e) => sortChange(e.currentTarget.innerText, 6)}
-                            onMouseEnter={(e) => Object.assign(e.currentTarget.style, liHoverStyle)}
-                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-                        >
-                            <span >
-                                Type
-                            </span>
+                        onClick={() => sortChange(sortName3, 6)}
+                            className="flex justify-between items-center h-[40px] px-[8px]! py-[4px]! text-black cursor-pointer border-b border-black hover:bg-[#9ca3af]!">
+                            <span >{sortName3}</span>
                             <span>
                                 <svg
                                     width="14"
