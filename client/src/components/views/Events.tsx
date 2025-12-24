@@ -1,5 +1,5 @@
 import AllEventsTable from "../tables/AllEventsTable";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FiDownload } from "react-icons/fi";
 import { useAuth } from "../../hooks/useAuthHook";
 import { EventDTO } from "../../models/events/EventDTO";
@@ -26,97 +26,6 @@ export default function Events() {
     const [events, setEvents] = useState<EventRow[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-
-    const eventDivStyle: React.CSSProperties = {
-        border: "2px solid #282A28",
-        backgroundColor: "transparent",
-        borderRadius: "14px",
-        borderColor: "#282A28",
-    };
-
-    const downloadStyle: React.CSSProperties = {
-        backgroundColor: "#d0d0d0",
-        borderRadius: "15px",
-        width: "200px",
-        color: "#000",
-    };
-
-    const firstRowStyle: React.CSSProperties = {
-        display: "flex",
-        justifyContent: "right",
-        marginInlineEnd: "10px",
-        gap: "12px"
-    };
-
-    const elementsStyle: React.CSSProperties = {
-        background: "#d0d0d0",
-        color: "#000",
-        width: "200px",
-        borderRadius: "15px",
-        padding: "4px",
-        height: "40px",
-        fontWeight: 500
-    };
-
-    const searchInputStyle: React.CSSProperties = {
-        ...elementsStyle,
-        width: "200px",
-    };
-
-    const dateInputStyle: React.CSSProperties = {
-        ...elementsStyle,
-        width: "200px",
-    };
-
-    const selectStyle: React.CSSProperties = {
-        ...elementsStyle,
-        width: "200px",
-        marginLeft: "15px"
-    };
-
-    const secondRowStyle: React.CSSProperties = {
-        display: "flex",
-        flexDirection: "row",
-        margin: "10px",
-    };
-
-    const leftSideStyle: React.CSSProperties = {
-        display: "flex",
-        gap: "10px",
-        justifyContent: "left",
-        width: "100%",
-        alignItems: "center",
-    };
-
-
-    const rightSideStyle: React.CSSProperties = {
-        display: "flex",
-        gap: "10px",
-        justifyContent: "right",
-        width: "100%",
-        alignItems: "center",
-    };
-
-    const liHoverStyle: React.CSSProperties = {
-        backgroundColor: "#9ca3af", // gray-400
-    };
-
-    /*const formatTime = (iso: string): string => {     DELETE IF WE DON`T USE LATER
-        const date = new Date(iso);
-        if (Number.isNaN(date.getTime())) return iso;
-
-        const pad = (n: number) => n.toString().padStart(2, "0");
-
-        const hours = pad(date.getHours());
-        const minutes = pad(date.getMinutes());
-        const seconds = pad(date.getSeconds());
-        const day = pad(date.getDate());
-        const month = pad(date.getMonth() + 1);
-        const year = date.getFullYear();
-
-        // isti stil kao pre: "HH:MM:SS   DD/MM/YYYY"
-        return `${hours}:${minutes}:${seconds}   ${day}/${month}/${year}`;
-    };*/
 
     const mapEventDTOToRow = (e: EventDTO): EventRow => {
         let type: EventRow["type"];
@@ -203,7 +112,7 @@ export default function Events() {
 
                 const data: EventDTO[] = await api.getAllEvents(token);
                 const mapped = data.map(mapEventDTOToRow);
-                console.log("aaaaaaaa ",mapped[0].time)
+                console.log("aaaaaaaa ", mapped[0].time)
                 setEvents(mapped);
             } catch (err) {
                 console.error(err);
@@ -217,81 +126,80 @@ export default function Events() {
     }, [token]);
 
     return (
-        <div style={eventDivStyle}>
-            <h2 style={{ marginTop: '3px', padding: "5px", margin: "10px" }}>Events</h2>
+        <div className="bg-transparent border-2 border-solid rounded-[14px] border-[#282A28]">
+            <h2 className="mt-[3px]! p-[5px]! m-[10px]!" >Events</h2>
 
-            <div style={firstRowStyle}>
-                <div style={{ display: "grid", gridTemplateRows: "repeat(2,1fr)" }}>
+            <div className="flex justify-start gap-[14px] ml-[10px]!">
+                <div className="flex gap-[20px]! items-center mt-[40px]!">
+                    <input
+                        className="bg-[#d0d0d0] text-black w-[200px] rounded-[15px]! p-[4px] h-[40px] font-semibold"
+                        placeholder="Type..."
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                    />
+                </div>
+                <div className="grid grid-rows-2">
+                    <label>Type:</label>
+                    <select
+                        className="bg-[#d0d0d0]! text-black! w-[200px]! rounded-[15px]! p-[4px]! h-[40px] font-semibold"
+                        value={eventType}
+                        onChange={(e) => setEventType(e.target.value)}
+                    >
+                        <option value="all">All types</option>
+                        <option value="info">Informations</option>
+                        <option value="warning">Warnings</option>
+                        <option value="error">Errors</option>
+                    </select>
+                </div>
+                <div className="grid grid-rows-2">
                     <label >Date from:</label>
                     <input
-                        style={dateInputStyle}
+                        className="bg-[#d0d0d0] text-[#000] w-[200px] rounded-[15px] p-[4px]! h-[40px] font-semibold"
                         type="datetime-local"
                         value={dateFrom}
                         onChange={(e) => setDateFrom(e.target.value)}
                     />
                 </div>
-                <div style={{ display: "grid", gridTemplateRows: "repeat(2,1fr)" }}>
+                <div className="grid grid-rows-2">
                     <label >Date to:</label>
                     <input
-                        style={dateInputStyle}
+                        className="bg-[#d0d0d0] text-[#000] w-[200px] rounded-[15px] p-[4px]! h-[40px] font-semibold"
                         type="datetime-local"
                         value={dateTo}
                         onChange={(e) => setDateTo(e.target.value)}
                     />
                 </div>
+                <button
+                    className="bg-[#d0d0d0] text-black w-[200px] rounded-[15px]! p-[4px] h-[40px] mt-[40px]! font-semibold hover:bg-[#9ca3af]"
+                    onClick={loadEventsWithQuery}
+                >
+                    Search
+                </button>
 
             </div>
-            <div style={secondRowStyle}>
-                <div style={leftSideStyle}>
-                    <input
-                        style={searchInputStyle}
-                        placeholder="Type..."
-                        value={searchText}
-                        onChange={(e) => setSearchText(e.target.value.toString())}
-                    />
-                    <button
-                        style={elementsStyle}
-                        onClick={() => loadEventsWithQuery()}
-                        onMouseEnter={(e) => Object.assign(e.currentTarget.style, liHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, downloadStyle)}
-                    >
-                        Search
-                    </button>
-                </div>
-                <div style={rightSideStyle}>
-                    <div>
-                        <select
-                            style={selectStyle}
-                            value={eventType}
-                            onChange={(e) => setEventType(e.target.value)}
-                            onMouseEnter={(e) => Object.assign(e.currentTarget.style, liHoverStyle)}
-                            onMouseLeave={(e) => Object.assign(e.currentTarget.style, selectStyle)}>
-                            <option value="all">All types</option>
-                            <option value="info">Informations</option>
-                            <option value="warning">Warnings</option>
-                            <option value="error">Errors</option>
-                        </select>
-                    </div>
+            <div className="flex justify-end items-center mt-4! me-[10px]!">
+
+                <div className="flex gap-[10px] items-center">
+
+
                     <DropDownMenu OnSortTypeChange={(value: number) => setSortType(value)} />
-                    <button
-                        style={downloadStyle}
-                        onMouseEnter={(e) => Object.assign(e.currentTarget.style, liHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, downloadStyle)}
-                    >
+
+                    <button className="bg-[#d0d0d0] text-black w-[200px] h-[40px] rounded-[15px]! font-semibold flex items-center justify-center gap-2 hover:bg-[#9ca3af]">
                         Download report <FiDownload size={20} />
                     </button>
                 </div>
             </div>
 
-            <div style={{ margin: "10px" }}>
+
+            <div className="m-[10px]!">
                 {isLoading && (
-                    <div style={{ marginBottom: "8px", color: "#d0d0d0" }}>
+                    <div className="mb-[8px]! text-white">
                         Loading events...
                     </div>
                 )}
 
                 {error && !isLoading && (
-                    <div style={{ marginBottom: "8px", color: "#ff4d4f" }}>
+                    <div className="mb-[8px]! text-red">
                         {error}
                     </div>
                 )}

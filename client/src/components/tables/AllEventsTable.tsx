@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import EventTableRow from "./EventTableRow";
+import EventTableRow from "./AllEventsTableRow";
 import { EventRow } from "../../types/events/EventRow";
 
 // Inline styles for now, will be in CSS later
@@ -18,7 +18,7 @@ export default function AllEventsTable({ events, sortType, searchText }: Argumen
     useEffect(() => {
         let copy = [...events];
 
-        if (sortType === 1) {
+        if (sortType === 1) {       //maybe move in utils
             copy.sort((a, b) => a.source.localeCompare(b.source));
         } else if (sortType === 2) {
             copy.sort((a, b) => b.source.localeCompare(a.source));
@@ -34,45 +34,17 @@ export default function AllEventsTable({ events, sortType, searchText }: Argumen
 
         setSortedEvents(copy);
     }, [searchText, sortType, events]);
-    const containerStyle: React.CSSProperties = {
-        background: "#1f1f1f",
-        borderRadius: "14px",
-        overflow: "hidden",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.5)",
-        marginTop: "12px",
-        border: "1px solid #333",
-    };
-
-    const tableStyle: React.CSSProperties = {
-        width: "100%",
-        borderCollapse: "collapse",
-        fontFamily: "Segoe UI, sans-serif",
-        fontSize: "14px",
-    };
-
-    const theadStyle: React.CSSProperties = {
-        background: "#2a2a2a",
-    };
-
-    const thStyle: React.CSSProperties = {
-        padding: "12px 16px",
-        textAlign: "left",
-        color: "#d0d0d0",
-        fontWeight: 600,
-        fontSize: "14px",
-        borderBottom: "1px solid #3a3a3a",
-    };
 
     return (
-        <div style={containerStyle}>
+        <div className="bg-[#1f1f1f] rounded-[14px] mt-4! overflow-hidden shadow-md border border-[#333]">
 
-            <table style={tableStyle}>
-                <thead style={theadStyle}>
+            <table className="w-full border-collapse font-sans text-[14px]!">
+                <thead className="bg-[#2a2a2a]">
                     <tr>
-                        <th style={thStyle}>Source</th>
-                        <th style={thStyle}>Time</th>
-                        <th style={thStyle}>Type</th>
-                        <th style={thStyle}></th>
+                        <th className="px-4! py-3! text-center text-[#d0d0d0] font-semibold text-[13px] border-b border-[#3a3a3a] uppercase tracking-[0.5px]">Source</th>
+                        <th className="px-4! py-3! text-center text-[#d0d0d0] font-semibold text-[13px] border-b border-[#3a3a3a] uppercase tracking-[0.5px]">Date and Time</th>
+                        <th className="px-4! py-3! text-center text-[#d0d0d0] font-semibold text-[13px] border-b border-[#3a3a3a] uppercase tracking-[0.5px]">Type</th>
+                        <th className="px-4! py-3! text-center text-[#d0d0d0] font-semibold text-[13px] border-b border-[#3a3a3a] uppercase tracking-[0.5px]"></th>
                     </tr>
                 </thead>
 
