@@ -3,6 +3,7 @@ import { AlertQueryDTO } from "../DTOs/AlertQueryDTO";
 import { ArchiveDTO } from "../DTOs/ArchiveDTO";
 import { ArchiveStatsDTO } from "../DTOs/ArchiveStatsDTO";
 import { ArchiveVolumeDTO } from "../DTOs/ArchiveVolumeDTO";
+import { DistributionDTO } from "../DTOs/DistributionDTO";
 import { EventDTO } from "../DTOs/EventDTO";
 import { LargestArchiveDTO } from "../DTOs/LargestArchiveDTO";
 import { LoginUserDTO } from "../DTOs/LoginUserDTO";
@@ -73,4 +74,15 @@ export interface IGatewayService {
   //Analysis Engine
   analysisEngineNormalize(rawMessage: string): Promise<NormalizedEventDTO>;
   analysisEngineDeleteCorrelationsByEventIds(eventIds: number[]): Promise<number>;
+
+  //EventCollector
+   createEvent(event: EventDTO): Promise<EventDTO>;
+    getAll(): Promise<EventDTO[]>;
+    getById(id: number): Promise<EventDTO>;
+    deleteById(id: number): Promise<boolean>;
+    deleteOldEvents(expiredIds: number[]): Promise<boolean>;
+    getMaxId():Promise<EventDTO>;
+    getEventsFromId1ToId2(fromId: number, toId: number): Promise<EventDTO[]>
+    getSortedEventsByDate(): Promise<EventDTO[]>
+    getEventPercentagesByEvent(): Promise<DistributionDTO>
 }
