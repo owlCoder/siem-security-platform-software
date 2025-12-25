@@ -23,7 +23,8 @@ const emptyCacheEntry: CacheEntry = {
     _id: "",
     key: "NOT_FOUND",
     result: [],
-    cachedAt: new Date(0)
+    cachedAt: new Date(0),
+    lastProcessedId: 0
 };
 
 export class QueryRepositoryService implements IQueryRepositoryService {    
@@ -43,12 +44,18 @@ export class QueryRepositoryService implements IQueryRepositoryService {
         if(!response) return emptyCacheEntry;
         return response;
     }
+
+    async deleteByKey(key: string): Promise<boolean> {
+        const response = await this.cacheRepository.deleteOne({key});
+        return response.deletedCount === 1;
+    }
     
     async addEntry(entry: CacheEntryDTO): Promise<CacheEntry> {
         const newEntry = new CacheEntry();
         newEntry.key = entry.key;
         newEntry.result = entry.result;
         newEntry.cachedAt = new Date(); 
+        newEntry.lastProcessedId = entry.lastProcessedId;
         // postavljamo trenutno vreme kao vreme kesiranja
         return await this.cacheRepository.save(newEntry);
     }
@@ -115,5 +122,9 @@ export class QueryRepositoryService implements IQueryRepositoryService {
             take: 3
         });
         return events;
+    }
+
+    public getLastProcessedId(): number {
+        return this.invertedIndexStructureForEvents.getLastProcessedId();
     }
 }

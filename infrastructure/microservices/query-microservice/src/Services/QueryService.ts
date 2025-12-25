@@ -25,14 +25,21 @@ export class QueryService implements IQueryService {
 
     async searchEvents(query: string): Promise<EventDTO[]> {
         const cacheResult = await this.queryRepositoryService.findByKey(query);
-        
+        const lastProcessedId = this.queryRepositoryService.getLastProcessedId();
+
         if (cacheResult.key !== "NOT_FOUND") {
-            return cacheResult.result.map((e: {source: string; type: EventType; description: string; timestamp: Date; }) => ({
-                source: e.source,
-                type: e.type,
-                description: e.description,
-                timestamp: e.timestamp,
-            }));
+            // ako su im lastProcessedId isti znaci da nije obradjen(dodat) nijedan novi event od trenutka kesiranja
+            if (cacheResult.lastProcessedId === lastProcessedId)
+            {
+                return cacheResult.result.map((e: {source: string; type: EventType; description: string; timestamp: Date; }) => ({
+                    source: e.source,
+                    type: e.type,
+                    description: e.description,
+                    timestamp: e.timestamp,
+                }));
+            }
+            // a ako se ne poklapaju brisemo stari kes -> rekesiranje
+            this.queryRepositoryService.deleteByKey(query);
         }
         
         const allEvents = await this.queryRepositoryService.getAllEvents();
@@ -102,6 +109,7 @@ export class QueryService implements IQueryService {
         this.queryRepositoryService.addEntry({
             key: query,
             result: result,
+            lastProcessedId: lastProcessedId,
         });
         return result;
     } 

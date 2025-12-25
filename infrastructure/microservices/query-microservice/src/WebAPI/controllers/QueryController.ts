@@ -15,7 +15,6 @@ export class QueryController {
     }
 
     private initializeRoutes(): void {
-        this.router.post("/query/cache", this.addCacheEntry.bind(this));
         this.router.get("/query/oldEvents/:hours", this.getOldEvents.bind(this));
         this.router.get("/query/search", this.searchEvents.bind(this));
         this.router.get("/query/lastThreeEvents", this.getLastThreeEvents.bind(this));
@@ -24,18 +23,6 @@ export class QueryController {
         this.router.get("/query/infoCount", this.getInfoCount.bind(this));
         this.router.get("/query/warningCount", this.getWarningCount.bind(this));
         this.router.get("/query/errorCount", this.getErrorCount.bind(this));
-    }
-
-    private async addCacheEntry(req: Request, res: Response): Promise<void> {
-        try {
-            //const entry = req.body as CacheEntry;
-            const { key, result } = req.body;
-            // moze da se doda validacija podataka ovde
-            await this.queryRepositoryService.addEntry({ key, result });
-            res.status(201).json({ message: "Cache entry added successfully." });
-        } catch (err) {
-            res.status(500).json({ message: "Error while adding cache entry." });
-        }
     }
 
     private async getOldEvents(req: Request, res: Response): Promise<void> {

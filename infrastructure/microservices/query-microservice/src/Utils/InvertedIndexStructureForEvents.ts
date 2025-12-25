@@ -89,6 +89,7 @@ export class InvertedIndexStructureForEvents {
             this.invertedIndex.get(token)!.add(event.id);
         }
 
+        this.lastProcessedId = event.id;
         this.eventCount += 1;
         switch (event.type) {
             case "INFO":

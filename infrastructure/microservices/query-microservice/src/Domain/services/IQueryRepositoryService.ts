@@ -11,6 +11,7 @@ export interface IQueryRepositoryService {
     getMaxId(): Promise<number>;
     getEventsFromId1ToId2(fromId: number, toId: number): Promise<Event[]>;
     findByKey(key: string): Promise<CacheEntry>;
+    deleteByKey(key: string): Promise<boolean>;
     //saveEvent(event: Event): Promise<Event>;
     //searchEvents(query: string): Promise<Event[]>;
     getLastThreeEvents(): Promise<Event[]>;
@@ -18,4 +19,5 @@ export interface IQueryRepositoryService {
     getInfoCount(): number;
     getWarningCount(): number;
     getErrorCount(): number;
+    getLastProcessedId(): number;
 }

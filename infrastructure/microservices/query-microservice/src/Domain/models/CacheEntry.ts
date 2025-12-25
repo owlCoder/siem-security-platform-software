@@ -14,4 +14,7 @@ export class CacheEntry {
 
     @Column({ type: "timestamp" })
     cachedAt!: Date;
+
+    @Column({ type: "integer"})
+    lastProcessedId!: number;
 } 
