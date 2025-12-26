@@ -108,7 +108,7 @@ export default function Storage() {
 
                 setArchives(mapToArchiveDTO(archivesResponse));
                 setStats(statsResponse ?? EMPTY_STATS);
-            } catch(err) {
+            } catch (err) {
                 console.error(err);
                 setError("Failed to load storageData");
             } finally {
@@ -140,19 +140,23 @@ export default function Storage() {
         }
     }
 
-    {isLoading &&
-        <div>Loading storage...</div>
-    }
-
-    {error && !isLoading && (
-        <div className="text-red">
-            {error}
-        </div>
-    )}
-
     return (
         <div className="border-2 border-[#282A28] bg-transparent rounded-[10px]!">
             <h2 className="mt-[3px]! p-[5px]! m-[10px]!">Storage</h2>
+
+            <div className="flex justify-end me-[10px]!" >
+                <div className={`flex w-[150px]! items-center gap-2 px-3! py-1.5! rounded-[8px] text-[12px] font-semibold
+            ${!isLoading
+                        ? "bg-[rgba(74,222,128,0.15)] text-[#4ade80] border border-[rgba(74,222,128,0.3)]"
+                        : "bg-[rgba(239,68,68,0.15)] text-[#f87171] border border-[rgba(239,68,68,0.3)]"
+                    }`}>
+                    <div
+                        className={`w-2 h-2 rounded-[14px]! ${!isLoading ? "bg-[#4ade80] animate-pulse" : "bg-[#f87171] animate-none"}`}
+                    ></div>
+                    {!isLoading ? "Live Updates Active" : "Connecting..."}
+                </div>
+
+            </div>
 
             <StorageStats stats={stats ?? EMPTY_STATS} />
 
@@ -160,9 +164,23 @@ export default function Storage() {
                 <StorageToolBar onSearch={handleSearchArchives} onSort={handleSortArchives} />
             </div>
 
-            <div className="p-[10px]!">
-                <StorageTable archives={archives} />
-            </div>
+            {isLoading && (
+                <div className="text-center p-10!">
+                    <div className="spinner"></div>
+                </div>
+            )}
+
+            {error && !isLoading && (
+                <div className="text-center p-6! text-red-400">
+                    {error}
+                </div>
+            )}
+
+            {!isLoading && !error && (
+                <div className="p-[10px]!">
+                    <StorageTable archives={archives} />
+                </div>
+            )}
         </div>
     );
 }
