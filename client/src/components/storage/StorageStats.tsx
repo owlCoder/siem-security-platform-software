@@ -1,5 +1,3 @@
-//za gornje kartice, koristice se statcard
-
 import { BsDatabase } from "react-icons/bs";
 import { ArchiveStatsDTO } from "../../models/storage/ArchiveStatsDTO"
 import StatCard from "../stat_card/StatCard";

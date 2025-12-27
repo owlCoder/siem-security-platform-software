@@ -25,65 +25,6 @@ export default function Storage() {
         lastArchiveName: "No archives"
     };
 
-    //const [isLoading, setIsLoading] = useState(true);
-
-    /*const mockArchives: ArchiveDTO[] = [
-        {
-            id: 1,
-            fileName: "alerts_2024-12-01.tar",
-            eventCount: 1200,
-            fileSize: 5242880,
-            createdAt: "2024-12-01T10:15:00Z",
-            downloadUrl: ""
-        },
-        {
-            id: 2,
-            fileName: "events_2024-12-02.tar",
-            eventCount: 340,
-            fileSize: 2097152,
-            createdAt: "2024-12-02T12:40:00Z",
-            downloadUrl: ""
-        },
-        {
-            id: 3,
-            fileName: "alerts_2024-12-03.tar",
-            eventCount: 980,
-            fileSize: 7340032,
-            createdAt: "2024-12-03T09:05:00Z",
-            downloadUrl: ""
-        },
-        {
-            id: 4,
-            fileName: "events_2024-12-04.tar",
-            eventCount: 120,
-            fileSize: 1048576,
-            createdAt: "2024-12-04T18:22:00Z",
-            downloadUrl: ""
-        }, 
-        {
-            id: 5,
-            fileName: "events_2024-12-05.tar",
-            eventCount: 1560,
-            fileSize: 9437184,
-            createdAt: "2024-12-05T07:50:00Z",
-            downloadUrl: ""
-        }
-    ];
-
-   
-
-    useEffect(() => {
-        setArchives(mockArchives);
-
-        setStats({
-            totalSize: mockArchives.reduce((s, a) => s + a.fileSize, 0),
-            retentionHours: 72,
-            lastArchiveName: mockArchives[0].fileName
-        });
-
-        //setIsLoading(false);
-    }, []);
-*/
     const mapToArchiveDTO = (data: StorageLogResponseDTO[]): ArchiveDTO[] =>
         data.map(a => ({
             id: a.storageLogId,
@@ -119,7 +60,7 @@ export default function Storage() {
     }, [token]);
 
     const handleSearchArchives = async (query: string) => {
-        if (!token) return;
+        //if (!token) return;
 
         try {
             const data = await storageAPI.searchArchives(/*token,*/ query);
@@ -130,7 +71,7 @@ export default function Storage() {
     }
 
     const handleSortArchives = async (by: "date" | "size" | "name", order: "asc" | "desc") => {
-        if (!token) return;
+        //if (!token) return;
 
         try {
             const data = await storageAPI.sortArchives(/*token,*/ by, order);
