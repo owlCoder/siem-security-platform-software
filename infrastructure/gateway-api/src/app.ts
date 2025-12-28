@@ -16,6 +16,7 @@ import { createAuthMiddleware } from './Middlewares/authentification/AuthMiddlew
 import { LogerService } from './Services/output/LogerService';
 import { ILogerService } from './Domain/services/ILogerService';
 import { EventCollectorGatewayController } from './WebAPI/controllers/EventCollectorGatewayController';
+import { GatewayServiceFactory } from "./Services/gateway/GatewayServiceFactory";
 
 
 const app = express();
@@ -43,7 +44,7 @@ app.get('/health', (req, res) => {
 });
 
 // Services
-const gatewayService: IGatewayService = new GatewayService();
+const gatewayService = GatewayServiceFactory.create();
 const loggerService: ILogerService = new LogerService();
 
 // Auth middleware (reuse across controllers)
