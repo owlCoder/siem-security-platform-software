@@ -6,8 +6,9 @@ import { defaultAxiosClient } from "../../Infrastructure/config/AxiosClient";
 import { serviceConfig } from "../../Infrastructure/config/ServiceConfig";
 import { LargestArchiveDTO } from "../../Domain/DTOs/LargestArchiveDTO";
 import { StorageLogResponseDTO } from "../../Domain/DTOs/StorageLogResponseDTO";
+import { IStorageGatewayService } from "../interfaces/IStorageGatewayService";
 
-export class StorageGatewayService {
+export class StorageGatewayService implements IStorageGatewayService {
   private readonly client: AxiosInstance;
 
   constructor() {
