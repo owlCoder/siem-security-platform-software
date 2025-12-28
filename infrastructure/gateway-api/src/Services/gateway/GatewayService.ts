@@ -12,67 +12,64 @@ import { TopArchiveDTO } from "../../Domain/DTOs/TopArchiveDTO";
 import { ParserEventDto } from "../../Domain/DTOs/ParserEventDTO";
 import { ArchiveVolumeDTO } from "../../Domain/DTOs/ArchiveVolumeDTO";
 import { NormalizedEventDTO } from "../../Domain/DTOs/NormalizedEventDTO";
-import { AuthGatewayService } from "../domains/AuthGatewayService";
-import { UserGatewayService } from "../domains/UserGatewayService";
-import { AlertGatewayService } from "../domains/AlertGatewayService";
-import { QueryGatewayService } from "../domains/QueryGatewayService";
-import { StorageGatewayService } from "../domains/StorageGatewayService";
-import { ParserGatewayService } from "../domains/ParserGatewayService";
-import { AnalysisGatewayService } from "../domains/AnalysisGatewayService";
-import { serviceConfig } from "../../Infrastructure/config/ServiceConfig";
 import { LargestArchiveDTO } from "../../Domain/DTOs/LargestArchiveDTO";
 import { DistributionDTO } from "../../Domain/DTOs/DistributionDTO";
 import { TopSourceDTO } from "../../Domain/DTOs/TopSourceDTO";
-import { EventCollectorGatewayService } from "../domains/EventCollectorGatewayService";
 import { StorageLogResponseDTO } from "../../Domain/DTOs/StorageLogResponseDTO";
+import { IAuthGatewayService } from "../interfaces/IAuthGatewayService";
+import { IUserGatewayService } from "../interfaces/IUserGatewayService";
+import { IAlertGatewayService } from "../interfaces/IAlertGatewayService";
+import { IQueryGatewayService } from "../interfaces/IQueryGatewayService";
+import { IStorageGatewayService } from "../interfaces/IStorageGatewayService";
+import { IParserGatewayService } from "../interfaces/IParserGatewayService";
+import { IAnalysisGatewayService } from "../interfaces/IAnalysisGatewayService";
+import { IEventCollectorGatewayService } from "../interfaces/IEventCollectorGatewayService";
 
 /**
  * Facade that delegates to domain-specific gateway services.
- * Keeps controller interface stable while honoring SRP in implementation.
+ * Now uses Dependency Injection for better testability and SOLID compliance.
  */
 export class GatewayService implements IGatewayService {
-  private readonly authService: AuthGatewayService;
-  private readonly userService: UserGatewayService;
-  private readonly alertService: AlertGatewayService;
-  private readonly queryService: QueryGatewayService;
-  private readonly storageService: StorageGatewayService;
-  private readonly parserService: ParserGatewayService;
-  private readonly analysisService: AnalysisGatewayService;
-  private readonly eventService: EventCollectorGatewayService;
-  constructor() {
-    this.authService = new AuthGatewayService();
-    this.userService = new UserGatewayService();
-    this.alertService = new AlertGatewayService();
-    this.queryService = new QueryGatewayService();
-    this.storageService = new StorageGatewayService();
-    this.parserService = new ParserGatewayService();
-    this.analysisService = new AnalysisGatewayService();
-    this.eventService=new EventCollectorGatewayService();
-  }
+  constructor(
+    private readonly authService: IAuthGatewayService,
+    private readonly userService: IUserGatewayService,
+    private readonly alertService: IAlertGatewayService,
+    private readonly queryService: IQueryGatewayService,
+    private readonly storageService: IStorageGatewayService,
+    private readonly parserService: IParserGatewayService,
+    private readonly analysisService: IAnalysisGatewayService,
+    private readonly eventService: IEventCollectorGatewayService
+  ) {}
+
+  // Event Collector
   async createEvent(event: EventDTO): Promise<EventDTO> {
     return await this.eventService.createEvent(event);
   }
+
   async getAll(): Promise<EventDTO[]> {
     return await this.eventService.getAllEvents();
   }
+
   async getById(id: number): Promise<EventDTO> {
     return await this.eventService.getEventById(id);
   }
+
   async deleteOldEvents(expiredIds: number[]): Promise<boolean> {
     return await this.eventService.deleteOldEvents(expiredIds);
   }
-  /*async getMaxId(): Promise<EventDTO> {
-    return await this.eventService.get(id); //dodati funkciju u event gateway service i event microservice
-  }*/
- async getEventsFromId1ToId2(fromId: number, toId: number): Promise<EventDTO[]> {
-    return await this.eventService.getEventsFromId1ToId2(fromId,toId);
+
+  async getEventsFromId1ToId2(fromId: number, toId: number): Promise<EventDTO[]> {
+    return await this.eventService.getEventsFromId1ToId2(fromId, toId);
   }
+
   async getSortedEventsByDate(): Promise<EventDTO[]> {
     return await this.eventService.getSortedEventsByDate();
   }
+
   async getEventPercentagesByEvent(): Promise<DistributionDTO> {
     return await this.eventService.getEventPercentagesByEvent();
   }
+
   async getTopSourceEvent(): Promise<TopSourceDTO> {
     return await this.eventService.getTopSourceEvent();
   }
