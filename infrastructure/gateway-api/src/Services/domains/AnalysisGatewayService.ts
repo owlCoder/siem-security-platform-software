@@ -2,8 +2,9 @@ import axios, { AxiosInstance } from "axios";
 import { NormalizedEventDTO } from "../../Domain/DTOs/NormalizedEventDTO";
 import { serviceConfig } from "../../Infrastructure/config/ServiceConfig";
 import { defaultAxiosClient } from "../../Infrastructure/config/AxiosClient";
+import { IAnalysisGatewayService } from "../interfaces/IAnalysisGatewayService";
 
-export class AnalysisGatewayService {
+export class AnalysisGatewayService implements IAnalysisGatewayService {
   private readonly client: AxiosInstance;
 
   constructor() {
