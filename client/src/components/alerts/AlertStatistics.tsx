@@ -1,23 +1,97 @@
-import React from "react";
+import React, { useMemo } from "react";
+import { AlertDTO } from "../../models/alerts/AlertDTO";
 import { AlertStatus } from "../../enums/AlertStatus";
 import { AlertSeverity } from "../../enums/AlertSeverity";
 import AlertCard from "./AlertCard";
-import { AlertStatisticsProps } from "../../types/props/alerts/AlertStatisticsProps";
 
+interface AlertStatisticsProps {
+  alerts: AlertDTO[];
+  lastAlertTime: string;
+}
 
-export const AlertStatistics: React.FC<AlertStatisticsProps> = ({ alerts, lastAlertTime }) => {
-  const totalAlerts = alerts.length;
-  const criticalAlerts = alerts.filter(a => a.severity === AlertSeverity.CRITICAL).length;
-  const activeAlerts = alerts.filter(a => a.status === AlertStatus.ACTIVE).length;
-  const resolvedAlerts = alerts.filter(a => a.status === AlertStatus.RESOLVED).length;
+export const AlertStatistics: React.FC<AlertStatisticsProps> = ({
+  alerts,
+  lastAlertTime,
+}) => {
+  // Calculate statistics
+  const statistics = useMemo(() => {
+    return {
+      total: alerts.length,
+      critical: alerts.filter((a) => a.severity === AlertSeverity.CRITICAL)
+        .length,
+      high: alerts.filter((a) => a.severity === AlertSeverity.HIGH).length,
+      active: alerts.filter((a) => a.status === AlertStatus.ACTIVE).length,
+      investigating: alerts.filter(
+        (a) => a.status === AlertStatus.INVESTIGATING
+      ).length,
+      resolved: alerts.filter((a) => a.status === AlertStatus.RESOLVED).length,
+    };
+  }, [alerts]);
+
+  const containerStyle: React.CSSProperties = {
+    marginBottom: "24px",
+  };
+
+  const gridStyle: React.CSSProperties = {
+    display: "grid",
+    gridTemplateColumns: "repeat(6, 1fr)",
+    gap: "12px",
+  };
+
+  const footerStyle: React.CSSProperties = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: "8px",
+    marginTop: "12px",
+    fontSize: "12px",
+    color: "#a6a6a6",
+  };
+
+  const lastAlertStyle: React.CSSProperties = {
+    fontWeight: 600,
+    color: "#60cdff",
+  };
 
   return (
-    <div className="grid grid-cols-5 gap-4 mb-6!">
-      <AlertCard measurementUnit={totalAlerts} color={"#60cdff"} message="Total Alerts" />
-      <AlertCard measurementUnit={criticalAlerts} color="#ff4b4b" message="Critical" />
-      <AlertCard measurementUnit={activeAlerts} color="#ffa500" message="Active" />
-      <AlertCard measurementUnit={resolvedAlerts} color="#4ade80" message="Resolved" />
-      <AlertCard measurementUnit={lastAlertTime} color="#60cdff" message="Last Alert" />
+    <div style={containerStyle}>
+      <div style={gridStyle}>
+        <AlertCard
+          measurementUnit={statistics.total}
+          color="#60cdff"
+          message="Total Alerts"
+        />
+        <AlertCard
+          measurementUnit={statistics.critical}
+          color="#ff4b4b"
+          message="Critical"
+        />
+        <AlertCard
+          measurementUnit={statistics.high}
+          color="#ffa500"
+          message="High Severity"
+        />
+        <AlertCard
+          measurementUnit={statistics.active}
+          color="#ffa500"
+          message="Active"
+        />
+        <AlertCard
+          measurementUnit={statistics.investigating}
+          color="#60a5fa"
+          message="Investigating"
+        />
+        <AlertCard
+          measurementUnit={statistics.resolved}
+          color="#4ade80"
+          message="Resolved"
+        />
+      </div>
+
+      <div style={footerStyle}>
+        <span>Last Alert Received:</span>
+        <span style={lastAlertStyle}>{lastAlertTime}</span>
+      </div>
     </div>
   );
 };

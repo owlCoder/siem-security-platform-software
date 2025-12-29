@@ -1,9 +1,16 @@
+import { AlertDTO } from "../../models/alerts/AlertDTO";
 import { AlertSeverity } from "../../enums/AlertSeverity";
+import { AlertStatus } from "../../enums/AlertStatus"; 
 import { PiWarningOctagonFill, PiInfoBold } from "react-icons/pi";
 import { BiMessageRounded } from "react-icons/bi";
 import { getSeverityColor, getStatusColor } from "../../helpers/alertColorHelpers";
-import { RecentAlertsTableProps } from "../../types/props/alerts/RecentAlertsTableProps";
 
+interface RecentAlertsTableProps {
+  alerts: AlertDTO[];
+  onSelectAlert: (id: number) => void;
+  onResolve: (id: number, resolvedBy: string) => void;
+  onUpdateStatus: (id: number, status: AlertStatus) => void; 
+}
 
 export default function RecentAlertsTable({
   alerts,

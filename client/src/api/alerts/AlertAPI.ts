@@ -5,38 +5,40 @@ import { AlertQueryDTO, PaginatedAlertsDTO } from "../../models/alerts/AlertQuer
 
 export class AlertAPI implements IAlertAPI {
   private readonly client: AxiosInstance;
+  private readonly basePath = "/siem/alerts";
 
   constructor() {
     this.client = axios.create({
       baseURL: import.meta.env.VITE_GATEWAY_URL,
       headers: { "Content-Type": "application/json" },
+      timeout: 30000, // sprečava beskonačne requeste
     });
   }
 
   async getAllAlerts(token: string): Promise<AlertDTO[]> {
-    const response = await this.client.get<AlertDTO[]>("/siem/alerts", {
+    const response = await this.client.get<AlertDTO[]>(this.basePath, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   }
 
   async getAlertById(id: number, token: string): Promise<AlertDTO> {
-    const response = await this.client.get<AlertDTO>(`/siem/alerts/${id}`, {
+    const response = await this.client.get<AlertDTO>(`${this.basePath}/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   }
-  
+
   async searchAlerts(query: AlertQueryDTO, token: string): Promise<PaginatedAlertsDTO> {
-    const response = await this.client.get<PaginatedAlertsDTO>("/siem/alerts/search", {
+    const response = await this.client.get<PaginatedAlertsDTO>(`${this.basePath}/search`, {
       headers: { Authorization: `Bearer ${token}` },
-      params: query
+      params: this.sanitizeQuery(query),
     });
     return response.data;
   }
 
   async resolveAlert(id: number, resolvedBy: string, status: string, token: string): Promise<AlertDTO> {
-    const response = await this.client.put<AlertDTO>(`/siem/alerts/${id}/resolve`, 
+    const response = await this.client.put<AlertDTO>(`${this.basePath}/${id}/resolve`, 
       { resolvedBy, status },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -44,10 +46,21 @@ export class AlertAPI implements IAlertAPI {
   }
 
   async updateAlertStatus(id: number, status: string, token: string): Promise<AlertDTO> {
-    const response = await this.client.put<AlertDTO>(`/siem/alerts/${id}/status`, 
+    const response = await this.client.put<AlertDTO>(`${this.basePath}/${id}/status`, 
       { status },
       { headers: { Authorization: `Bearer ${token}` } }
     );
     return response.data;
+  }
+
+  /** Uklanja undefined, null ili prazne vrednosti iz query parametara */
+  private sanitizeQuery(query: AlertQueryDTO): Record<string, any> {
+    const sanitized: Record<string, any> = {};
+    Object.entries(query).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        sanitized[key] = value;
+      }
+    });
+    return sanitized;
   }
 }
