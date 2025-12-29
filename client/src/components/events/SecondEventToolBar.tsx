@@ -4,14 +4,18 @@ import DropDownMenu from "./DropDownMenu";
 export function SecondEventToolBar({ onSortType, dateFrom, dateTo, eventType }: any) {
 
     const handleDownloadPdf = () => {
-        const baseUrl = "http://localhost:5790/api/v1/query/pdfReport";
-        
         const dFrom = dateFrom ? new Date(dateFrom).toISOString() : "";
         const dTo = dateTo ? new Date(dateTo).toISOString() : "";
+        const url = `http://localhost:5790/api/v1/query/pdfReport?dateFrom=${encodeURIComponent(dFrom)}&dateTo=${encodeURIComponent(dTo)}&eventType=${encodeURIComponent(eventType || 'all')}`;
 
-        const url = `${baseUrl}?dateFrom=${encodeURIComponent(dFrom)}&dateTo=${encodeURIComponent(dTo)}&eventType=${encodeURIComponent(eventType || 'all')}`;
-
-        window.open(url, '_blank');
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = url;
+        document.body.appendChild(iframe);
+        
+        setTimeout(() => {
+            document.body.removeChild(iframe);
+        }, 3000);
     };
 
     return (
