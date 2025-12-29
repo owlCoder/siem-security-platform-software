@@ -14,6 +14,7 @@ import { QueryController } from './WebAPI/controllers/QueryController';
 import { saveQueryState } from './Utils/StateManager';
 import { Alert } from './Domain/models/Alert';
 import { QueryAlertRepositoryService } from './Services/QueryAlertRepositoryService';
+import { saveQueryAlertState } from './Utils/StateAlertManager';
 
 
 dotenv.config({ quiet: true });
@@ -88,6 +89,10 @@ process.on('SIGINT', async () => {
       errorCount: queryRepositoryService.getErrorCount()
     });
     loggerService.log("State saved. Exiting...");
+    /*OVDE DODATI CUVANJE STANJA INVERTED INDEX STRUKTURE SA ALERTOVIMA NAKON DODAVANJA U qureyAlertRepoService-u
+    saveQueryAlertState({
+      
+    });*/
     process.exit(0);
   } catch(err){
     loggerService.log(`Error during shutdown: ${err}`);
