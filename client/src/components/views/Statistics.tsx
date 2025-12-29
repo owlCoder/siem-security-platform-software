@@ -12,163 +12,143 @@ import TopArchives from "../statistics/TopArchives";
 import ArchiveVolume from "../statistics/ArchiveVolume";
 import { StatisticsProps } from "../../types/props/statistics/StatisticsProps";
 
+export default function Statistics({ queryApi, storageApi }: StatisticsProps) {
+    /* =======================
+       TEST DATA 
+       ======================= */
 
-export default function Statistics({queryApi,storageApi}:StatisticsProps) {
-
-    const testData: DistributionDTO = {notifications: 35, warnings: 35, errors: 30};
+    const testData: DistributionDTO = {
+        notifications: 35,
+        warnings: 35,
+        errors: 30,
+    };
 
     const testEvent: EventStatisticsDTO[] = [
-    { date: "10/12", count: 10 },
-    { date: "11/12", count: 15 },
-    { date: "12/12", count: 7 },
-    { date: "13/12", count: 12 },
-    { date: "14/12", count: 9 }
+        { date: "10/12", count: 10 },
+        { date: "11/12", count: 15 },
+        { date: "12/12", count: 7 },
+        { date: "13/12", count: 12 },
+        { date: "14/12", count: 9 },
     ];
 
     const testAlert: AlertStatisticsDTO[] = [
-    { date: "10/12", count: 8 },
-    { date: "11/12", count: 5 },
-    { date: "12/12", count: 13 },
-    { date: "13/12", count: 7 },
-    { date: "14/12", count: 6 }
+        { date: "10/12", count: 8 },
+        { date: "11/12", count: 5 },
+        { date: "12/12", count: 13 },
+        { date: "13/12", count: 7 },
+        { date: "14/12", count: 6 },
     ];
 
     const testTopArchives: TopArchiveDTO[] = [
-    { id: 1, fileName: "logs_2025_12_14_22_00.tar", count: 120 },
-    { id: 2, fileName: "auth_logs_2025_12_14.tar", count: 95 },
-    { id: 3, fileName: "system_events_2025_12_13.tar", count: 78 },
-    { id: 4, fileName: "app_errors_2025_12_12.tar", count: 54 },
-    { id: 5, fileName: "network_2025_12_11.tar", count: 33 }
+        { id: 1, fileName: "logs_2025_12_14_22_00.tar", count: 120 },
+        { id: 2, fileName: "auth_logs_2025_12_14.tar", count: 95 },
+        { id: 3, fileName: "system_events_2025_12_13.tar", count: 78 },
+        { id: 4, fileName: "app_errors_2025_12_12.tar", count: 54 },
+        { id: 5, fileName: "network_2025_12_11.tar", count: 33 },
     ];
 
     const testArchiveVolume: ArchiveVolumeDTO[] = [
-    { label: "10/12", size: 1024 }, 
-    { label: "11/12", size: 850 },
-    { label: "12/12", size: 1200 },
-    { label: "13/12", size: 640 },
-    { label: "14/12", size: 980 }
+        { label: "10/12", size: 1024 },
+        { label: "11/12", size: 850 },
+        { label: "12/12", size: 1200 },
+        { label: "13/12", size: 640 },
+        { label: "14/12", size: 980 },
     ];
 
-    const {token} = useAuth();
+    /* =======================
+       STATE & EFFECTS
+       ======================= */
+
+    const { token } = useAuth();
 
     const [archiveType, setArchiveType] = useState<"events" | "alerts">("events");
-    const [volumePeriod, setVolumePeriod] = useState<"daily" | "monthly" | "yearly">("daily");
+    const [volumePeriod, setVolumePeriod] = useState<
+        "daily" | "monthly" | "yearly"
+    >("daily");
 
     const [eventStats, setEventStats] = useState<EventStatisticsDTO[]>([]);
     const [alertStats, setAlertStats] = useState<AlertStatisticsDTO[]>([]);
     const [distribution, setDistribution] = useState<DistributionDTO | null>(null);
-    const [topArchives, setToparchives] = useState<TopArchiveDTO[]>([]);
+    const [topArchives, setTopArchives] = useState<TopArchiveDTO[]>([]);
     const [archiveVolume, setArchiveVolume] = useState<ArchiveVolumeDTO[]>([]);
-
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
-            if(!token) return;
+            if (!token) return;
 
             setIsLoading(true);
 
-            try{
+            try {
                 const [
-                    eventsData, 
-                    alertsData, 
+                    eventsData,
+                    alertsData,
                     distributionData,
                     topArchivesData,
-                    volumeData
+                    volumeData,
                 ] = await Promise.all([
-                    queryApi.getEventStatistics(token), 
-                    queryApi.getAlertStatistics(token), 
+                    queryApi.getEventStatistics(token),
+                    queryApi.getAlertStatistics(token),
                     queryApi.getEventDistribution(token),
-                    storageApi.getTopArchives(token,archiveType, 5),
-                    storageApi.getArchiveVolume(token,volumePeriod)
+                    storageApi.getTopArchives(token, archiveType, 5),
+                    storageApi.getArchiveVolume(token, volumePeriod),
                 ]);
 
                 setEventStats(eventsData);
                 setAlertStats(alertsData);
                 setDistribution(distributionData);
-                setToparchives(topArchivesData);
+                setTopArchives(topArchivesData);
                 setArchiveVolume(volumeData);
-
-            } catch (error){
+            } catch (error) {
                 console.error(error);
-            } finally{
+            } finally {
                 setIsLoading(false);
             }
         };
 
         fetchData();
-    }, [token, archiveType, volumePeriod]);
+    }, [token, archiveType, volumePeriod, queryApi, storageApi]);
 
-    const statisticsDivStyle: React.CSSProperties = {
-        padding: "16px",
-        marginBottom: "20px",
-        minHeight: "380px",
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
+    /* =======================
+       RENDER
+       ======================= */
 
-        border: "2px solid #282A28",
-        backgroundColor: "transparent",
-        borderRadius: "10px",
-        borderColor: "#282A28",
-  };
-
-    const headingStyle: React.CSSProperties = {
-        marginTop: "10px",
-        padding: "5px",
-        margin: "10px"
-    };
-
-    const sectionStyle: React.CSSProperties = {
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "stretch",
-        gap: "20px",
-        width: "100%",
-    };
-
-    const storageDivStyle: React.CSSProperties = {
-        border: "2px solid #282A28",
-        backgroundColor: "transparent",
-        borderRadius: "14px",
-        borderColor: "#282A28",
-    };
-
-/*
-    if (isLoading){
-        return (
-            <div style={rectangleStyle}>
-                <h3 style={headingStyle}>Loading statistics...</h3>
-            </div>
-        );
-    }
-*/
     return (
-        <div>
-            <div style={sectionStyle}>
-                <div style={{flex: 1, ...statisticsDivStyle}}>
+        <div className="w-full p-6 space-y-6">
+            <h2 className="text-2xl font-semibold text-gray-800">
+                Statistics
+            </h2>
+
+            {/* TOP ROW */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <div className="flex flex-col min-h-[380px] p-4 rounded-lg border-2 border-[#282A28]">
                     <StatisticsChart
                         eventData={testEvent}
-                        alertData={testAlert}/>
+                        alertData={testAlert}
+                    />
                 </div>
-                
-                <div style={{flex: 1, ...statisticsDivStyle}}>
+
+                <div className="flex flex-col min-h-[380px] p-4 rounded-lg border-2 border-[#282A28]">
                     <TopArchives
                         data={testTopArchives}
                         type={archiveType}
-                        onTypeChange={setArchiveType}/>
+                        onTypeChange={setArchiveType}
+                    />
                 </div>
             </div>
 
-            <div style={sectionStyle}>
-                <div style={{flex: 1, ...statisticsDivStyle}}>
-                    <EventDistribution data={testData}/>
+            {/* BOTTOM ROW */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <div className="flex flex-col min-h-[380px] p-4 rounded-lg border-2 border-[#282A28]">
+                    <EventDistribution data={testData} />
                 </div>
-                <div style={{flex: 1, ...statisticsDivStyle}}>
+
+                <div className="flex flex-col min-h-[380px] p-4 rounded-lg border-2 border-[#282A28]">
                     <ArchiveVolume
                         data={testArchiveVolume}
                         period={volumePeriod}
-                        onPeriodChange={setVolumePeriod}/>
+                        onPeriodChange={setVolumePeriod}
+                    />
                 </div>
             </div>
         </div>
