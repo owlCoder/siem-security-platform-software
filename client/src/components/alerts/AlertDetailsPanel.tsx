@@ -1,14 +1,9 @@
 import React, { useState } from "react";
-import { AlertDTO } from "../../models/alerts/AlertDTO";
 import { AlertStatus } from "../../enums/AlertStatus";
 import { IoClose } from "react-icons/io5";
 import { getSeverityColor, getStatusColor } from "../../helpers/alertColorHelpers";
+import { AlertDetailsPanelProps } from "../../types/props/alerts/AlertDetailsPanelProps";
 
-interface AlertDetailsPanelProps {
-  alert: AlertDTO;
-  onClose: () => void;
-  onResolve: (id: number, resolvedBy: string) => void;
-}
 
 export default function AlertDetailsPanel({
   alert: alertData,

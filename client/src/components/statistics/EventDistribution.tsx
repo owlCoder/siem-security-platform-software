@@ -1,13 +1,9 @@
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
-import { DistributionDTO } from "../../models/query/DistributionDTO"
 import React, { useRef } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { FiDownload } from "react-icons/fi";
-
-type EventDistributionProps = {
-    data: DistributionDTO;
-}
+import { EventDistributionProps } from "../../types/props/statistics/EventDistributionProps";
 
 export default function EventDistribution({data}: EventDistributionProps){
     const chartData = [

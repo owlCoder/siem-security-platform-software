@@ -1,11 +1,8 @@
 import { FiDownload } from "react-icons/fi";
 import DropDownMenu from "./DropDownMenu";
+import { SecondEventToolBarProps } from "../../types/props/events/SecondEventToolBarProps";
 
-interface SecondEventToolBar{
-    onSortType:(sort:number)=>void;
-}
-
-export function SecondEventToolBar({onSortType}:SecondEventToolBar) {
+export function SecondEventToolBar({onSortType}:SecondEventToolBarProps) {
 
     return (
         <>

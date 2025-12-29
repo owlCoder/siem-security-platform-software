@@ -6,13 +6,7 @@ import { EventRow } from "../../types/events/EventRow";
 import { SearchToolBar } from "../events/SearchToolBar";
 import { SecondEventToolBar } from "../events/SecondEventToolBar";
 import { mapEventDTO } from "../../helpers/mapEventDTO";
-import { IQueryAPI } from "../../api/query/IQueryAPI";
-import { IParserAPI } from "../../api/parser/IParserAPI";
-
-interface EventsProps {
-    queryApi: IQueryAPI;
-    parserApi: IParserAPI;
-}
+import { EventsProps } from "../../types/props/events/EventsProps";
 
 export default function Events({ queryApi, parserApi }: EventsProps) {
     //const { token } = useAuth();

@@ -1,15 +1,10 @@
 import React, { useRef, useState } from "react";
-import { AlertStatisticsDTO } from "../../models/query/AlertStatisticsDTO";
-import { EventStatisticsDTO } from "../../models/query/EventStatisticsDTO"
 import { Area, AreaChart, CartesianGrid, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { FiDownload } from "react-icons/fi";
+import { StatisticsChartProps } from "../../types/props/statistics/StatisticsChartProps";
 
-type StatisticsChartProps = {
-    eventData: EventStatisticsDTO[];
-    alertData: AlertStatisticsDTO[];
-}
 
 export default function StatisticsChart({eventData, alertData}: StatisticsChartProps) {
     const [showEvents, setShowEvents] = useState(true);

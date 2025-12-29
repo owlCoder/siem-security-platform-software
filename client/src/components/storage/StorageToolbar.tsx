@@ -1,12 +1,9 @@
 import { useState } from "react";
 import DropDownMenu from "../events/DropDownMenu";
+import { StorageToolBarProps } from "../../types/props/storage/StorageToolBarProps";
 
-type Props = {
-    onSearch: (query: string) => void;
-    onSort: (by: "date" | "size" | "name", order: "asc" | "desc") => void;
-}
 
-export default function StorageToolBar({ onSearch, onSort }: Props) {
+export default function StorageToolBar({ onSearch, onSort }: StorageToolBarProps) {
     const [searchText, setSearchText] = useState("");
 
     const handleSearch = () => {

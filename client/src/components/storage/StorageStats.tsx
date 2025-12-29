@@ -1,14 +1,11 @@
 import { BsDatabase } from "react-icons/bs";
-import { ArchiveStatsDTO } from "../../models/storage/ArchiveStatsDTO"
 import StatCard from "../stat_card/StatCard";
 import { MdAccessTime } from "react-icons/md";
 import { FiArchive } from "react-icons/fi";
+import { StorageStatsProps } from "../../types/props/storage/StorageStatsProps";
 
-type Props = {
-    stats: ArchiveStatsDTO;
-}
 
-export default function StorageStats({ stats }: Props) {
+export default function StorageStats({ stats }: StorageStatsProps) {
 
     const totalSizeGB = (stats.totalSize / (1024 ** 3)).toFixed(2);
 

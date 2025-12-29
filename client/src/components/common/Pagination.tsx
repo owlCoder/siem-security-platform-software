@@ -1,14 +1,7 @@
 import React from "react";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
+import { PaginationProps } from "../../types/props/alerts/PaginationProps";
 
-interface PaginationProps {
-  currentPage: number;
-  totalPages: number;
-  pageSize: number;
-  totalItems: number;
-  onPageChange: (page: number) => void;
-  onPageSizeChange: (size: number) => void;
-}
 
 export const Pagination: React.FC<PaginationProps> = ({
   currentPage,

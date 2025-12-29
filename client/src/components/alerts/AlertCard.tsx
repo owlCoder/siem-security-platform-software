@@ -1,8 +1,4 @@
-interface AlertCardProps {
-    measurementUnit: number | string;
-    color: string;
-    message: string;
-}
+import { AlertCardProps } from "../../types/props/alerts/AlertCardProps";
 
 export default function AlertCard({ measurementUnit, color, message }: AlertCardProps) {
 

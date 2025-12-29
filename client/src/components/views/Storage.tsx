@@ -6,11 +6,8 @@ import StorageStats from "../storage/StorageStats";
 import StorageTable from "../tables/StorageTable";
 import StorageToolBar from "../storage/StorageToolbar";
 import { ArchiveDTO } from "../../models/storage/ArchiveDTO";
-import { IStorageAPI } from "../../api/storage/IStorageAPI";
+import { StorageProps } from "../../types/props/storage/StorageProps";
 
-interface StorageProps{
-    storageApi:IStorageAPI;
-}
 
 
 export default function Storage({storageApi}:StorageProps) {

@@ -1,11 +1,4 @@
-type StatCardProps = {
-    title: string;
-    value?: number | string;
-    valueDescription?: string;
-    icon?: React.ReactNode;
-    iconColor?: string;
-    subtitle?: string;
-};
+import { StatCardProps } from "../../types/props/dashboard/StatCardProps";
 
 export default function StatCard({ title, value, valueDescription, icon, iconColor, subtitle }: StatCardProps) {
 

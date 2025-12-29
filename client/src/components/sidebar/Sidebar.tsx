@@ -10,10 +10,8 @@ import { TbSquareLetterS } from "react-icons/tb";
 import { TbSquareLetterI } from "react-icons/tb";
 import { TbSquareLetterE } from "react-icons/tb";
 import { TbSquareLetterM } from "react-icons/tb";
+import { SidebarProps } from "../../types/props/dashboard/SiedbarProps";
 
-interface SidebarProps {
-    setSideMenuPage: (page: number) => void;
-}
 
 export default function Sidebar({ setSideMenuPage }: SidebarProps) {
     const [isSidebarOpened, setIsSidebarOpened] = useState(false);

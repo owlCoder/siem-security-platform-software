@@ -1,13 +1,8 @@
-import { IStorageAPI } from "../../api/storage/IStorageAPI";
-import { ArchiveDTO } from "../../models/storage/ArchiveDTO";
+import { StorageTableProps } from "../../types/props/storage/StorageTableProps";
 import StorageTableRow from "./StorageTableRow";
 
-type Props = {
-    archives: ArchiveDTO[];
-    storageApi: IStorageAPI;
-};
 
-export default function StorageTable({ archives, storageApi }: Props) {
+export default function StorageTable({ archives, storageApi }: StorageTableProps) {
 
     const thClass = "px-4! py-3! text-center text-[#d0d0d0] font-semibold text-[13px] border-b border-[#3a3a3a] uppercase tracking-[0.5px]"
 

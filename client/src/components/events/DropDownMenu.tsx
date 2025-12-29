@@ -1,11 +1,6 @@
 import { useState } from "react";
+import { DropDownMenuProps } from "../../types/props/events/DropDownMenuProps";
 
-interface DropDownMenuProps {
-    OnSortTypeChange: (value: number) => void;
-    sortName1:string;
-    sortName2:string;
-    sortName3:string;
-}
 
 export default function DropDownMenu({ OnSortTypeChange,sortName1,sortName2,sortName3 }: DropDownMenuProps) {
     const [open, setOpen] = useState(false);

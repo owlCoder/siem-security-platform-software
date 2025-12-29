@@ -1,10 +1,4 @@
-import { TopArchiveDTO } from "../../models/storage/TopArchiveDTO";
-
-type TopArchivesProps = {
-    data: TopArchiveDTO[];
-    type: "events" | "alerts";
-    onTypeChange: (type: "events" | "alerts") => void;
-};
+import { TopArchivesProps } from "../../types/props/statistics/TopArchivesProps";
 
 export default function TopArchives( {data, type, onTypeChange}: TopArchivesProps) {
     const thClass = "px-4! py-5! text-center text-[#d0d0d0] font-semibold text-[13px] border-b border-[#3a3a3a] uppercase tracking-[0.5px]"

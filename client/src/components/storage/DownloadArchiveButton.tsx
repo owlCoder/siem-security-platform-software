@@ -1,15 +1,10 @@
 import { FiDownload } from "react-icons/fi";
 import { useAuth } from "../../hooks/useAuthHook";
 import { useState } from "react";
-import { IStorageAPI } from "../../api/storage/IStorageAPI";
+import { DownloadArchiveProps } from "../../types/props/storage/DownloadArchiveProps";
 
-type Props = {
-    archiveId: number;
-    fileName: string;
-    storageApi: IStorageAPI;
-}
 
-export default function DownloadArchiveButton({ archiveId, fileName, storageApi }: Props) {
+export default function DownloadArchiveButton({ archiveId, fileName, storageApi }: DownloadArchiveProps) {
     const { token } = useAuth();
     const [isDownloading, setIsDownloading] = useState(false);
 

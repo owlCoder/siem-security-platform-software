@@ -1,9 +1,5 @@
-import { EventRow } from "../../types/events/EventRow";
+import { RowProps } from "../../types/props/events/RowProps";
 
-interface RowProps {   //at the end,move into a right folders(types) 
-    e: EventRow;
-    index: number;
-}
 export function RecentEventsTableRow({ e, index }: RowProps) {
     const badgeClasses: Record<string, string> = {
         INFO: "bg-[rgba(59,130,246,0.15)] text-[#60a5fa] border border-[rgba(59,130,246,0.3)]",

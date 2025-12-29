@@ -1,11 +1,6 @@
-import { ArchiveVolumeDTO } from "../../models/storage/ArchiveVolumeDTO";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { ArchiveVolumeProps } from "../../types/props/statistics/ArchiveVolumeProps";
 
-type ArchiveVolumeProps = {
-    data: ArchiveVolumeDTO[];
-    period: "daily" | "monthly" | "yearly";
-    onPeriodChange: (period: "daily" | "monthly" | "yearly") => void;
-};
 
 export default function ArchiveVolume({ data, period, onPeriodChange }: ArchiveVolumeProps){
     

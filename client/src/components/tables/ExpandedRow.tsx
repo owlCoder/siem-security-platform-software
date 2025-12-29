@@ -1,12 +1,6 @@
 import { useEffect, useState } from "react";
-import { EventRow } from "../../types/events/EventRow";
-import { IParserAPI } from "../../api/parser/IParserAPI";
+import { ExpandedProps } from "../../types/props/events/ExpandedProps";
 
-interface ExpandedProps { //move into a right folders(types)
-    expanded: boolean;
-    e: EventRow;
-    parserApi: IParserAPI;
-}
 
 export function ExpandedRow({ expanded, e, parserApi }: ExpandedProps) {
     //const { token } = useAuth();

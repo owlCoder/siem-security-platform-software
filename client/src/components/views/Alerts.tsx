@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { AlertAPI } from "../../api/alerts/AlertAPI";
 import { useAlerts } from "../../hooks/useAlerts";
 import { AlertStatistics } from "../alerts/AlertStatistics";
 import { AlertFilters } from "../alerts/AlertFilters";
@@ -12,11 +11,7 @@ import { AlertSSEService } from "../../services/AlertSSEService";
 import { DesktopNotificationService } from "../../services/DesktopNotificationService";
 import { useAuth } from "../../hooks/useAuthHook";
 import { AlertDTO } from "../../models/alerts/AlertDTO";
-import { IAlertAPI } from "../../api/alerts/IAlertAPI";
-
-interface AlertsProps{
-  alertsApi:IAlertAPI;
-}
+import { AlertsProps } from "../../types/props/alerts/AlertsProps";
 
 const desktopNotification = new DesktopNotificationService();
 

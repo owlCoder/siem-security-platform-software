@@ -1,15 +1,10 @@
 //jedan red u tabeli
-import { IStorageAPI } from "../../api/storage/IStorageAPI";
-import { ArchiveDTO } from "../../models/storage/ArchiveDTO"
+import { StorageTableRowProps } from "../../types/props/storage/StorageTableRowProps";
 import DownloadArchiveButton from "../storage/DownloadArchiveButton";
 import { AiOutlineFileZip } from "react-icons/ai";
 
-type Props = {
-    archive: ArchiveDTO;
-    storageApi: IStorageAPI;
-}
 
-export default function StorageTableRow({ archive, storageApi }: Props) {
+export default function StorageTableRow({ archive, storageApi }: StorageTableRowProps) {
 
     const tdClass = "px-4! py-1! text-center text-[#dcdcdc] text-[14px] border-b-[1px] border-b-[#2d2d2d]"
 

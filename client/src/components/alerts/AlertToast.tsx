@@ -1,14 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { AlertDTO } from "../../models/alerts/AlertDTO";
 import { PiWarningOctagonFill } from "react-icons/pi";
 import { IoClose } from "react-icons/io5";
 import { getSeverityColor } from "../../helpers/alertColorHelpers";
+import { AlertToastProps } from "../../types/props/alerts/AlertToastProps";
 
-interface AlertToastProps {
-  alert: AlertDTO;
-  onClose: () => void;
-  onViewDetails?: (id: number) => void;
-}
 
 export default function AlertToast({ alert, onClose, onViewDetails }: AlertToastProps) {
   const [progress, setProgress] = useState(100);

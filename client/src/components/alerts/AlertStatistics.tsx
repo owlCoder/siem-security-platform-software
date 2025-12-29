@@ -1,13 +1,9 @@
 import React from "react";
-import { AlertDTO } from "../../models/alerts/AlertDTO";
 import { AlertStatus } from "../../enums/AlertStatus";
 import { AlertSeverity } from "../../enums/AlertSeverity";
 import AlertCard from "./AlertCard";
+import { AlertStatisticsProps } from "../../types/props/alerts/AlertStatisticsProps";
 
-interface AlertStatisticsProps {
-  alerts: AlertDTO[];
-  lastAlertTime: string;
-}
 
 export const AlertStatistics: React.FC<AlertStatisticsProps> = ({ alerts, lastAlertTime }) => {
   const totalAlerts = alerts.length;

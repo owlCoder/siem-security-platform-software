@@ -2,10 +2,7 @@ import React, { useState } from "react";
 import { AlertSeverity } from "../../enums/AlertSeverity";
 import { AlertStatus } from "../../enums/AlertStatus";
 import { AlertQueryDTO } from "../../models/alerts/AlertQueryDTO";
-
-interface AlertFiltersProps {
-  onSearch: (query: AlertQueryDTO) => void;
-}
+import { AlertFiltersProps } from "../../types/props/alerts/AlertFilterProps";
 
 export const AlertFilters: React.FC<AlertFiltersProps> = ({ onSearch }) => {
   const [searchText, setSearchText] = useState("");

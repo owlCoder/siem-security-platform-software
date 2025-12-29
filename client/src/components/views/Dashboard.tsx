@@ -7,12 +7,7 @@ import RecentEventsTable from "../tables/RecentEventsTable";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuthHook";
 import { EventRow } from "../../types/events/EventRow";
-import { IQueryAPI } from "../../api/query/IQueryAPI";
-import { IStorageAPI } from "../../api/storage/IStorageAPI";
-interface DashboardProps{
-    queryApi:IQueryAPI;
-    storageApi:IStorageAPI;
-}
+import { DashboardProps } from "../../types/props/dashboard/DashboardProps";
 
 export default function Dashboard({queryApi,storageApi}:DashboardProps) {
     const [eventsData, setEventsData] = useState<EventRow[]>([]);

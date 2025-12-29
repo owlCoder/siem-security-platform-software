@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import { QueryAPI } from "../../api/query/QueryAPI";
-import { StorageAPI } from "../../api/storage/StorageAPI";
 import { useAuth } from "../../hooks/useAuthHook";
 import { EventStatisticsDTO } from "../../models/query/EventStatisticsDTO";
 import { AlertStatisticsDTO } from "../../models/query/AlertStatisticsDTO";
@@ -12,13 +10,8 @@ import StatisticsChart from "../statistics/StatisticsChart";
 import EventDistribution from "../statistics/EventDistribution";
 import TopArchives from "../statistics/TopArchives";
 import ArchiveVolume from "../statistics/ArchiveVolume";
-import { IQueryAPI } from "../../api/query/IQueryAPI";
-import { IStorageAPI } from "../../api/storage/IStorageAPI";
+import { StatisticsProps } from "../../types/props/statistics/StatisticsProps";
 
-interface StatisticsProps{
-    queryApi:IQueryAPI;
-    storageApi:IStorageAPI;
-}
 
 export default function Statistics({queryApi,storageApi}:StatisticsProps) {
 
