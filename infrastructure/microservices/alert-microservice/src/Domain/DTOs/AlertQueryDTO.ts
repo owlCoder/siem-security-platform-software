@@ -1,6 +1,6 @@
-
 import { AlertSeverity } from "../enums/AlertSeverity";
 import { AlertStatus } from "../enums/AlertStatus";
+import { AlertDTO } from "./AlertDTO";
 
 export interface AlertQueryDTO {
   // Pagination
@@ -20,7 +20,7 @@ export interface AlertQueryDTO {
 }
 
 export interface PaginatedAlertsDTO {
-  data: any[]; // AlertDTO[]
+  data: AlertDTO[];
   pagination: {
     page: number;
     limit: number;

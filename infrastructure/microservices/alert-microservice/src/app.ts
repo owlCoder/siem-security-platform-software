@@ -20,7 +20,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: process.env.CORS_ORIGIN ?? "*",
-    methods: process.env.CORS_METHODS?.split(",") ?? ["GET", "POST", "PUT", "DELETE"],
+    methods: process.env.CORS_METHODS?.split(",") ?? ["GET", "POST", "PUT"],
     credentials: true
   })
 );
@@ -44,7 +44,7 @@ const typeormAlertRepo: Repository<Alert> = Db.getRepository(Alert);
 const logger = new LoggerService();
 const alertRepository = new AlertRepositoryService(typeormAlertRepo, logger);
 const alertService = new AlertService(alertRepository, logger);
-const alertNotificationService = new AlertNotificationService();
+const alertNotificationService = new AlertNotificationService(logger); // prosleđujemo logger
 
 // Controller
 const alertController = new AlertController(alertService, alertNotificationService, logger);

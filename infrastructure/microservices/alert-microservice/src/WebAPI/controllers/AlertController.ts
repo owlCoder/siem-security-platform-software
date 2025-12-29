@@ -12,7 +12,9 @@ import {
   validateAlertId, 
   validateCreateAlertDTO, 
   validateAlertStatus, 
-  validateAlertSeverity 
+  validateAlertSeverity,
+  validateResolveAlertDTO,
+  validateCreateAlertFromCorrelationDTO
 } from "../validators/AlertValidators";
 
 export class AlertController {
@@ -66,9 +68,10 @@ export class AlertController {
   private async createAlertFromCorrelation(req: Request, res: Response): Promise<void> {
     try {
       const data: CreateAlertFromCorrelationDTO = req.body;
-      
-      if (!data.correlationId || !data.description || !data.correlatedEventIds) {
-        res.status(400).json({ success: false, message: "Missing required fields" });
+
+      const validation = validateCreateAlertFromCorrelationDTO(data);
+      if (!validation.success) {
+        res.status(400).json({ success: false, message: validation.message });
         return;
       }
 
@@ -80,9 +83,9 @@ export class AlertController {
         source: "AnalysisEngine"
       };
 
-      const validation = validateCreateAlertDTO(alertData);
-      if (!validation.success) {
-        res.status(400).json({ success: false, message: validation.message });
+      const alertValidation = validateCreateAlertDTO(alertData);
+      if (!alertValidation.success) {
+        res.status(400).json({ success: false, message: alertValidation.message });
         return;
       }
 
@@ -211,9 +214,9 @@ export class AlertController {
       }
 
       const resolveData: ResolveAlertDTO = req.body;
-
-      if (!resolveData.resolvedBy || !resolveData.status) {
-        res.status(400).json({ success: false, message: "Missing required fields: resolvedBy and status" });
+      const resolveValidation = validateResolveAlertDTO(resolveData);
+      if (!resolveValidation.success) {
+        res.status(400).json({ success: false, message: resolveValidation.message });
         return;
       }
 
