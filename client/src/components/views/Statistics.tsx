@@ -12,12 +12,15 @@ import StatisticsChart from "../statistics/StatisticsChart";
 import EventDistribution from "../statistics/EventDistribution";
 import TopArchives from "../statistics/TopArchives";
 import ArchiveVolume from "../statistics/ArchiveVolume";
+import { IQueryAPI } from "../../api/query/IQueryAPI";
+import { IStorageAPI } from "../../api/storage/IStorageAPI";
 
+interface StatisticsProps{
+    queryApi:IQueryAPI;
+    storageApi:IStorageAPI;
+}
 
-const queryAPI = new QueryAPI();
-const storageAPI = new StorageAPI();
-
-export default function Statistics() {
+export default function Statistics({queryApi,storageApi}:StatisticsProps) {
 
     const testData: DistributionDTO = {notifications: 35, warnings: 35, errors: 30};
 
@@ -80,11 +83,11 @@ export default function Statistics() {
                     topArchivesData,
                     volumeData
                 ] = await Promise.all([
-                    queryAPI.getEventStatistics(token), 
-                    queryAPI.getAlertStatistics(token), 
-                    queryAPI.getEventDistribution(token),
-                    storageAPI.getTopArchives(archiveType, 5, token),
-                    storageAPI.getArchiveVolume(volumePeriod, token)
+                    queryApi.getEventStatistics(token), 
+                    queryApi.getAlertStatistics(token), 
+                    queryApi.getEventDistribution(token),
+                    storageApi.getTopArchives(token,archiveType, 5),
+                    storageApi.getArchiveVolume(token,volumePeriod)
                 ]);
 
                 setEventStats(eventsData);

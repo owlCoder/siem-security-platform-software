@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { StorageAPI } from "../../api/storage/StorageAPI";
 import { useAuth } from "../../hooks/useAuthHook";
 import { StorageLogResponseDTO } from "../../models/storage/StorageLogResponseDTO";
 import { ArchiveStatsDTO } from "../../models/storage/ArchiveStatsDTO";
@@ -7,11 +6,14 @@ import StorageStats from "../storage/StorageStats";
 import StorageTable from "../tables/StorageTable";
 import StorageToolBar from "../storage/StorageToolbar";
 import { ArchiveDTO } from "../../models/storage/ArchiveDTO";
+import { IStorageAPI } from "../../api/storage/IStorageAPI";
+
+interface StorageProps{
+    storageApi:IStorageAPI;
+}
 
 
-const storageAPI = new StorageAPI();
-
-export default function Storage() {
+export default function Storage({storageApi}:StorageProps) {
 
     const { token } = useAuth();
     const [archives, setArchives] = useState<ArchiveDTO[]>([]);
@@ -43,9 +45,9 @@ export default function Storage() {
             try {
                 setIsLoading(true);
 
-                const archivesResponse = await storageAPI.getAllArchives(/*token*/);
+                const archivesResponse = await storageApi.getAllArchives(/*token*/);
                 console.log("ARCHIVES RESPONSE: ", archivesResponse);
-                const statsResponse = await storageAPI.getStats(/*token*/);
+                const statsResponse = await storageApi.getStats(/*token*/);
 
                 setArchives(mapToArchiveDTO(archivesResponse));
                 setStats(statsResponse ?? EMPTY_STATS);
@@ -63,7 +65,7 @@ export default function Storage() {
         //if (!token) return;
 
         try {
-            const data = await storageAPI.searchArchives(/*token,*/ query);
+            const data = await storageApi.searchArchives(/*token,*/ query);
             setArchives(mapToArchiveDTO(data));
         } catch (err) {
             console.error(err);
@@ -74,7 +76,7 @@ export default function Storage() {
         //if (!token) return;
 
         try {
-            const data = await storageAPI.sortArchives(/*token,*/ by, order);
+            const data = await storageApi.sortArchives(/*token,*/ by, order);
             setArchives(mapToArchiveDTO(data));
         } catch (err) {
             console.error(err);
@@ -119,7 +121,7 @@ export default function Storage() {
 
             {!isLoading && !error && (
                 <div className="p-[10px]!">
-                    <StorageTable archives={archives} />
+                    <StorageTable archives={archives} storageApi={storageApi} />
                 </div>
             )}
         </div>

@@ -12,11 +12,15 @@ import { AlertSSEService } from "../../services/AlertSSEService";
 import { DesktopNotificationService } from "../../services/DesktopNotificationService";
 import { useAuth } from "../../hooks/useAuthHook";
 import { AlertDTO } from "../../models/alerts/AlertDTO";
+import { IAlertAPI } from "../../api/alerts/IAlertAPI";
 
-const alertAPI = new AlertAPI();
+interface AlertsProps{
+  alertsApi:IAlertAPI;
+}
+
 const desktopNotification = new DesktopNotificationService();
 
-export default function Alerts() {
+export default function Alerts({alertsApi}:AlertsProps) {
   const { token } = useAuth();
   const { 
     alerts, 
@@ -27,7 +31,7 @@ export default function Alerts() {
     updateStatus, 
     addAlert, 
     updateAlert 
-  } = useAlerts(alertAPI);
+  } = useAlerts(alertsApi);
   
   const [selectedAlertId, setSelectedAlertId] = useState<number | null>(null);
   const [toastAlert, setToastAlert] = useState<AlertDTO | null>(null);

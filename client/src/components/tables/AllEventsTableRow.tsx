@@ -3,14 +3,16 @@ import { IoIosArrowDown } from "react-icons/io";
 import { ExpandedRow } from "./ExpandedRow";
 import React from "react";
 import { EventRow } from "../../types/events/EventRow";
+import { IParserAPI } from "../../api/parser/IParserAPI";
 
 interface RowProps {   //at the end,move into a right folders(types) 
     e: EventRow;
     index: number;
+    parserApi: IParserAPI;
 }
-export default function EventTableRow({ e, index }: RowProps) {
+export default function EventTableRow({ e, index, parserApi }: RowProps) {
     const [rotateArrow, setRotateArrow] = useState<number | null>(null);
-    
+
     const arrowStyle = (index: number): React.CSSProperties => ({
         transform: rotateArrow === index ? "rotate(180deg)" : "rotate(0deg)",
         transition: "transform 0.3s ease"
@@ -40,7 +42,7 @@ export default function EventTableRow({ e, index }: RowProps) {
             </tr>
 
             {/* Expanded details row */}
-            <ExpandedRow expanded={rotateArrow === index} e={e} />
+            <ExpandedRow expanded={rotateArrow === index} e={e} parserApi={parserApi} />
         </React.Fragment>
     );
 }

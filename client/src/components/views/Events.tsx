@@ -1,21 +1,20 @@
 import AllEventsTable from "../tables/AllEventsTable";
 import { useEffect, useState } from "react";
-import { FiDownload } from "react-icons/fi";
 import { useAuth } from "../../hooks/useAuthHook";
 import { EventDTO } from "../../models/events/EventDTO";
-import { EventType } from "../../enums/EventType";
-import DropDownMenu from "../events/DropDownMenu";
-import { QueryAPI } from "../../api/query/QueryAPI";
 import { EventRow } from "../../types/events/EventRow";
 import { SearchToolBar } from "../events/SearchToolBar";
 import { SecondEventToolBar } from "../events/SecondEventToolBar";
+import { mapEventDTO } from "../../helpers/mapEventDTO";
+import { IQueryAPI } from "../../api/query/IQueryAPI";
+import { IParserAPI } from "../../api/parser/IParserAPI";
 
-export default function Events() {
-    /*const eventss: EventRow[] = [
-            { id: 1, source: "Auth Service", time: "01:23:33   22/11/2025", type: EventType.INFO, description: "User login successful" },
-            { id: 2, source: "Auth Service", time: "01:25:49   22/11/2025", type: EventType.WARNING, description: "Multiple failed login attempts" },
-            { id: 3, source: "Database", time: "21:03:11   20/11/2025", type: EventType.ERROR, description: "Database connection lost" },
-        ];*/
+interface EventsProps {
+    queryApi: IQueryAPI;
+    parserApi: IParserAPI;
+}
+
+export default function Events({ queryApi, parserApi }: EventsProps) {
     //const { token } = useAuth();
     const token = "token";      // TODO: DELETE AFTER TESTING!
 
@@ -30,27 +29,7 @@ export default function Events() {
     const [error, setError] = useState<string | null>(null);
 
     const mapEventDTOToRow = (e: EventDTO): EventRow => {
-        let type: EventRow["type"];
-        switch (e.type) {
-            case "ERROR":
-                type = EventType.ERROR;
-                break;
-            case "WARNING":
-                type = EventType.WARNING;
-                break;
-            case "INFO":
-            default:
-                type = EventType.INFO;
-                break;
-        }
-
-        return {
-            id: e.id,
-            source: e.source.toString(),
-            time: e.timestamp,
-            type,
-            description: e.description.toString(),
-        };
+        return mapEventDTO(e);
     };
 
     const loadEventsWithQuery = async () => {
@@ -62,9 +41,6 @@ export default function Events() {
         try {
             setIsLoading(true);
             setError(null);
-
-            const api = new QueryAPI();
-
             // pravi se query za search
             // npr: text=server
             let query =
@@ -90,7 +66,7 @@ export default function Events() {
                 query += query ? `|type=${eventType.toUpperCase()}` : `type=${eventType.toUpperCase()}`;
             }
 
-            const data: EventDTO[] = await api.getEventsByQuery(query, token);
+            const data: EventDTO[] = await queryApi.getEventsByQuery(query, token);
             const mapped = data.map(mapEventDTOToRow);
 
             setEvents(mapped);
@@ -110,11 +86,9 @@ export default function Events() {
                 setIsLoading(true);
                 setError(null);
 
-                const api = new QueryAPI();
 
-                const data: EventDTO[] = await api.getAllEvents(token);
+                const data: EventDTO[] = await queryApi.getAllEvents(token);
                 const mapped = data.map(mapEventDTOToRow);
-                console.log("aaaaaaaa ", mapped[0].time)
                 setEvents(mapped);
             } catch (err) {
                 console.error(err);
@@ -143,10 +117,10 @@ export default function Events() {
                 </div>
 
             </div>
-            <SearchToolBar value={searchText} onSearchText={setSearchText} value1={eventType} onEventType={setEventType} 
-                            value2={dateTo} onDateTo={setDateTo} value3={dateFrom} onDateFrom={setDateFrom} onSearchClick={loadEventsWithQuery}/>
-        
-            <SecondEventToolBar onSortType={setSortType}/>
+            <SearchToolBar value={searchText} onSearchText={setSearchText} value1={eventType} onEventType={setEventType}
+                value2={dateTo} onDateTo={setDateTo} value3={dateFrom} onDateFrom={setDateFrom} onSearchClick={loadEventsWithQuery} />
+
+            <SecondEventToolBar onSortType={setSortType} />
 
             <div className="m-[10px]!">
                 {error && !isLoading && (
@@ -155,7 +129,7 @@ export default function Events() {
                     </div>
                 )}
 
-                <AllEventsTable events={events} sortType={sortType} searchText={searchText} />
+                <AllEventsTable events={events} sortType={sortType} searchText={searchText} parserApi={parserApi} />
             </div>
         </div>
     );

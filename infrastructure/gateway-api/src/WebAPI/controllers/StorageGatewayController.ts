@@ -16,7 +16,7 @@ export class StorageGatewayController {
     this.router.get("/storageLog/stats", /*this.authenticate,*/ this.getArchiveStats.bind(this));
     this.router.get("/storageLog/file/:id", /*this.authenticate,*/ this.downloadArchive.bind(this));
     this.router.post("/storageLog/run",  /*this.authenticate,*/ this.runArchiveProcess.bind(this));
-    this.router.get("/storageLog/top", this.authenticate, this.getTopArchives.bind(this));
+    this.router.get("/storageLog/top", /*this.authenticate,*/ this.getTopArchives.bind(this));
     this.router.get("/storageLog/volume", this.authenticate, this.getArchiveVolume.bind(this));
     this.router.get("/storageLog/largest", /*this.authenticate,*/ this.getLargestArchive.bind(this));
   }

@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
-import { ParserAPI } from "../../api/parser/ParserAPI";
 import { EventRow } from "../../types/events/EventRow";
+import { IParserAPI } from "../../api/parser/IParserAPI";
 
 interface ExpandedProps { //move into a right folders(types)
     expanded: boolean;
     e: EventRow;
+    parserApi: IParserAPI;
 }
 
-export function ExpandedRow({ expanded, e }: ExpandedProps) {
+export function ExpandedRow({ expanded, e, parserApi }: ExpandedProps) {
     //const { token } = useAuth();
     const token = "token";      // TODO: DELETE AFTER TESTING!
-    const parserApi = new ParserAPI();      // TODO: GET API AS ARGUMENT INSTEAD OF INITIALIZING IT LIKE THIS
     const [rawMsg, setRawMsg] = useState<string>();
 
     useEffect(() => {

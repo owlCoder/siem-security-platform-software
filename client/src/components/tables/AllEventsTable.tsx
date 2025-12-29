@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import EventTableRow from "./AllEventsTableRow";
 import { EventRow } from "../../types/events/EventRow";
+import { IParserAPI } from "../../api/parser/IParserAPI";
 
 // Inline styles for now, will be in CSS later
 // types, interfaces and classes will be moved too
@@ -9,9 +10,10 @@ interface Arguments {
     events: EventRow[],
     sortType?: number,
     searchText?: string
+    parserApi: IParserAPI,
 }
 
-export default function AllEventsTable({ events, sortType, searchText }: Arguments) {
+export default function AllEventsTable({ events, sortType, searchText, parserApi }: Arguments) {
     const [sortedEvents, setSortedEvents] = useState<EventRow[]>(events);
     // const [rotateArrow, setRotateArrow] = useState<number | null>(null);
 
@@ -57,7 +59,8 @@ export default function AllEventsTable({ events, sortType, searchText }: Argumen
                         <EventTableRow
                             key={e.id}
                             e={e}
-                            index={index} />
+                            index={index}
+                            parserApi={parserApi} />
                     )))}
                 </tbody>
             </table>
