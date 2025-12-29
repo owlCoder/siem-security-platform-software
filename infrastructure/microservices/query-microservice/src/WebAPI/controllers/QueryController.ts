@@ -45,7 +45,7 @@ export class QueryController {
         try {
             const query = req.query.q as string || "";
             const page = parseInt(req.query.p as string) || 1;
-            const limit = parseInt(req.query.l as string);
+            const limit = parseInt(req.query.l as string) || 50;
             const results = await this.queryService.searchEvents(query, page, limit);
             res.status(200).json(results);
         } catch (err) {

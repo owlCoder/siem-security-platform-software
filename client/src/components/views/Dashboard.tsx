@@ -5,12 +5,18 @@ import { PiShieldWarningBold } from "react-icons/pi";
 import { IoShieldCheckmark } from "react-icons/io5";
 import RecentEventsTable from "../tables/RecentEventsTable";
 import { useEffect, useState } from "react";
+import { QueryAPI } from "../../api/query/QueryAPI";
 import { useAuth } from "../../hooks/useAuthHook";
 import { EventRow } from "../../types/events/EventRow";
-import { DashboardProps } from "../../types/props/dashboard/DashboardProps";
+import { StorageAPI } from "../../api/storage/StorageAPI";
 import { calculateMostEventType } from "../../helpers/calculateMostEvent";
 
-export default function Dashboard({queryApi,storageApi}:DashboardProps) {
+export default function Dashboard() {
+    /* const events: EventRow[] = [
+         { id: 1, source: "Auth Service", time: "01:23:33   22/11/2025", type: EventType.INFO, description: "User login successful" },
+         { id: 2, source: "Auth Service", time: "01:25:49   22/11/2025", type: EventType.WARNING, description: "Multiple failed login attempts" },
+         { id: 3, source: "Database", time: "21:03:11   20/11/2025", type: EventType.ERROR, description: "Database connection lost" },
+     ];*/
     const [eventsData, setEventsData] = useState<EventRow[]>([]);
     const [allEventsCount, setEventCount] = useState<number>(0);
     const [infoCount, setInfoCount] = useState<number>(0);
@@ -34,8 +40,10 @@ export default function Dashboard({queryApi,storageApi}:DashboardProps) {
     useEffect(() => {
         const fetchData = async () => {
             //if (!token) return;           // TODO: DELETE COMMENT AFTER TESTING
+            const api = new QueryAPI();
+            const storageApi = new StorageAPI();
             try {
-                const recentEvents = await queryApi.getLastThreeEvents(token);
+                const recentEvents = await api.getLastThreeEvents(token);
                 const mappedEvents: EventRow[] = recentEvents.map(event => ({
                     id: event.id,
                     source: event.source,
@@ -44,14 +52,14 @@ export default function Dashboard({queryApi,storageApi}:DashboardProps) {
                     description: event.description
                 }));
                 setEventsData(mappedEvents);
-                const allEventsCount = await queryApi.getEventsCount(token);
+                const allEventsCount = await api.getEventsCount(token);
                 setEventCount(allEventsCount);
 
-                const infoCount = await queryApi.getInfoCount(token);
+                const infoCount = await api.getInfoCount(token);
                 setInfoCount(infoCount);
-                const warningCount = await queryApi.getWarningCount(token);
+                const warningCount = await api.getWarningCount(token);
                 setWarningCount(warningCount);
-                const errorCount = await queryApi.getErrorCount(token);
+                const errorCount = await api.getErrorCount(token);
                 setErrorCount(errorCount);
                 getMostEventType(infoCount,errorCount,warningCount);
                 console.log("Ucitani events");
@@ -59,7 +67,7 @@ export default function Dashboard({queryApi,storageApi}:DashboardProps) {
                 console.log("Arhiva largest ",archive)
                 setMostWeightArchive(archive.archiveName);
                 setMostWeightArchiveValue(archive.size);       
-                const event=await queryApi.getTopEventSource(token);
+                const event=await api.getTopEventSource(token);
                 console.log("Top event ",event);
                 setTopEvent(event.source!);
                 setTopEventValue(event.count!);      

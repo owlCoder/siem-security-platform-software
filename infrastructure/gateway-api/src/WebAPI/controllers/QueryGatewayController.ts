@@ -65,7 +65,7 @@ export class QueryGatewayController {
     try {
       const query = req.query.q as string;
       const page = parseInt(req.query.p as string) || 1;
-      const limit = Number(req.query.l as string);
+      const limit = Number(req.query.l as string) || 50;
       const results = await this.gatewayService.searchEvents(query, page, limit);
       res.status(200).json(results);
     } catch (err) {

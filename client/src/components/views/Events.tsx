@@ -7,6 +7,7 @@ import { SearchToolBar } from "../events/SearchToolBar";
 import { SecondEventToolBar } from "../events/SecondEventToolBar";
 import { mapEventDTO } from "../../helpers/mapEventDTO";
 import { EventsProps } from "../../types/props/events/EventsProps";
+import { Pagination } from "../common/Pagination";
 
 export default function Events({ queryApi, parserApi }: EventsProps) {
     //const { token } = useAuth();
@@ -23,14 +24,16 @@ export default function Events({ queryApi, parserApi }: EventsProps) {
     const [error, setError] = useState<string | null>(null);
 
     const [page, setPage] = useState<number>(1);
-    const [totalResults, setTotalResults] = useState<number>(0);
-    const limit = 50;
+    const [pageSize, setPageSize] = useState<number>(50);
+    const [totalItems, setTotalItems] = useState<number>(0);
+
+    const totalPages = Math.ceil(totalItems / pageSize);
 
     const mapEventDTOToRow = (e: EventDTO): EventRow => {
         return mapEventDTO(e);
     };
 
-    const loadEventsWithQuery = async (targetPage: number = 1) => {
+    const loadEventsWithQuery = async (targetPage: number = 1, currentLimit: number = pageSize) => {
         if (!token) {
             console.error("No auth token available.");
             return;
@@ -64,31 +67,17 @@ export default function Events({ queryApi, parserApi }: EventsProps) {
                 query += query ? `|type=${eventType.toUpperCase()}` : `type=${eventType.toUpperCase()}`;
             }
             
-            const response = await queryApi.getEventsByQuery(query, token, targetPage, limit);
+            const response = await queryApi.getEventsByQuery(query, token, targetPage, currentLimit);
             const mapped = response.data.map(mapEventDTOToRow);
 
             setEvents(mapped);
-            setTotalResults(response.total);
+            setTotalItems(response.total);
             setPage(response.page);
         } catch (err) {
             console.error(err);
             setError("Search failed.");
         } finally {
             setIsLoading(false);
-        }
-    };
-
-    const handleNextPage = () => {
-        const nextPage = page + 1;
-        if (nextPage <= Math.ceil(totalResults / limit)) {
-            loadEventsWithQuery(nextPage);
-        }
-    };
-
-    const handlePrevPage = () => {
-        const prevPage = page - 1;
-        if (prevPage >= 1) {
-            loadEventsWithQuery(prevPage);
         }
     };
 
@@ -127,33 +116,23 @@ export default function Events({ queryApi, parserApi }: EventsProps) {
                 )}
 
                 <AllEventsTable events={events} sortType={sortType} searchText={searchText} parserApi={parserApi}/>
-                <div className="flex justify-between items-center m-[10px]! p-[10px]! border-t border-[#282A28]">
-                    <div className="text-[12px] text-gray-400">
-                        Showing {events.length} of {totalResults} events
-                    </div>
-                    
-                    <div className="flex gap-4 items-center">
-                        <button 
-                            onClick={handlePrevPage}
-                            disabled={page === 1 || isLoading}
-                            className="px-3 py-1 bg-[#282A28] rounded disabled:opacity-50 text-[13px]"
-                        >
-                            Previous
-                        </button>
-                        
-                        <span className="text-[13px]">
-                            Page {page} of {Math.ceil(totalResults / limit) || 1}
-                        </span>
-                        
-                        <button 
-                            onClick={handleNextPage}
-                            disabled={page >= Math.ceil(totalResults / limit) || isLoading}
-                            className="px-3 py-1 bg-[#282A28] rounded disabled:opacity-50 text-[13px]"
-                        >
-                            Next
-                        </button>
-                    </div>
-                </div>
+                {!isLoading && events.length > 0 && (
+                    <Pagination
+                        currentPage={page}
+                        totalPages={totalPages}
+                        pageSize={pageSize}
+                        totalItems={totalItems}
+                        onPageChange={(newPage) => {
+                            setPage(newPage);
+                            loadEventsWithQuery(newPage, pageSize);
+                        }}
+                        onPageSizeChange={(newSize) => {
+                            setPageSize(newSize);
+                            setPage(1); 
+                            loadEventsWithQuery(1, newSize);
+                        }}
+                    />
+                )}
             </div>
         </div>
     );

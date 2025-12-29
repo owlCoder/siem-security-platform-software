@@ -25,110 +25,13 @@ export class QueryService implements IQueryService {
     ) {}
 
     async searchEvents(query: string, page: number = 1, limit: number = 50): Promise<EventsResultDTO> {
-        /*
-        const cacheResult = await this.queryRepositoryService.findByKey(`${query}_p${page}`);
+        const cacheResult = await this.queryRepositoryService.findByKey(`${query}_p${page}_l${limit}`);
         const lastProcessedId = this.queryRepositoryService.getLastProcessedId();
 
         if (cacheResult.key !== "NOT_FOUND") {
             // ako su im lastProcessedId isti znaci da nije obradjen(dodat) nijedan novi event od trenutka kesiranja
             if (cacheResult.lastProcessedId === lastProcessedId)
             {
-                return cacheResult.result.map((e: {source: string; type: EventType; description: string; timestamp: Date; }) => ({
-                    source: e.source,
-                    type: e.type,
-                    description: e.description,
-                    timestamp: e.timestamp,
-                }));
-            }
-            // a ako se ne poklapaju brisemo stari kes -> rekesiranje
-            this.queryRepositoryService.deleteByKey(query);
-        }
-        
-        const allEvents = await this.queryRepositoryService.getAllEvents();
-
-        if (query.trim() === "") {
-            return allEvents.map(e => ({
-                source: e.source,
-                type: e.type,
-                description: e.description,
-                timestamp: e.timestamp,
-            }));
-        }
-        // query je npr. "type=info|date=20/10/2025" ili "type=info|host=server1|dateFrom=2025-11-20|dateTo=2025-11-22"
-        // pozivamo parseQueryString da dobijemo parove kljuc-vrednost sa nazivom polja i vrednosti za pretragu
-        const filters = parseQueryString(query);
-        const textQuery = filters["text"] || "";
-        delete filters["text"];
-
-        let filteredEvents = allEvents;
-
-        if (textQuery !== "") {
-            const trimmedQuery = textQuery.trim().toLowerCase();
-            const matchingIds = this.queryRepositoryService.findEvents(trimmedQuery);
-            //const matchingIds = this.queryRepositoryService.findEvents(trimmedQuery); 
-
-            // ako postoji text filter i nema poklapanja to znaci da nema rezultata
-            if (matchingIds.size === 0) {
-                filteredEvents = [];
-            } else {
-                filteredEvents = allEvents.filter(event =>
-                    matchingIds.has(event.id)
-                );
-            }
-        }
-        
-        const result =  filteredEvents.filter(event => {
-
-            for (const key of Object.keys(filters)) {
-                const value = filters[key].toLowerCase();
-
-                if (key === "dateFrom") {
-                    const date = new Date(filters[key]);
-                    if (new Date(event.timestamp) < date) return false;
-                    continue;
-                }
-
-                if (key === "dateTo") {
-                    const date = new Date(filters[key]);
-                    if (new Date(event.timestamp) > date) return false;
-                    continue;
-                }
-                
-                if (key === "type") {
-                    if (event.type.toLowerCase() !== value) return false;
-                    continue;
-                }
-            }
-
-            return true;
-        }).map(e => ({
-            source: e.source,
-            type: e.type,
-            description: e.description,
-            timestamp: e.timestamp,
-        }));
-
-        this.queryRepositoryService.addEntry({
-            key: query,
-            result: result,
-            lastProcessedId: lastProcessedId,
-        });
-        return result;
-        */const cacheResult = await this.queryRepositoryService.findByKey(`${query}_p${page}`);
-        const lastProcessedId = this.queryRepositoryService.getLastProcessedId();
-
-        if (cacheResult.key !== "NOT_FOUND") {
-            // ako su im lastProcessedId isti znaci da nije obradjen(dodat) nijedan novi event od trenutka kesiranja
-            if (cacheResult.lastProcessedId === lastProcessedId)
-            {
-                /*
-                return cacheResult.result.map((e: {source: string; type: EventType; description: string; timestamp: Date; }) => ({
-                    source: e.source,
-                    type: e.type,
-                    description: e.description,
-                    timestamp: e.timestamp,
-                }));
-                */
                return cacheResult.result as EventsResult;
             }
             // a ako se ne poklapaju brisemo stari kes -> rekesiranje
@@ -147,7 +50,6 @@ export class QueryService implements IQueryService {
         if (textQuery !== "") {
             matchingIds = this.queryRepositoryService.findEvents(textQuery.trim().toLowerCase());
         } else {
-            // Ako nema teksta, moramo imati sve ID-eve (ovo treba optimizovati u repository-ju)
             // ovde cemo getEventsById 
             matchingIds = new Set(allEvents.map(e => e.id));
         }
@@ -170,11 +72,9 @@ export class QueryService implements IQueryService {
             return true;
         });
 
-        // 3. Sad kad imaš listu ID-jeva koji SIGURNO prolaze sve, radiš paginaciju
         const totalResults = fullyFilteredEvents.length;
         const paginatedEvents = fullyFilteredEvents.slice((page - 1) * limit, page * limit);
 
-        // 4. Vraćaš tačno 50 rezultata (ako ih ima toliko ukupno)
         const data: EventDTO[] = paginatedEvents.map(e => ({
             source: e.source,
             type: e.type,
@@ -189,9 +89,8 @@ export class QueryService implements IQueryService {
             limit
         };
 
-        // Keširanje
         this.queryRepositoryService.addEntry({
-            key: `${query}_p${page}`,
+            key: `${query}_p${page}_l${limit}`,
             result: response as any,
             lastProcessedId: lastProcessedId,
         });
