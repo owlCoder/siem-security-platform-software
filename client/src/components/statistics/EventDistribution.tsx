@@ -1,197 +1,125 @@
-import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 import React, { useRef } from "react";
+import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { FiDownload } from "react-icons/fi";
 import { EventDistributionProps } from "../../types/props/statistics/EventDistributionProps";
 
-export default function EventDistribution({data}: EventDistributionProps){
-    const chartData = [
-        {name: 'Notifications', value: data.notifications, color: "#00d492"},
-        {name: 'Warnings', value: data.warnings, color: "#00bc7d"},
-        {name: 'Errors', value: data.errors, color: "#007a55"},
-    ];
+export default function EventDistribution({ data }: EventDistributionProps) {
+  /* =======================
+     DATA
+     ======================= */
+  const chartData = [
+    { name: "Notifications", value: data.notifications, color: "#00d492" },
+    { name: "Warnings", value: data.warnings, color: "#00bc7d" },
+    { name: "Errors", value: data.errors, color: "#007a55" },
+  ];
 
-    const containerStyle: React.CSSProperties = {
-        display: "flex",
-        flexDirection: "column",
-        gap: "16px",
-        width: "100%",
-        padding: "16px"
-    };
+  /* =======================
+     PDF EXPORT
+     ======================= */
+  const printRef = useRef<HTMLDivElement | null>(null);
 
-    const headerStyle: React.CSSProperties = {
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: "12px",
-    };
+  const handleDownload = async () => {
+    if (!printRef.current) return;
 
-    const chartContainerStyle: React.CSSProperties = {
-        width: "100%",
-        height: "350px",
-        borderRadius: "12px",
-        padding: "20px",
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center"
-    };
+    const bg =
+      window.getComputedStyle(printRef.current).backgroundColor || "#ffffff";
 
-    const legendContainerStyle: React.CSSProperties = {
-        display: "flex",
-        flexDirection: "column",
-        gap: "12px",
-        marginTop: "20px",
-        width: "75%",
-        maxWidth: "300px"
-    };
-
-    const legendItemStlye: React.CSSProperties = {
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "8px 12px",
-        backgroundColor: "#313338",
-        borderRadius: "8px"
-    };
-
-    const legendLableStyle: React.CSSProperties = {
-        display: "flex",
-        alignItems: "center",
-        gap: "10px"
-    };
-
-    const legendDotStyle = (color: string): React.CSSProperties => ({
-        width: "16px",
-        height: "16px",
-        borderRadius: "4px",
-        backgroundColor: color
+    const canvas = await html2canvas(printRef.current, {
+      scale: 2,
+      backgroundColor: bg,
     });
 
-    const legendTextStyle: React.CSSProperties = {
-        fontSize: "14px",
-        color: "#ffffff",
-        fontWeight: 600
-    };
+    const imgData = canvas.toDataURL("image/png");
+    const doc = new jsPDF({ unit: "mm", format: "a4", compress: true });
 
-    const legendValueStyle: React.CSSProperties = {
-        fontSize: "10px",
-        color: "#c5c5c5",
-        fontWeight: 700
-    }
+    const margin = 10;
+    let cursorY = margin;
 
-    const buttonStyle: React.CSSProperties = {
-        cursor: "pointer",
-        fontWeight: "bold",
-        padding: "8px 20px",
-        borderRadius: "10px",
-        backgroundColor: "#007a55"
-    }
+    doc.setFontSize(14);
+    doc.text("Event distribution", margin, cursorY + 6);
+    cursorY += 10;
 
-    const printRef = useRef<HTMLDivElement | null>(null);
+    const imgProps = (doc as any).getImageProperties(imgData);
+    const pdfImgW = doc.internal.pageSize.getWidth() - margin * 2;
+    const pdfImgH = (imgProps.height * pdfImgW) / imgProps.width;
 
-    const handleDownload = async () => {
-        try{
-            if(!printRef.current){
-                return;
-            }
+    doc.addImage(imgData, "PNG", margin, cursorY, pdfImgW, pdfImgH);
+    doc.save("event-distribution.pdf");
+  };
 
-            const bg = window.getComputedStyle(printRef.current).backgroundColor || "#ffffff";
-            const canvas = await html2canvas(printRef.current, {scale: 2, backgroundColor: bg});
-            const imgData = canvas.toDataURL("image/png");
+  /* =======================
+     RENDER
+     ======================= */
+  return (
+    <div ref={printRef}>
+      {/* HEADER */}
+      <div className="flex justify-between items-center m-4!">
+        <span className="text-white text-lg font-semibold">
+          Event distribution
+        </span>
 
-            // pie chart
-            const doc = new jsPDF({unit: "mm", format: "a4", compress: true});
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const pageHeight = doc.internal.pageSize.getHeight();
-            const margin = 10;
-            let cursorY = margin;
+        <button
+          onClick={handleDownload}
+          className="px-4! py-2! rounded-[10px]! bg-[#007a55] transition-all duration-200"
+          title="Download chart"
+        >
+          <FiDownload size={18} />
+        </button>
+      </div>
 
-            doc.setFontSize(14);
-            doc.text("Event distribution", margin, cursorY + 6);
-            cursorY += 10;
-
-            const imgProps = (doc as any).getImageProperties(imgData);
-            const pdfImgW = pageWidth - margin * 2;
-            const pdfImgH = (imgProps.height * pdfImgW) / imgProps.width;
-
-            if(cursorY + pdfImgH > pageHeight - margin){
-                doc.addPage();
-                cursorY = margin;
-            }
-            doc.addImage(imgData, "PNG", margin, cursorY, pdfImgW, pdfImgH);
-            cursorY += pdfImgH + 8;
-
-            // data
-            doc.setFontSize(10);
-            doc.text("Event ditribution(per type):", margin, cursorY + 4);
-            cursorY += 6;
-
-            doc.setFontSize(9);
-            const lines = [
-                `Notifications: ${data.notifications}%`,
-                `Warnings: ${data.warnings}%`,
-                `Errors: ${data.errors}%`,
-            ];
-
-            for(const line of lines){
-                if(cursorY + 6 > pageHeight - margin){
-                    doc.addPage();
-                    cursorY = margin;
-                }
-                doc.text(line, margin + 4, cursorY + 4);
-                cursorY += 6;
-            }
-
-            doc.save("event-distribution.pdf");
-        } catch(err){
-            console.error("PDF generation failed", err);
-        }
-    }
-
-    return(
-        <div style={containerStyle}>
-            <div style={headerStyle}>
-                <span style={{color: "#ffffff", fontSize: "18px", fontWeight: 600}}>
-                    Event distribution
-                </span>
-                <button
-                    onClick={handleDownload}
-                    style={buttonStyle}>
-                        <FiDownload size={20} />
-                </button> 
-            </div>
-
-            <div ref={printRef} style={chartContainerStyle}>
-                <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                        <Pie
-                            data={chartData}
-                            cx="50%"
-                            cy="50%"
-                            labelLine={false}
-                            outerRadius={100}
-                            dataKey="value">
-                                {chartData.map((entry, index) => (
-                                    <Cell key={index} fill={entry.color} />
-                                ))}
-                        </Pie>
-                    </PieChart>
-                </ResponsiveContainer>
-
-                <div style={legendContainerStyle}>
-                    {chartData.map((item, index) => (
-                        <div key={index} style={legendItemStlye}>
-                            <div style={legendLableStyle}>
-                                <div style={legendDotStyle(item.color)} />
-                                <span style={legendTextStyle}>{item.name}</span>
-                            </div>
-                            <span style={legendValueStyle}>{item.value}%</span>
-                        </div>
-                    ))}
-                </div>
-            </div>
+      {/* CONTENT */}
+      <div className="flex h-[350px] items-center gap-12 p-6 pr-12!">
+        {/* PIE */}
+        <div className="h-full w-[55%]">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={chartData}
+                cx="50%"
+                cy="50%"
+                outerRadius={112}
+                labelLine={false}
+                dataKey="value"
+              >
+                {chartData.map((entry, index) => (
+                  <Cell key={index} fill={entry.color} />
+                ))}
+              </Pie>
+            </PieChart>
+          </ResponsiveContainer>
         </div>
-    );
+
+        {/* LEGEND */}
+        <div className="flex w-[45%] max-w-[380px] flex-col gap-4">
+          {chartData.map((item, index) => (
+            <div
+              key={index}
+              className="
+                flex items-center justify-between
+                bg-[#313338]
+                rounded-[14px]
+                px-5! py-3!
+              "
+            >
+              <div className="flex items-center gap-4">
+                <div
+                  className="h-5 w-5 rounded-md"
+                  style={{ backgroundColor: item.color }}
+                />
+                <span className="text-base font-semibold text-white">
+                  {item.name}
+                </span>
+              </div>
+
+              <span className="text-sm font-semibold text-[#c5c5c5]">
+                {item.value}%
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
