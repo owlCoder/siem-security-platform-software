@@ -1,6 +1,5 @@
 import { IGatewayService } from "../../Domain/services/IGatewayService";
 import { LoginUserDTO } from "../../Domain/DTOs/LoginUserDTO";
-import { RegistrationUserDTO } from "../../Domain/DTOs/RegistrationUserDTO";
 import { AuthResponseType } from "../../Domain/types/AuthResponse";
 import { UserDTO } from "../../Domain/DTOs/UserDTO";
 import { AlertDTO } from "../../Domain/DTOs/AlertDTO";
@@ -25,6 +24,8 @@ import { DistributionDTO } from "../../Domain/DTOs/DistributionDTO";
 import { TopSourceDTO } from "../../Domain/DTOs/TopSourceDTO";
 import { EventCollectorGatewayService } from "../domains/EventCollectorGatewayService";
 import { StorageLogResponseDTO } from "../../Domain/DTOs/StorageLogResponseDTO";
+import { OTPVerificationDTO } from "../../Domain/DTOs/OtpVerificationDTO";
+import { AuthJwtResponse } from "../../Domain/types/AuthJwtResponse";
 
 /**
  * Facade that delegates to domain-specific gateway services.
@@ -47,7 +48,7 @@ export class GatewayService implements IGatewayService {
     this.storageService = new StorageGatewayService();
     this.parserService = new ParserGatewayService();
     this.analysisService = new AnalysisGatewayService();
-    this.eventService=new EventCollectorGatewayService();
+    this.eventService = new EventCollectorGatewayService();
   }
   async createEvent(event: EventDTO): Promise<EventDTO> {
     return await this.eventService.createEvent(event);
@@ -64,8 +65,8 @@ export class GatewayService implements IGatewayService {
   /*async getMaxId(): Promise<EventDTO> {
     return await this.eventService.get(id); //dodati funkciju u event gateway service i event microservice
   }*/
- async getEventsFromId1ToId2(fromId: number, toId: number): Promise<EventDTO[]> {
-    return await this.eventService.getEventsFromId1ToId2(fromId,toId);
+  async getEventsFromId1ToId2(fromId: number, toId: number): Promise<EventDTO[]> {
+    return await this.eventService.getEventsFromId1ToId2(fromId, toId);
   }
   async getSortedEventsByDate(): Promise<EventDTO[]> {
     return await this.eventService.getSortedEventsByDate();
@@ -99,8 +100,8 @@ export class GatewayService implements IGatewayService {
     return this.authService.login(data);
   }
 
-  async register(data: RegistrationUserDTO): Promise<AuthResponseType> {
-    return this.authService.register(data);
+  async verifyOtp(data: OTPVerificationDTO): Promise<AuthJwtResponse> {
+    return this.authService.verifyOtp(data);
   }
 
   async validateToken(token: string): Promise<{

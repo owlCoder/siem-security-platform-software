@@ -6,16 +6,17 @@ import { useNavigate } from "react-router-dom";
 
 type LoginFormProps = {
   authAPI: IAuthAPI;
+  handleLoginSuccess: (session: { session_id: string; user_id: number }) => void;
 };
 
-export const LoginForm: React.FC<LoginFormProps> = ({ authAPI }) => {
+export const LoginForm: React.FC<LoginFormProps> = ({ authAPI, handleLoginSuccess }) => {
   const [formData, setFormData] = useState<LoginUserDTO>({
     username: "",
     password: "",
   });
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
-  const { login, isAuthenticated } = useAuth();
+  //const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,10 +35,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({ authAPI }) => {
     try {
       const response = await authAPI.login(formData);
 
-      if (response.success && response.token) {
-        login(response.token);
-        navigate("/dashboard");
+      if (response.success && response.otp_required && response.session) {
+        handleLoginSuccess({ session_id: response.session?.session_id, user_id: response.session?.user_id });
+        //login(response.token);
+        //navigate("/dashboard");
       } else {
+        //console.log(response);
+        //console.log(response.success, response.otp_required, response.session?.session_id, response.session?.user_id);
         setError(response.message || "Login failed. Please try again.");
       }
     } catch (err: any) {
@@ -48,8 +52,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ authAPI }) => {
   };
 
   useEffect(() => {
-    if (isAuthenticated)
-      navigate("/dashboard");
+    /*if (isAuthenticated)
+      navigate("/dashboard");*/
   })
 
   return (

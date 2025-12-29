@@ -1,9 +1,10 @@
 import axios, { AxiosInstance } from "axios";
 import { LoginUserDTO } from "../../Domain/DTOs/LoginUserDTO";
-import { RegistrationUserDTO } from "../../Domain/DTOs/RegistrationUserDTO";
 import { AuthResponseType } from "../../Domain/types/AuthResponse";
 import { defaultAxiosClient } from "../../Infrastructure/config/AxiosClient";
 import { serviceConfig } from "../../Infrastructure/config/ServiceConfig";
+import { OTPVerificationDTO } from "../../Domain/DTOs/OtpVerificationDTO";
+import { AuthJwtResponse } from "../../Domain/types/AuthJwtResponse";
 
 export class AuthGatewayService {
   private readonly client: AxiosInstance;
@@ -23,21 +24,35 @@ export class AuthGatewayService {
 
   async login(data: LoginUserDTO): Promise<AuthResponseType> {
     try {
-      const response = await this.client.post<AuthResponseType>("/auth/login", data);
+      const response = await this.client.post<AuthResponseType>("/login", data);
       return response.data;
-    } catch {
-      return { authenificated: false };
+    } catch (error: any) {
+      return {
+        success: false,
+        otp_required: false,
+        message:
+          error?.response?.data?.message ??
+          "Unable to login. Please try again later."
+      };
     }
   }
 
-  async register(data: RegistrationUserDTO): Promise<AuthResponseType> {
+  async verifyOtp(data: OTPVerificationDTO): Promise<AuthJwtResponse> {
     try {
-      const response = await this.client.post<AuthResponseType>("/auth/register", data);
+      const response = await this.client.post<AuthJwtResponse>("/verify-otp", data);
       return response.data;
-    } catch {
-      return { authenificated: false };
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.message || "OTP verification failed. Please try again.";
+
+      return {
+        success: false,
+        token: "",
+        message,
+      };
     }
   }
+
 
   async validateToken(token: string): Promise<{
     valid: boolean;

@@ -1,62 +1,57 @@
 import React, { useState } from "react";
 import { IAuthAPI } from "../api/auth/IAuthAPI";
 import { LoginForm } from "../components/auth/LoginForm";
-import { RegisterForm } from "../components/auth/RegisterForm";
+import { OtpForm } from "../components/auth/OtpForm";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuthHook";
 
 type AuthPageProps = {
   authAPI: IAuthAPI;
 };
 
 export const AuthPage: React.FC<AuthPageProps> = ({ authAPI }) => {
-  const [activeTab, setActiveTab] = useState<"login" | "register">("login");
+  const [otpRequired, setOtpRequired] = useState<boolean>(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
+  const { login, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLoginSuccess = (session: { session_id: string; user_id: number }) => {
+    setSessionId(session.session_id);
+    setUserId(session.user_id);
+    setOtpRequired(true);
+  };
+
+  const handleOtpSuccess = (token: string) => {
+    // save token, mark user as authenticated, redirect, etc.
+    login(token);
+    navigate("/mainLayout")
+    console.log("User authenticated, token:", token);
+  };
 
   return (
     <div className="overlay-blur-none" style={{ position: "fixed" }}>
       <div className="window" style={{ width: "500px", maxWidth: "90%" }}>
-        <div className="titlebar">
-          <div className="titlebar-icon">
-            <img style={{marginTop: -5 }} src='/icon.png' width="20" height="20" />
-          </div>
+        <div className="titlebar flex justify-center">
           <span className="titlebar-title">Authentication</span>
         </div>
 
         <div className="window-content" style={{ padding: 0 }}>
-          {/* Tabs */}
-          <div className="flex" style={{ borderBottom: "1px solid var(--win11-divider)" }}>
-            <button
-              className={`flex-1 ${activeTab === "login" ? "btn-accent" : "btn-ghost"}`}
-              style={{
-                borderRadius: 0,
-                height: "48px",
-                fontSize: "14px",
-                fontWeight: 600,
-                borderBottom: activeTab === "login" ? "2px solid var(--win11-accent)" : "none",
-              }}
-              onClick={() => setActiveTab("login")}
-            >
-              Login
-            </button>
-            <button
-              className={`flex-1 ${activeTab === "register" ? "btn-accent" : "btn-ghost"}`}
-              style={{
-                borderRadius: 0,
-                height: "48px",
-                fontSize: "14px",
-                fontWeight: 600,
-                borderBottom: activeTab === "register" ? "2px solid var(--win11-accent)" : "none",
-              }}
-              onClick={() => setActiveTab("register")}
-            >
-              Register
-            </button>
-          </div>
-
-          {/* Content */}
           <div style={{ padding: "24px" }}>
-            {activeTab === "login" ? (
-              <LoginForm authAPI={authAPI} />
-            ) : (
-              <RegisterForm authAPI={authAPI} />
+            {!otpRequired && (
+              <LoginForm
+                authAPI={authAPI}
+                handleLoginSuccess={handleLoginSuccess}
+              />
+            )}
+
+            {otpRequired && sessionId && userId && (
+              <OtpForm
+                authAPI={authAPI}
+                sessionId={sessionId}
+                userId={userId}
+                onSuccess={handleOtpSuccess}
+              />
             )}
           </div>
         </div>
