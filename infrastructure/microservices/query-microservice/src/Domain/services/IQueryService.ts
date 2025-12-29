@@ -10,5 +10,5 @@ import { EventsResultDTO } from "../DTOs/EventsResultDTO";
 
 export interface IQueryService {
     searchEvents(query: string, page?: number, limit?: number): Promise<EventsResultDTO>;
-    generatePdfReport(query: string): Promise<string>;
+    generatePdfReport(dateFrom: string, dateTo: string, eventType: string): Promise<string>;
 }

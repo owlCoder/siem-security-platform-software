@@ -127,4 +127,21 @@ export class QueryRepositoryService implements IQueryRepositoryService {
     public getLastProcessedId(): number {
         return this.invertedIndexStructureForEvents.getLastProcessedId();
     }
+
+    public async getFilteredEvents(dateFrom: string, dateTo: string, eventType: string): Promise<Event[]> {
+        const where: any = {};
+
+        if (dateFrom && dateTo) {
+            where.timestamp = Between(new Date(dateFrom), new Date(dateTo));
+        }
+
+        if (eventType && eventType !== 'all') {
+            where.severity = eventType.toUpperCase();
+        }
+
+        return await this.eventRepository.find({
+            where,
+            order: { timestamp: "DESC" }
+        });
+    }
 }

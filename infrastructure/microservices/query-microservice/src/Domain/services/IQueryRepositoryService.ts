@@ -20,4 +20,5 @@ export interface IQueryRepositoryService {
     getWarningCount(): number;
     getErrorCount(): number;
     getLastProcessedId(): number;
+    getFilteredEvents(dateFrom: string, dateTo: string, eventType: string): Promise<any[]>;
 }

@@ -23,6 +23,7 @@ export class QueryController {
         this.router.get("/query/infoCount", this.getInfoCount.bind(this));
         this.router.get("/query/warningCount", this.getWarningCount.bind(this));
         this.router.get("/query/errorCount", this.getErrorCount.bind(this));
+        this.router.get("/query/pdfReport", this.getPdfReport.bind(this));
     }
 
     private async getOldEvents(req: Request, res: Response): Promise<void> {
@@ -106,6 +107,32 @@ export class QueryController {
             res.status(500).json({ message: "Error while retrieving error count." });
         }
     }
+
+    private async getPdfReport(req: Request, res: Response): Promise<void> {
+    try {
+        const dateFrom = req.query.dateFrom as string;
+        const dateTo = req.query.dateTo as string;
+        const eventType = req.query.eventType as string;
+
+        const base64String = await this.queryService.generatePdfReport(dateFrom, dateTo, eventType);
+
+        if (!base64String) {
+            res.status(404).json({ message: "No events found for the selected filters." });
+            return;
+        }
+
+        const pdfBuffer = Buffer.from(base64String, 'base64');
+
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", `attachment; filename=SIEM-Report-${Date.now()}.pdf`);
+        res.setHeader("Content-Length", pdfBuffer.length.toString());
+
+        res.status(200).send(pdfBuffer);
+    } catch (err) {
+        console.error("PDF Error:", err);
+        res.status(500).json({ message: "Error while generating PDF report." });
+    }
+}
 
     public getRouter(): Router {
         return this.router;

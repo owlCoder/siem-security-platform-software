@@ -98,16 +98,24 @@ export class QueryService implements IQueryService {
         return response;
     } 
 
-    public async generatePdfReport(query: string): Promise<string> {
-        const maxId = await this.queryRepositoryService.getMaxId();
-        const eventsToReport = await this.searchEvents(query, 1, maxId); 
+    public async generatePdfReport(dateFrom: string, dateTo: string, eventType: string): Promise<string> {
+    console.log("BACKEND PRIMIO DATUME:", { dateFrom, dateTo, eventType });
+    console.log("FORMAT DATUMA:", typeof dateFrom);
+        const eventsToReport = await this.queryRepositoryService.getFilteredEvents(dateFrom, dateTo, eventType); 
 
-        if (eventsToReport.data.length === 0) {
-            console.warn(`No results found for query: ${query}.`);
+        if (!eventsToReport || eventsToReport.length === 0) {
+            console.warn(`No results found for dates: ${dateFrom} - ${dateTo}, type: ${eventType}`);
             return ''; 
         }
 
-        const base64PdfString = await PdfGenerator.createReport(eventsToReport.data); 
+        const data: EventDTO[] = eventsToReport.map(e => ({
+            source: e.source,
+            type: e.type,
+            description: e.description,
+            timestamp: e.timestamp,
+        }));
+
+        const base64PdfString = await PdfGenerator.createReport(data); 
         
         return base64PdfString; 
     }
