@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuthHook";
-import { StorageLogResponseDTO } from "../../models/storage/StorageLogResponseDTO";
 import { ArchiveStatsDTO } from "../../models/storage/ArchiveStatsDTO";
 import StorageStats from "../storage/StorageStats";
 import StorageTable from "../tables/StorageTable";
 import StorageToolBar from "../storage/StorageToolbar";
 import { ArchiveDTO } from "../../models/storage/ArchiveDTO";
 import { StorageProps } from "../../types/props/storage/StorageProps";
-
-
+import { mapToArchiveDTO } from "../../helpers/mapToArchiveDTO";
+import { emptyStats } from "../../constants/emptyStats";
 
 export default function Storage({storageApi}:StorageProps) {
 
@@ -17,22 +16,6 @@ export default function Storage({storageApi}:StorageProps) {
     const [stats, setStats] = useState<ArchiveStatsDTO | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-
-    const EMPTY_STATS: ArchiveStatsDTO = {
-        totalSize: 0,
-        retentionHours: 72,
-        lastArchiveName: "No archives"
-    };
-
-    const mapToArchiveDTO = (data: StorageLogResponseDTO[]): ArchiveDTO[] =>
-        data.map(a => ({
-            id: a.storageLogId,
-            fileName: a.fileName,
-            recordCount: a.recordCount,
-            fileSize: a.fileSize,
-            createdAt: a.createdAt,
-            downloadUrl: `${import.meta.env.VITE_GATEWAY_URL}/storageLog/file/${a.storageLogId}`
-        }));
 
     useEffect(() => {
         // if(!token)
@@ -47,7 +30,7 @@ export default function Storage({storageApi}:StorageProps) {
                 const statsResponse = await storageApi.getStats(/*token*/);
 
                 setArchives(mapToArchiveDTO(archivesResponse));
-                setStats(statsResponse ?? EMPTY_STATS);
+                setStats(statsResponse ?? emptyStats);
             } catch (err) {
                 console.error(err);
                 setError("Failed to load storageData");
@@ -56,7 +39,7 @@ export default function Storage({storageApi}:StorageProps) {
             }
         };
         fetchStorageData();
-    }, [token]);
+    }, [/*token*/]);
 
     const handleSearchArchives = async (query: string) => {
         //if (!token) return;
@@ -98,7 +81,7 @@ export default function Storage({storageApi}:StorageProps) {
 
             </div>
 
-            <StorageStats stats={stats ?? EMPTY_STATS} />
+            <StorageStats stats={stats ?? emptyStats} />
 
             <div className="my-4!">
                 <StorageToolBar onSearch={handleSearchArchives} onSort={handleSortArchives} />
