@@ -20,11 +20,11 @@ export function SecondEventToolBar({ onSortType, dateFrom, dateTo, eventType }: 
 
     return (
         <div className="flex justify-end items-center mt-4! me-[10px]!">
-            <div className="flex gap-[16px] items-center">
+            <div className="flex gap-[10px] items-center">
                 <DropDownMenu OnSortTypeChange={(value: number) => onSortType(value)} sortName1="Source" sortName2="Date and Time" sortName3="Type" />
                 <button 
                     onClick={handleDownloadPdf}
-                    className="bg-[#007a55] text-white w-[200px] h-[40px] rounded-[10px]! font-semibold flex items-center justify-center gap-2 hover:bg-[#009166]"
+                    className="bg-[#007a55] text-white w-[185px] h-[40px] rounded-[10px]! font-semibold flex items-center justify-center gap-2 hover:bg-[#009166]"
                 >
                     Download report <FiDownload size={20} />
                 </button>

@@ -136,7 +136,7 @@ export class QueryRepositoryService implements IQueryRepositoryService {
         }
 
         if (eventType && eventType !== 'all') {
-            where.severity = eventType.toUpperCase();
+            where.type = eventType.toUpperCase();
         }
 
         return await this.eventRepository.find({

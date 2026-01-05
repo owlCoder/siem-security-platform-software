@@ -4,12 +4,12 @@ export function SearchToolBar({ value, onSearchText, value1, onEventType, value2
 
     return (
         <>
-            <div className="flex flex-row items-end gap-[10px] ml-[10px] w-full pr-[20px]">
+            <div className="flex flex-row items-end gap-[10px] ml-[10px]! w-full pr-[20px]">
                 
                 <div className="flex flex-col gap-[4px] w-[40%]">
                     <label className="opacity-0 text-[14px]">Spacing</label>
                     <input
-                        className="px-3 py-2 h-[40px] rounded-[10px] border border-[rgba(255,255,255,0.12)] bg-[rgba(0,0,0,0.3)] text-white text-[13px] outline-none w-full"
+                        className="px-3! py-2 h-[40px] rounded-[10px] border border-[rgba(255,255,255,0.12)] bg-[rgba(0,0,0,0.3)] text-white text-[13px] outline-none w-full"
                         placeholder="Type..."
                         value={value}
                         onChange={(e) => onSearchText(e.target.value)}
@@ -19,7 +19,7 @@ export function SearchToolBar({ value, onSearchText, value1, onEventType, value2
                 <div className="flex flex-col gap-[4px] w-[15%]">
                     <label className="text-white text-[14px]">Type:</label>
                     <select
-                        className="border border-[rgba(255,255,255,0.12)] bg-[#2d2d2d] hover:bg-[#3d3d3d] text-white rounded-[10px] py-[4px] h-[40px] font-semibold outline-none w-full"
+                        className="border border-[rgba(255,255,255,0.12)] bg-[#2d2d2d] hover:bg-[#3d3d3d] text-white rounded-[10px]! py-[4px]! h-[40px] font-semibold outline-none w-full"
                         value={value1}
                         onChange={(e) => onEventType(e.target.value)}
                     >
@@ -50,9 +50,9 @@ export function SearchToolBar({ value, onSearchText, value1, onEventType, value2
                     />
                 </div>
 
-                <div className="w-[15%]">
+                <div className="w-[15%] mr-5!">
                     <button
-                        className="bg-[#007a55] text-white w-full rounded-[10px] h-[40px] font-semibold hover:bg-[#009166] transition-colors"
+                        className="bg-[#007a55] text-white w-full rounded-[10px]! h-[40px] font-semibold hover:bg-[#009166] transition-colors"
                         onClick={onSearchClick}
                     >
                         Search
