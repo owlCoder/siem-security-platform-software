@@ -12,8 +12,11 @@ export class AlertRepositoryService implements IAlertRepositoryService {
     private readonly logger: ILoggerService
   ) {}
 
+  // odmah čuva u bazu
   async create(data: Partial<Alert>): Promise<Alert> {
-    return this.repo.create(data);
+    const entity = this.repo.create(data);
+    const saved = await this.repo.save(entity);
+    return saved;
   }
 
   async save(alert: Alert): Promise<Alert> {

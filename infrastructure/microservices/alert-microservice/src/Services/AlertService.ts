@@ -16,14 +16,16 @@ export class AlertService implements IAlertService {
   ) {}
 
   async createAlert(data: CreateAlertDTO): Promise<AlertDTO> {
-    const entity = await this.repo.create({
+    const alertData = {
       ...data,
       status: AlertStatus.ACTIVE,
       resolvedAt: null,
-      resolvedBy: null
-    });
+      resolvedBy: null,
+      resolutionNotes: null,
+      detectionRule: data.detectionRule || null 
+    };
 
-    const saved = await this.repo.save(entity);
+    const saved = await this.repo.create(alertData);
     await this.logger.log(`Alert created successfully with ID: ${saved.id}`);
     
     return toAlertDTO(saved);

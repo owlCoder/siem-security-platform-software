@@ -11,7 +11,6 @@ import { AlertSSEService } from "../../services/AlertSSEService";
 import { DesktopNotificationService } from "../../services/DesktopNotificationService";
 import { useAuth } from "../../hooks/useAuthHook";
 import { IAlertAPI } from "../../api/alerts/IAlertAPI";
-import { AlertSeverity } from "../../enums/AlertSeverity";
 import { AlertStatus } from "../../enums/AlertStatus";
 import { AlertDTO } from "../../models/alerts/AlertDTO";
 
@@ -39,45 +38,6 @@ export default function Alerts({ alertsApi }: AlertsProps) {
   const [sseConnected, setSseConnected] = useState(false);
   const [currentQuery, setCurrentQuery] = useState<AlertQueryDTO>({ page: 1, limit: 10 });
 
-  // Test alertovi za prikaz u tabeli
-  const testAlerts: AlertDTO[] = [
-    {
-      id: 1,
-      title: "Database Connection Lost",
-      description: "Cannot reach database.",
-      severity: AlertSeverity.CRITICAL,
-      status: AlertStatus.ACTIVE,
-      correlatedEvents: [],
-      source: "Database",
-      createdAt: new Date(),
-      resolvedAt: null,
-      resolvedBy: null,
-    },
-    {
-      id: 2,
-      title: "Multiple Login Failures",
-      description: "User attempted 5 wrong passwords.",
-      severity: AlertSeverity.HIGH,
-      status: AlertStatus.INVESTIGATING,
-      correlatedEvents: [],
-      source: "Auth Service",
-      createdAt: new Date(),
-      resolvedAt: null,
-      resolvedBy: null,
-    },
-    {
-      id: 3,
-      title: "New User Signup",
-      description: "User registered successfully.",
-      severity: AlertSeverity.LOW,
-      status: AlertStatus.RESOLVED,
-      correlatedEvents: [],
-      source: "Auth Service",
-      createdAt: new Date(),
-      resolvedAt: new Date(),
-      resolvedBy: "admin",
-    },
-  ];
 
   // Request desktop notification permission on mount
   useEffect(() => {
@@ -172,13 +132,13 @@ export default function Alerts({ alertsApi }: AlertsProps) {
     setToastAlert(null);
   };
 
-  const lastAlert = alerts.length > 0 ? alerts[0] : testAlerts[0];
+  const lastAlert = alerts.length > 0 ? alerts[0] : null;
   const lastAlertTime = lastAlert
     ? new Date(lastAlert.createdAt).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
-    : "--:--";
+    : "No alerts";
 
   const selectedAlert = selectedAlertId
-    ? alerts.find((a) => a.id === selectedAlertId) || testAlerts.find((a) => a.id === selectedAlertId) || null
+    ? alerts.find((a) => a.id === selectedAlertId) || null
     : null;
 
   return (
@@ -202,7 +162,7 @@ export default function Alerts({ alertsApi }: AlertsProps) {
           </div>
           {desktopNotification.canShowNotifications() && (
             <div className="flex items-center gap-2 rounded-[8px] border border-[rgba(96,165,250,0.3)] bg-[rgba(96,165,250,0.15)] px-6.5! py-1.5! text-[12px] text-[#60a5fa]">
-              Notifications Enabled
+               Notifications Enabled
             </div>
           )}
         </div>
@@ -214,16 +174,17 @@ export default function Alerts({ alertsApi }: AlertsProps) {
       {isLoading && (
         <div className="text-center p-10">
           <div className="spinner"></div>
+          <p className="text-gray-400 mt-4">Loading alerts...</p>
         </div>
       )}
 
       {!isLoading && (
         <>
           <RecentAlertsTable
-            alerts={alerts.length > 0 ? alerts : testAlerts}
+            alerts={alerts}
             onSelectAlert={handleSelectAlert}
             onResolve={handleResolve}
-            onUpdateStatus={handleUpdateStatus} // sada tip AlertStatus
+            onUpdateStatus={handleUpdateStatus}
           />
           {pagination && (
             <Pagination

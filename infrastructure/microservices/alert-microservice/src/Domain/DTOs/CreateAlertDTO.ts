@@ -6,4 +6,5 @@ export interface CreateAlertDTO {
   severity: AlertSeverity;
   correlatedEvents: number[];
   source: string;
+  detectionRule?: string; 
 }

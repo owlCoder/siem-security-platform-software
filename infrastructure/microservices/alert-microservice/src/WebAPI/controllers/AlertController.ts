@@ -32,13 +32,13 @@ export class AlertController {
   private initializeRoutes(): void {
     this.router.get("/alerts/notifications/stream", this.streamNotifications.bind(this));
     this.router.get("/alerts/search", this.searchAlerts.bind(this));
+    this.router.post("/alerts/correlation", this.createAlertFromCorrelation.bind(this));
     this.router.get("/alerts", this.getAllAlerts.bind(this));
     this.router.get("/alerts/:id", this.getAlertById.bind(this));
     this.router.get("/alerts/severity/:severity", this.getAlertsBySeverity.bind(this));
     this.router.get("/alerts/status/:status", this.getAlertsByStatus.bind(this));
     this.router.put("/alerts/:id/resolve", this.resolveAlert.bind(this));
     this.router.put("/alerts/:id/status", this.updateAlertStatus.bind(this));
-    this.router.post("/alerts/correlation", this.createAlertFromCorrelation.bind(this));
   }
 
   public getRouter(): Router {
@@ -80,7 +80,8 @@ export class AlertController {
         description: data.description,
         severity: data.severity || AlertSeverity.HIGH,
         correlatedEvents: data.correlatedEventIds,
-        source: "AnalysisEngine"
+        source: "AnalysisEngine",
+        detectionRule: `correlation_${data.correlationId}` 
       };
 
       const alertValidation = validateCreateAlertDTO(alertData);
