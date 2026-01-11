@@ -1,10 +1,27 @@
 import { Between, Repository } from "typeorm";
 import { Alert } from "../Domain/models/Alert";
 import { IQueryAlertRepositoryService } from "../Domain/services/IQueryAlertRepositoryService";
+import { CacheAlertEntry } from "../Domain/models/CacheAlertEntry";
+import { ILoggerService } from "../Domain/services/ILoggerService";
+import { InvertedIndexStructureForAlerts } from "../Utils/InvertedIndexStructureForAlerts";
+
+const emptyCacheEntry: CacheAlertEntry = {
+    _id: "",
+    key: "NOT_FOUND",
+    result: [],
+    cachedAt: new Date(0),
+    lastProcessedId: 0
+};
 
 export class QueryAlertRepositoryService implements IQueryAlertRepositoryService {
-
-    constructor(private readonly alertRepository: Repository<Alert>){
+    public readonly invertedIndexStructureForAlerts: InvertedIndexStructureForAlerts;
+    constructor(private readonly cacheAlertRepository : Repository<CacheAlertEntry>,
+                private readonly loggerService: ILoggerService,
+                private readonly alertRepository: Repository<Alert>)
+    {
+        this.invertedIndexStructureForAlerts = new InvertedIndexStructureForAlerts(this);
+        this.loggerService.log("QueryAlertRepositoryService initialized.");
+        this.loggerService.log("Inverted index structure for alerts initialized and " + this.invertedIndexStructureForAlerts.getAlertsCount() + " events indexed.");
         
     }
     public async getMaxId(): Promise<number> {
