@@ -1,26 +1,21 @@
 import { useState, useEffect } from "react";
 import { useAlerts } from "../../hooks/useAlerts";
-import { AlertStatistics } from "../alerts/AlertStatistics";
-import { AlertFilters } from "../alerts/AlertFilters";
-import RecentAlertsTable from "../tables/RecentAlertsTable";
+import AlertStatistics from "../alerts/AlertStatistics";
+import AlertFilters from "../alerts/AlertFilters";
+import RecentAlertsTable from "../tables/alerts/RecentAlertsTable";
 import { AlertQueryDTO } from "../../models/alerts/AlertQueryDTO";
 import AlertDetailsPanel from "../alerts/AlertDetailsPanel";
 import AlertToast from "../alerts/AlertToast";
-import { Pagination } from "../common/Pagination";
+import Pagination from "../common/Pagination";
 import { AlertSSEService } from "../../services/AlertSSEService";
-import { DesktopNotificationService } from "../../services/DesktopNotificationService";
 import { useAuth } from "../../hooks/useAuthHook";
-import { IAlertAPI } from "../../api/alerts/IAlertAPI";
 import { AlertStatus } from "../../enums/AlertStatus";
 import { AlertDTO } from "../../models/alerts/AlertDTO";
+import { AlertsProps } from "../../types/props/alerts/AlertsProps";
 
-interface AlertsProps {
-  alertsApi: IAlertAPI;
-}
 
-const desktopNotification = new DesktopNotificationService();
 
-export default function Alerts({ alertsApi }: AlertsProps) {
+export default function Alerts({ alertsApi, desktopNotification }: AlertsProps) {
   const { token } = useAuth();
   const {
     alerts,
@@ -61,7 +56,7 @@ export default function Alerts({ alertsApi }: AlertsProps) {
     service.onNewAlert((alert) => {
       addAlert(alert);
       setToastAlert(alert);
-      
+
       // Show desktop notification for critical/high alerts
       desktopNotification.showAlertNotification(alert, () => {
         setSelectedAlertId(alert.id);
@@ -147,22 +142,20 @@ export default function Alerts({ alertsApi }: AlertsProps) {
         <h2 className="m-0">Alert Dashboard</h2>
         <div className="flex items-center gap-3">
           <div
-            className={`flex items-center gap-2 px-9.5! py-1.5! rounded-[8px] text-[12px] font-semibold ${
-              sseConnected
+            className={`flex items-center gap-2 px-9.5! py-1.5! rounded-[8px] text-[12px] font-semibold ${sseConnected
                 ? "bg-[rgba(74,222,128,0.15)] text-[#4ade80] border border-[rgba(74,222,128,0.3)]"
                 : "bg-[rgba(239,68,68,0.15)] text-[#f87171] border border-[rgba(239,68,68,0.3)]"
-            }`}
+              }`}
           >
             <div
-              className={`w-2 h-2 rounded-full ${
-                sseConnected ? "bg-[#4ade80] animate-pulse" : "bg-[#f87171] animate-none"
-              }`}
+              className={`w-2 h-2 rounded-full ${sseConnected ? "bg-[#4ade80] animate-pulse" : "bg-[#f87171] animate-none"
+                }`}
             ></div>
             {sseConnected ? "Live Updates Active" : "Connecting..."}
           </div>
           {desktopNotification.canShowNotifications() && (
             <div className="flex items-center gap-2 rounded-[8px] border border-[rgba(96,165,250,0.3)] bg-[rgba(96,165,250,0.15)] px-6.5! py-1.5! text-[12px] text-[#60a5fa]">
-               Notifications Enabled
+              Notifications Enabled
             </div>
           )}
         </div>

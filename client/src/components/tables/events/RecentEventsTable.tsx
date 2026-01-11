@@ -1,4 +1,4 @@
-import { EventRow } from "../../types/events/EventRow";
+import { EventRow } from "../../../types/events/EventRow";
 import { RecentEventsTableRow } from "./RecentEventsTableRow";
 
 export default function RecentEventsTable({ events }: { events: EventRow[] }) {

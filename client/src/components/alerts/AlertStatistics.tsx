@@ -1,18 +1,11 @@
-import React, { useMemo } from "react";
-import { AlertDTO } from "../../models/alerts/AlertDTO";
+import  { useMemo } from "react";
 import { AlertStatus } from "../../enums/AlertStatus";
 import { AlertSeverity } from "../../enums/AlertSeverity";
 import AlertCard from "./AlertCard";
+import { AlertStatisticsProps } from "../../types/props/alerts/AlertStatisticsProps";
 
-interface AlertStatisticsProps {
-  alerts: AlertDTO[];
-  lastAlertTime: string;
-}
 
-export const AlertStatistics: React.FC<AlertStatisticsProps> = ({
-  alerts,
-  lastAlertTime,
-}) => {
+export default function AlertStatistics ({alerts,lastAlertTime,}:AlertStatisticsProps)  {
   const statistics = useMemo(() => ({
     total: alerts.length,
     critical: alerts.filter(a => a.severity === AlertSeverity.CRITICAL).length,

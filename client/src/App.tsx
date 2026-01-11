@@ -13,6 +13,7 @@ import { IQueryAPI } from "./api/query/IQueryAPI";
 import { QueryAPI } from "./api/query/QueryAPI";
 import { IStorageAPI } from "./api/storage/IStorageAPI";
 import { StorageAPI } from "./api/storage/StorageAPI";
+import { DesktopNotificationService } from "./services/DesktopNotificationService";
 
 const auth_api: IAuthAPI = new AuthAPI();
 const user_api: IUserAPI = new UserAPI();
@@ -20,6 +21,7 @@ const alerts_api:IAlertAPI=new AlertAPI();
 const parser_api:IParserAPI=new ParserAPI();
 const query_api:IQueryAPI=new QueryAPI();
 const storage_api:IStorageAPI=new StorageAPI();
+const desktopNotification = new DesktopNotificationService();
 
 function App() {
   return (
@@ -37,7 +39,7 @@ function App() {
 
         {/* Temporary unprotected route — should require authentication */}
         <Route path="/mainLayout" element={<MainLayout alertsAPI={alerts_api}
-                  parserAPI={parser_api} queryAPI={query_api} storageAPI={storage_api} />} />
+                  parserAPI={parser_api} queryAPI={query_api} storageAPI={storage_api} desktopNotification={desktopNotification} />} />
       </Routes>
     </>
   );

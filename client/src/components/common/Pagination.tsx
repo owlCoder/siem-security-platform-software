@@ -1,16 +1,15 @@
-import React from "react";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 import { PaginationProps } from "../../types/props/alerts/PaginationProps";
 import { generatePageNumbers } from "../../helpers/pagination";
 
-export const Pagination: React.FC<PaginationProps> = ({
+export default function Pagination({
   currentPage,
   totalPages,
   pageSize,
   totalItems,
   onPageChange,
   onPageSizeChange,
-}) => {
+}: PaginationProps) {
   const startItem = (currentPage - 1) * pageSize + 1;
   const endItem = Math.min(currentPage * pageSize, totalItems);
 
@@ -37,11 +36,10 @@ export const Pagination: React.FC<PaginationProps> = ({
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className={`px-2.5 py-1.5 rounded-[3px] border text-[13px] flex items-center gap-1.5 transition-all ${
-            currentPage === 1
+          className={`px-2.5 py-1.5 rounded-[3px] border text-[13px] flex items-center gap-1.5 transition-all ${currentPage === 1
               ? "opacity-40 cursor-not-allowed border-[#444] bg-[#1f1f1f] text-[#d0d0d0]"
               : "border-[#444] bg-[#1f1f1f] text-[#d0d0d0] cursor-pointer hover:bg-[#2a2a2a] hover:border-[#60a5fa]"
-          }`}
+            }`}
         >
           <IoChevronBack size={14} />
           Previous
@@ -60,11 +58,10 @@ export const Pagination: React.FC<PaginationProps> = ({
             <button
               key={page}
               onClick={() => onPageChange(page as number)}
-              className={`px-3 py-1.5 rounded-[3px] border text-[13px] min-w-[36px] text-center transition-all ${
-                page === currentPage
+              className={`px-3 py-1.5 rounded-[3px] border text-[13px] min-w-[36px] text-center transition-all ${page === currentPage
                   ? "border-[#60a5fa] bg-[rgba(96,165,250,0.15)] text-[#60a5fa] font-semibold cursor-default"
                   : "border-[#444] bg-[#1f1f1f] text-[#d0d0d0] cursor-pointer hover:bg-[#2a2a2a] hover:border-[#60a5fa]"
-              }`}
+                }`}
             >
               {page}
             </button>
@@ -74,11 +71,10 @@ export const Pagination: React.FC<PaginationProps> = ({
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className={`px-2.5 py-1.5 rounded-[3px] border text-[13px] flex items-center gap-1.5 transition-all ${
-            currentPage === totalPages
+          className={`px-2.5 py-1.5 rounded-[3px] border text-[13px] flex items-center gap-1.5 transition-all ${currentPage === totalPages
               ? "opacity-40 cursor-not-allowed border-[#444] bg-[#1f1f1f] text-[#d0d0d0]"
               : "border-[#444] bg-[#1f1f1f] text-[#d0d0d0] cursor-pointer hover:bg-[#2a2a2a] hover:border-[#60a5fa]"
-          }`}
+            }`}
         >
           Next
           <IoChevronForward size={14} />

@@ -1,4 +1,4 @@
-import AllEventsTable from "../tables/AllEventsTable";
+import AllEventsTable from "../tables/events/AllEventsTable";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuthHook";
 import { EventDTO } from "../../models/events/EventDTO";
@@ -7,7 +7,7 @@ import { SearchToolBar } from "../events/SearchToolBar";
 import { SecondEventToolBar } from "../events/SecondEventToolBar";
 import { mapEventDTO } from "../../helpers/mapEventDTO";
 import { EventsProps } from "../../types/props/events/EventsProps";
-import { Pagination } from "../common/Pagination";
+import Pagination from "../common/Pagination";
 
 export default function Events({ queryApi, parserApi }: EventsProps) {
     //const { token } = useAuth();
@@ -66,7 +66,7 @@ export default function Events({ queryApi, parserApi }: EventsProps) {
             if (eventType && eventType !== "all") {
                 query += query ? `|type=${eventType.toUpperCase()}` : `type=${eventType.toUpperCase()}`;
             }
-            
+
             const response = await queryApi.getEventsByQuery(query, token, targetPage, currentLimit);
             const mapped = response.data.map(mapEventDTOToRow);
 
@@ -83,7 +83,7 @@ export default function Events({ queryApi, parserApi }: EventsProps) {
 
     useEffect(() => {
         //if (!token) return;       // TODO: DELETE COMMENT AFTER TESTING!
-        
+
         void loadEventsWithQuery(1);
     }, [token]);
 
@@ -106,11 +106,11 @@ export default function Events({ queryApi, parserApi }: EventsProps) {
             <SearchToolBar value={searchText} onSearchText={setSearchText} value1={eventType} onEventType={setEventType}
                 value2={dateTo} onDateTo={setDateTo} value3={dateFrom} onDateFrom={setDateFrom} onSearchClick={loadEventsWithQuery} />
 
-           <SecondEventToolBar 
-            onSortType={setSortType} 
-            dateFrom={dateFrom} 
-             dateTo={dateTo} 
-             eventType={eventType} 
+            <SecondEventToolBar
+                onSortType={setSortType}
+                dateFrom={dateFrom}
+                dateTo={dateTo}
+                eventType={eventType}
             />
 
             <div className="m-[10px]!">
@@ -120,7 +120,7 @@ export default function Events({ queryApi, parserApi }: EventsProps) {
                     </div>
                 )}
 
-                <AllEventsTable events={events} sortType={sortType} searchText={searchText} parserApi={parserApi}/>
+                <AllEventsTable events={events} sortType={sortType} searchText={searchText} parserApi={parserApi} />
                 {!isLoading && events.length > 0 && (
                     <Pagination
                         currentPage={page}
@@ -133,7 +133,7 @@ export default function Events({ queryApi, parserApi }: EventsProps) {
                         }}
                         onPageSizeChange={(newSize) => {
                             setPageSize(newSize);
-                            setPage(1); 
+                            setPage(1);
                             loadEventsWithQuery(1, newSize);
                         }}
                     />

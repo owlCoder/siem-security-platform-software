@@ -2,14 +2,11 @@ import React, { useState } from "react";
 import { AlertSeverity } from "../../enums/AlertSeverity";
 import { AlertStatus } from "../../enums/AlertStatus";
 import { AlertQueryDTO } from "../../models/alerts/AlertQueryDTO";
-import { SelectFilters } from "./SelectFilters";
-import { SearchBar } from "./SearchBar";
+import SelectFilters from "./SelectFilters";
+import SearchBar from "./SearchBar";
+import { AlertFiltersProps } from "../../types/props/alerts/AlertFilterProps";
 
-interface AlertFiltersProps {
-  onSearch: (query: AlertQueryDTO) => void;
-}
-
-export const AlertFilters: React.FC<AlertFiltersProps> = ({ onSearch }) => {
+export default function AlertFilters({ onSearch }:AlertFiltersProps)  {
   const [searchText, setSearchText] = useState("");
   const [severity, setSeverity] = useState<AlertSeverity | undefined>();
   const [status, setStatus] = useState<AlertStatus | undefined>();

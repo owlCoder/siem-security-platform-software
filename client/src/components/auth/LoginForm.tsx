@@ -1,15 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { IAuthAPI } from "../../api/auth/IAuthAPI";
 import { LoginUserDTO } from "../../models/auth/LoginUserDTO";
 import { useNavigate } from "react-router-dom";
+import { LoginFormProps } from "../../types/props/auth/LoginFormProps";
 
-type LoginFormProps = {
-  authAPI: IAuthAPI;
-  handleLoginSuccess: (session: { session_id: string; user_id: number }) => void;
-  handleOtpSuccess: (token: string) => void;
-};
 
-export const LoginForm: React.FC<LoginFormProps> = ({ authAPI, handleLoginSuccess, handleOtpSuccess }) => {
+export default function LoginForm({ authAPI, handleLoginSuccess, handleOtpSuccess }:LoginFormProps){
   const [formData, setFormData] = useState<LoginUserDTO>({
     username: "",
     password: "",

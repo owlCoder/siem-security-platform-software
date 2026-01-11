@@ -1,14 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { IUserAPI } from "../../../api/users/IUserAPI";
 import { useAuth } from "../../../hooks/useAuthHook";
 import { UserDTO } from "../../../models/users/UserDTO";
+import { DashboardNavbarProps } from "../../../types/props/dashboard/DashboardNavBarProps";
 
-type DashboardNavbarProps = {
-  userAPI: IUserAPI;
-};
-
-export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ userAPI }) => {
+export default function DashboardNavbar({ userAPI }: DashboardNavbarProps) {
   const { user: authUser, logout, token } = useAuth();
   const [user, setUser] = useState<UserDTO | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -18,7 +14,7 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ userAPI }) => 
     const fetchUser = async () => {
       if (authUser?.id) {
         try {
-          const userData = await userAPI.getUserById(token ?? "", authUser.id, );
+          const userData = await userAPI.getUserById(token ?? "", authUser.id,);
           setUser(userData);
         } catch (error) {
           console.error("Failed to fetch user:", error);
@@ -88,7 +84,7 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ userAPI }) => 
             {/* Logout Button */}
             <button className="btn btn-ghost" onClick={handleLogout} style={{ padding: "8px 16px" }}>
               <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M6 2v2H3v8h3v2H2V2h4zm4 3l4 3-4 3V9H6V7h4V5z"/>
+                <path d="M6 2v2H3v8h3v2H2V2h4zm4 3l4 3-4 3V9H6V7h4V5z" />
               </svg>
               Logout
             </button>

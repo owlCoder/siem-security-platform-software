@@ -1,18 +1,12 @@
-import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuthHook";
+import { ProtectedRouteProps } from "../../types/props/auth/ProtectedRouteProps";
 
-type ProtectedRouteProps = {
-  children: React.ReactNode;
-  requiredRole: string;
-  redirectTo?: string;
-};
-
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+export default function ProtectedRoute({
   children,
   requiredRole,
   redirectTo = "/",
-}) => {
+}:ProtectedRouteProps) {
   const { isAuthenticated, user, isLoading, logout } = useAuth();
   const location = useLocation();
 

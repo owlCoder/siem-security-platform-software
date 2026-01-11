@@ -7,7 +7,7 @@ import Storage from '../components/views/Storage';
 import Alert from '../components/views/Alerts';
 import { MainLayoutProps } from '../types/props/pages/MainLayoutProps';
 
-export default function MainLayout({ alertsAPI, parserAPI, queryAPI, storageAPI }: MainLayoutProps) {
+export default function MainLayout({ alertsAPI, parserAPI, queryAPI, storageAPI, desktopNotification }: MainLayoutProps) {
     const [sideMenuPage, setSideMenuPage] = useState<number>(0);
 
     return (
@@ -19,7 +19,7 @@ export default function MainLayout({ alertsAPI, parserAPI, queryAPI, storageAPI 
                 {sideMenuPage === 1 && <Events queryApi={queryAPI} parserApi={parserAPI} />}
                 {sideMenuPage === 2 && <Statistics queryApi={queryAPI} storageApi={storageAPI} />}
                 {sideMenuPage === 3 && <Storage storageApi={storageAPI} />}
-                {sideMenuPage === 4 && <Alert alertsApi={alertsAPI} />}
+                {sideMenuPage === 4 && <Alert alertsApi={alertsAPI} desktopNotification={desktopNotification}/>}
             </div>
         </div>
     );

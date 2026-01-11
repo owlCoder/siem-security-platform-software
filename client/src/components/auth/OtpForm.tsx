@@ -1,15 +1,7 @@
 import React, { useState } from "react";
-import { IAuthAPI } from "../../api/auth/IAuthAPI";
+import { OtpFormProps } from "../../types/props/auth/OtpFormProps";
 
-type OtpFormProps = {
-    authAPI: IAuthAPI;
-    sessionId: string;
-    setSessionId: React.Dispatch<React.SetStateAction<string | null>>;
-    userId: number;
-    onSuccess: (token: string) => void;
-};
-
-export const OtpForm: React.FC<OtpFormProps> = ({ authAPI, sessionId, setSessionId, userId, onSuccess }) => {
+export default function OtpForm({ authAPI, sessionId, setSessionId, userId, onSuccess }:OtpFormProps) {
     const [otp, setOtp] = useState("");
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import EventTableRow from "./AllEventsTableRow";
-import { EventRow } from "../../types/events/EventRow";
-import { EventsTableProps } from "../../types/props/events/EventsTableProps";
-import { sortEvents } from "../../helpers/sortEvents";
+import { EventRow } from "../../../types/events/EventRow";
+import { EventsTableProps } from "../../../types/props/events/EventsTableProps";
+import { sortEvents } from "../../../helpers/sortEvents";
 
 
 export default function AllEventsTable({ events, sortType, searchText, parserApi }: EventsTableProps) {

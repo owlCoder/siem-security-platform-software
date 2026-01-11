@@ -1,22 +1,15 @@
-import React from "react";
+import { SearchBarProps } from "../../types/props/alerts/SearchBarProps";
 
-interface SearchBarProps {
-  searchText: string;
-  onSearchTextChange: (value: string) => void;
-  onSearch: () => void;
-  onReset: () => void;
-  onKeyPress: (e: React.KeyboardEvent) => void;
-}
 
 const inputClass = "flex-1 px-3! py-2! rounded-[10px]! border border-[rgba(255,255,255,0.12)] bg-[rgba(0,0,0,0.3)]! text-white text-[13px] outline-none";
 
-export const SearchBar: React.FC<SearchBarProps> = ({
+export default function SearchBar({
   searchText,
   onSearchTextChange,
   onSearch,
   onReset,
   onKeyPress
-}) => {
+}:SearchBarProps) {
   return (
     <div className="col-span-4">
       <label className="block text-[11px] text-gray-400 mb-1 uppercase tracking-wider font-semibold">Search Source</label>

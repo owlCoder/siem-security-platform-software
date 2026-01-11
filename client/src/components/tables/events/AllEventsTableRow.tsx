@@ -2,8 +2,8 @@ import { useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import { ExpandedRow } from "./ExpandedRow";
 import React from "react";
-import { EventTableRowProps } from "../../types/props/events/EventTableRowProps";
-import { badgeClasses } from "../../constants/badgeClasses";
+import { EventTableRowProps } from "../../../types/props/events/EventTableRowProps";
+import { badgeClasses } from "../../../constants/badgeClasses";
 
 export default function EventTableRow({ e, index, parserApi }: EventTableRowProps) {
     const [rotateArrow, setRotateArrow] = useState<number | null>(null);

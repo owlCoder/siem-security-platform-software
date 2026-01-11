@@ -3,7 +3,7 @@ import { BsDatabase } from "react-icons/bs";
 import { BiError } from "react-icons/bi";
 import { PiShieldWarningBold } from "react-icons/pi";
 import { IoShieldCheckmark } from "react-icons/io5";
-import RecentEventsTable from "../tables/RecentEventsTable";
+import RecentEventsTable from "../tables/events/RecentEventsTable";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuthHook";
 import { EventRow } from "../../types/events/EventRow";

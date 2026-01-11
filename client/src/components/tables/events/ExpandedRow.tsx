@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ExpandedProps } from "../../types/props/events/ExpandedProps";
+import { ExpandedProps } from "../../../types/props/events/ExpandedProps";
 
 
 export function ExpandedRow({ expanded, e, parserApi }: ExpandedProps) {

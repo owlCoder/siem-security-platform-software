@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { LoginForm } from "../components/auth/LoginForm";
-import { OtpForm } from "../components/auth/OtpForm";
+import LoginForm from "../components/auth/LoginForm";
+import OtpForm from "../components/auth/OtpForm";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuthHook";
 import { AuthPageProps } from "../types/props/pages/AuthPageProps";

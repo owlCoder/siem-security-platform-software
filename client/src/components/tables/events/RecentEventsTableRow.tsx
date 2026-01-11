@@ -1,5 +1,5 @@
-import { badgeClasses } from "../../constants/badgeClasses";
-import { RowProps } from "../../types/props/events/RowProps";
+import { badgeClasses } from "../../../constants/badgeClasses";
+import { RowProps } from "../../../types/props/events/RowProps";
 
 export function RecentEventsTableRow({ e, index }: RowProps) {
     return (

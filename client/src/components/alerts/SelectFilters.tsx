@@ -1,21 +1,10 @@
-import React from "react";
 import { AlertSeverity } from "../../enums/AlertSeverity";
 import { AlertStatus } from "../../enums/AlertStatus";
-
-interface SelectFiltersProps {
-  severity?: AlertSeverity;
-  status?: AlertStatus;
-  sortBy: 'createdAt' | 'severity' | 'status';
-  sortOrder: 'ASC' | 'DESC';
-  onSeverityChange: (value: AlertSeverity | undefined) => void;
-  onStatusChange: (value: AlertStatus | undefined) => void;
-  onSortByChange: (value: 'createdAt' | 'severity' | 'status') => void;
-  onSortOrderChange: (value: 'ASC' | 'DESC') => void;
-}
+import { SelectFiltersProps } from "../../types/props/alerts/SelectFiltersProps";
 
 const selectClass = "w-full px-1 h-10 rounded-[10px] border border-white/20 bg-black/30 text-white text-[10px] outline-none";
 
-export const SelectFilters: React.FC<SelectFiltersProps> = ({
+export default function SelectFilters ({
   severity,
   status,
   sortBy,
@@ -24,7 +13,7 @@ export const SelectFilters: React.FC<SelectFiltersProps> = ({
   onStatusChange,
   onSortByChange,
   onSortOrderChange
-}) => {
+}:SelectFiltersProps) {
   return (
     <>
       <div className="col-span-2">
