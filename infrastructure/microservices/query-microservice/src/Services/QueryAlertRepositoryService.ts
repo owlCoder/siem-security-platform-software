@@ -34,12 +34,12 @@ export class QueryAlertRepositoryService implements IQueryAlertRepositoryService
                // postavljamo trenutno vreme kao vreme kesiranja
                return await this.cacheAlertRepository.save(newEntry);
     }
-    //alert nema kolonu u bazi koja se vezuje za vreme kreiranja tako da to mora da se doda
+    
     async getOldAlerts(hours: number): Promise<Alert[]> {
-        /*const allAlerts = await this.getAllAlerts();
+        const allAlerts = await this.getAllAlerts();
         const xHoursAgo = new Date(Date.now() - hours * 60 * 60 * 1000);
         
-        const oldEvents = allAlerts.filter(alert => new Date(alert.timestamp) < xHoursAgo);
+        const oldEvents = allAlerts.filter(alert => new Date(alert.createdAt) < xHoursAgo);
         oldEvents.forEach(event => {
             this.invertedIndexStructureForAlerts.removeAlertFromIndex(event.id);
         });
@@ -49,8 +49,7 @@ export class QueryAlertRepositoryService implements IQueryAlertRepositoryService
             this.cacheAlertRepository.clear();
             this.loggerService.log("Deleted old events and cleared cache.");
         }
-        return oldEvents;*/
-        throw new Error("Method not implemented.");
+        return oldEvents;
     }
     findAlerts(query: string): Set<number> {
         const resultIds = this.invertedIndexStructureForAlerts.getIdsForTokens(query);
@@ -66,7 +65,11 @@ export class QueryAlertRepositoryService implements IQueryAlertRepositoryService
         return response.deletedCount === 1;
     }
     async getLastThreeAlerts(): Promise<Alert[]> {
-        throw new Error("Method not implemented.");
+        const alerts = await this.alertRepository.find({
+            order: { createdAt: "DESC" },
+            take: 3
+        });
+        return alerts;
     }
     public getAlertsCount(): number {
         return this.invertedIndexStructureForAlerts.getAlertsCount();
