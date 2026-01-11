@@ -15,6 +15,7 @@ import { saveQueryState } from './Utils/StateManager';
 import { Alert } from './Domain/models/Alert';
 import { QueryAlertRepositoryService } from './Services/QueryAlertRepositoryService';
 import { saveQueryAlertState } from './Utils/StateAlertManager';
+import { CacheAlertEntry } from './Domain/models/CacheAlertEntry';
 
 
 dotenv.config({ quiet: true });
@@ -50,6 +51,7 @@ void (async () => {
 
   // ORM Repository
   const cacheRepository : MongoRepository<CacheEntry> = MongoDb.getMongoRepository(CacheEntry);
+  const cacheAlertRepository : MongoRepository<CacheAlertEntry> = MongoDb.getMongoRepository(CacheAlertEntry);
   const eventRepository : Repository<Event> = MySQLDb.getRepository(Event);
   const alertRepository : Repository<Alert> = AlertDb.getRepository(Alert);
   //const test = await eventRepository.find();
@@ -59,7 +61,7 @@ void (async () => {
   loggerService = new LoggerService();
   queryRepositoryService = new QueryRepositoryService(cacheRepository, loggerService, eventRepository);
   const queryService = new QueryService(queryRepositoryService);
-  queryAlertRepositoryService = new QueryAlertRepositoryService(alertRepository);
+  queryAlertRepositoryService = new QueryAlertRepositoryService(cacheAlertRepository, loggerService, alertRepository);
   
 
   // WebAPI rute
