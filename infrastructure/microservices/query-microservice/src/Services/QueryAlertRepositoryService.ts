@@ -34,11 +34,27 @@ export class QueryAlertRepositoryService implements IQueryAlertRepositoryService
                // postavljamo trenutno vreme kao vreme kesiranja
                return await this.cacheAlertRepository.save(newEntry);
     }
-    getOldAlerts(hours: number): Promise<Alert[]> {
+    //alert nema kolonu u bazi koja se vezuje za vreme kreiranja tako da to mora da se doda
+    async getOldAlerts(hours: number): Promise<Alert[]> {
+        /*const allAlerts = await this.getAllAlerts();
+        const xHoursAgo = new Date(Date.now() - hours * 60 * 60 * 1000);
+        
+        const oldEvents = allAlerts.filter(alert => new Date(alert.timestamp) < xHoursAgo);
+        oldEvents.forEach(event => {
+            this.invertedIndexStructureForAlerts.removeAlertFromIndex(event.id);
+        });
+        
+        if (oldEvents.length > 0)
+        {
+            this.cacheAlertRepository.clear();
+            this.loggerService.log("Deleted old events and cleared cache.");
+        }
+        return oldEvents;*/
         throw new Error("Method not implemented.");
     }
     findAlerts(query: string): Set<number> {
-        throw new Error("Method not implemented.");
+        const resultIds = this.invertedIndexStructureForAlerts.getIdsForTokens(query);
+        return resultIds;
     }
     async findByKey(key: string): Promise<CacheAlertEntry> {
         const response = await this.cacheAlertRepository.findOne({ where: { key } });
@@ -49,14 +65,14 @@ export class QueryAlertRepositoryService implements IQueryAlertRepositoryService
         const response = await this.cacheAlertRepository.deleteOne({key});
         return response.deletedCount === 1;
     }
-    getLastThreeAlerts(): Promise<Alert[]> {
+    async getLastThreeAlerts(): Promise<Alert[]> {
         throw new Error("Method not implemented.");
     }
-    getAlertsCount(): number {
-        throw new Error("Method not implemented.");
+    public getAlertsCount(): number {
+        return this.invertedIndexStructureForAlerts.getAlertsCount();
     }
-    getLastProcessedId(): number {
-        throw new Error("Method not implemented.");
+    public getLastProcessedId(): number {
+        return this.invertedIndexStructureForAlerts.getLastProcessedId();
     }
     public async getMaxId(): Promise<number> {
         const result = await this.alertRepository.find({
