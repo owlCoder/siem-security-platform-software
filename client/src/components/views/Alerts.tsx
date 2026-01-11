@@ -162,8 +162,12 @@ export default function Alerts({ alertsApi, desktopNotification }: AlertsProps) 
       </div>
 
       <AlertStatistics alerts={alerts} lastAlertTime={lastAlertTime} />
-      <AlertFilters onSearch={handleSearch} />
-
+      <AlertFilters 
+  onSearch={handleSearch} 
+  severity={currentQuery.severity || 'all'} 
+  status={currentQuery.status || 'all'}
+  searchText={currentQuery.source || ''} 
+/>
       {isLoading && (
         <div className="text-center p-10">
           <div className="spinner"></div>
