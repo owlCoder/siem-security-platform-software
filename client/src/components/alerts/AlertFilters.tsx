@@ -44,7 +44,7 @@ export const AlertFilters: React.FC<AlertFiltersProps> = ({ onSearch }) => {
 
   return (
     <div className="mb-6">
-      <div className="grid grid-cols-12 gap-3 mb-3">
+      <div className="grid grid-cols-12 gap-3 mb-3 rounded-[10px]">
         <SelectFilters
           severity={severity}
           status={status}

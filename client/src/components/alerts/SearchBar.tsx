@@ -8,8 +8,7 @@ interface SearchBarProps {
   onKeyPress: (e: React.KeyboardEvent) => void;
 }
 
-const inputClass = "flex-1 px-1 h-10 rounded-xl border border-white/20 bg-black/30 text-white text-[10px] outline-none";
-const buttonClass = "flex-1 px-2 h-10 bg-[#007a55] hover:opacity-90 text-white font-semibold rounded-xl flex items-center justify-center gap-0.5 transition-all";
+const inputClass = "flex-1 px-3! py-2! rounded-[10px]! border border-[rgba(255,255,255,0.12)] bg-[rgba(0,0,0,0.3)]! text-white text-[13px] outline-none";
 
 export const SearchBar: React.FC<SearchBarProps> = ({
   searchText,
@@ -21,7 +20,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <div className="col-span-4">
       <label className="block text-[11px] text-gray-400 mb-1 uppercase tracking-wider font-semibold">Search Source</label>
-      <div className="flex gap-2 w-full">
+      <div className="flex gap-3 w-full">
         <input
           type="text"
           placeholder="Search by..."
@@ -30,16 +29,16 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           onKeyPress={onKeyPress}
           className={inputClass}
         />
-        <button onClick={onSearch} className={buttonClass}>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-4 h-4 text-white">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1110.5 3a7.5 7.5 0 016.15 13.65z" />
-          </svg>
+        <button 
+          onClick={onSearch} 
+          className="w-[90px]! sm:w-[80px] py-2! rounded-[10px]! bg-[#007a55]! hover:bg-[#9ca3af]! text-white text-[13px] font-semibold cursor-pointer"
+        >
           Search
         </button>
-        <button onClick={onReset} className={buttonClass}>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-4 h-4 text-white">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
+        <button 
+          onClick={onReset} 
+          className="w-[90px]! sm:w-[80px] py-2! rounded-[10px]! bg-[#313338]! hover:bg-[#9ca3af]! text-white text-[13px] font-semibold cursor-pointer"
+        >
           Reset
         </button>
       </div>

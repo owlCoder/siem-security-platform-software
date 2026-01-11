@@ -13,7 +13,7 @@ interface SelectFiltersProps {
   onSortOrderChange: (value: 'ASC' | 'DESC') => void;
 }
 
-const selectClass = "w-full px-1 h-10 rounded-xl border border-white/20 bg-black/30 text-white text-[10px] outline-none";
+const selectClass = "w-full px-1 h-10 rounded-[10px] border border-white/20 bg-black/30 text-white text-[10px] outline-none";
 
 export const SelectFilters: React.FC<SelectFiltersProps> = ({
   severity,
