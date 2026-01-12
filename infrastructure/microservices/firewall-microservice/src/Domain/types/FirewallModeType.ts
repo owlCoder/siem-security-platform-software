@@ -1,0 +1,1 @@
+export type FirewallModeType = "WHITELIST" | "BLACKLIST";
