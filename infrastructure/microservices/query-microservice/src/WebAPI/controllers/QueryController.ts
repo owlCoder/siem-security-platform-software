@@ -24,6 +24,7 @@ export class QueryController {
         this.router.get("/query/warningCount", this.getWarningCount.bind(this));
         this.router.get("/query/errorCount", this.getErrorCount.bind(this));
         this.router.get("/query/pdfReport", this.getPdfReport.bind(this));
+        this.router.get("/query/alertsPdfReport", this.getAlertsPdfReport.bind(this));
     }
 
     private async getOldEvents(req: Request, res: Response): Promise<void> {
@@ -134,6 +135,40 @@ export class QueryController {
     }
 }
 
+private async getAlertsPdfReport(req: Request, res: Response): Promise<void> {
+    try {
+        const severity = req.query.severity as string;
+        const status = req.query.status as string;
+        const source = req.query.source as string;
+        const dateFrom = req.query.dateFrom as string;
+        const dateTo = req.query.dateTo as string;
+
+       
+        const base64String = await this.queryService.generateAlertsPdfReport(
+            severity,
+            status,
+            source,
+            dateFrom,
+            dateTo
+        );
+
+        if (!base64String || base64String === "") {
+            res.status(404).json({ message: "No alerts found for the selected filters." });
+            return;
+        }
+
+        const pdfBuffer = Buffer.from(base64String, 'base64');
+
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", `attachment; filename=ALERTS-Report-${Date.now()}.pdf`);
+        res.setHeader("Content-Length", pdfBuffer.length.toString());
+
+        res.status(200).send(pdfBuffer);
+    } catch (err) {
+        console.error("Alerts PDF Controller Error:", err);
+        res.status(500).json({ message: "Error while generating alerts PDF report." });
+    }
+}
     public getRouter(): Router {
         return this.router;
     }

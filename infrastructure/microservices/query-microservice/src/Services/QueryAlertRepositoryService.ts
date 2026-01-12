@@ -93,5 +93,34 @@ export class QueryAlertRepositoryService implements IQueryAlertRepositoryService
     async getAllAlerts(): Promise<Alert[]> {
         return this.alertRepository.find();
     } 
+    public async getFilteredAlerts(
+    severity: string,
+    status?: string,
+    source?: string,
+    dateFrom?: string,
+    dateTo?: string 
+): Promise<Alert[]> {
+    
+    
+    const queryBuilder = this.alertRepository.createQueryBuilder("alert");
+
+    if (severity && severity !== 'all') {
+        queryBuilder.andWhere("alert.severity = :severity", { severity });
+    }
+    if (status && status !== 'all') {
+        queryBuilder.andWhere("alert.status = :status", { status });
+    }
+    if (source && source.trim() !== '') {
+        queryBuilder.andWhere("alert.source LIKE :source", { source: `%${source}%` });
+    }
+    if (dateFrom && dateTo && dateFrom !== 'undefined' && dateTo !== 'undefined') {
+        queryBuilder.andWhere("alert.createdAt BETWEEN :dateFrom AND :dateTo", { 
+            dateFrom: new Date(dateFrom), 
+            dateTo: new Date(dateTo) 
+        });
+    }
+
+    return await queryBuilder.orderBy("alert.createdAt", "DESC").getMany();
+}
     
 }   

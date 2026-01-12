@@ -1,3 +1,5 @@
+
+
 import { IQueryService } from "../Domain/services/IQueryService";
 import { IQueryRepositoryService } from "../Domain/services/IQueryRepositoryService";
 import { parseQueryString } from "../Utils/ParseQuery";
@@ -5,6 +7,11 @@ import { EventDTO } from "../Domain/DTOs/EventDTO";
 import { PdfGenerator } from "../Utils/PdfGenerator";
 import { EventsResultDTO } from "../Domain/DTOs/EventsResultDTO";
 import { EventsResult } from "../Domain/models/EventsResult";
+import { Repository } from "typeorm";
+import { Alert } from "../Domain/models/Alert";
+import { AlertReportDTO } from "../Domain/DTOs/AlertReportDTO";
+import { IQueryAlertRepositoryService } from "../Domain/services/IQueryAlertRepositoryService";
+
 
 // princip pretrage:
 // imamo recnik koji mapira reci iz eventa na event id-eve
@@ -22,6 +29,7 @@ import { EventsResult } from "../Domain/models/EventsResult";
 export class QueryService implements IQueryService {
     constructor(
         private readonly queryRepositoryService: IQueryRepositoryService,
+        private readonly queryAlertRepositoryService: IQueryAlertRepositoryService 
     ) {}
 
     async searchEvents(query: string, page: number = 1, limit: number = 50): Promise<EventsResultDTO> {
@@ -29,46 +37,36 @@ export class QueryService implements IQueryService {
         const lastProcessedId = this.queryRepositoryService.getLastProcessedId();
 
         if (cacheResult.key !== "NOT_FOUND") {
-            // ako su im lastProcessedId isti znaci da nije obradjen(dodat) nijedan novi event od trenutka kesiranja
-            if (cacheResult.lastProcessedId === lastProcessedId)
-            {
-               return cacheResult.result as EventsResult;
+            if (cacheResult.lastProcessedId === lastProcessedId) {
+                return cacheResult.result as EventsResult;
             }
-            // a ako se ne poklapaju brisemo stari kes -> rekesiranje
             this.queryRepositoryService.deleteByKey(query);
         }
 
-        // query je npr. "type=info|date=20/10/2025" ili "type=info|host=server1|dateFrom=2025-11-20|dateTo=2025-11-22"
-        // pozivamo parseQueryString da dobijemo parove kljuc-vrednost sa nazivom polja i vrednosti za pretragu
         const filters = parseQueryString(query);
         const textQuery = filters["text"] || "";
         delete filters["text"];
         
         let matchingIds: Set<number>;
-        const allEvents = await this.queryRepositoryService.getAllEvents(); // Ili neka brža mapa
+        const allEvents = await this.queryRepositoryService.getAllEvents();
 
         if (textQuery !== "") {
             matchingIds = this.queryRepositoryService.findEvents(textQuery.trim().toLowerCase());
         } else {
-            // ovde cemo getEventsById 
             matchingIds = new Set(allEvents.map(e => e.id));
         }
 
         const fullyFilteredEvents = allEvents.filter(event => {
             if (!matchingIds.has(event.id)) return false;
-
             if (filters.type && event.type.toLowerCase() !== filters.type.toLowerCase()) return false;
-            
             if (filters.dateFrom) {
                 const dateFrom = new Date(filters.dateFrom);
                 if (new Date(event.timestamp) < dateFrom) return false;
             }
-
             if (filters.dateTo) {
                 const dateTo = new Date(filters.dateTo);
                 if (new Date(event.timestamp) > dateTo) return false;
             }
-
             return true;
         });
 
@@ -99,12 +97,9 @@ export class QueryService implements IQueryService {
     } 
 
     public async generatePdfReport(dateFrom: string, dateTo: string, eventType: string): Promise<string> {
-    console.log("BACKEND PRIMIO DATUME:", { dateFrom, dateTo, eventType });
-    console.log("FORMAT DATUMA:", typeof dateFrom);
         const eventsToReport = await this.queryRepositoryService.getFilteredEvents(dateFrom, dateTo, eventType); 
 
         if (!eventsToReport || eventsToReport.length === 0) {
-            console.warn(`No results found for dates: ${dateFrom} - ${dateTo}, type: ${eventType}`);
             return ''; 
         }
 
@@ -115,10 +110,36 @@ export class QueryService implements IQueryService {
             timestamp: e.timestamp,
         }));
 
-        const base64PdfString = await PdfGenerator.createReport(data); 
-        
-        return base64PdfString; 
+        return await PdfGenerator.createReport(data); 
     }
 
-    // dodati logovanje za debug kad se doda LoggerService
+    public async generateAlertsPdfReport(
+    severity: string,
+    status?: string,
+    source?: string,
+    dateFrom?: string,
+    dateTo?: string
+): Promise<string> {
+    try {
+        const alerts = await this.queryAlertRepositoryService.getFilteredAlerts(
+            severity, status, source, dateFrom, dateTo
+        );
+
+        if (!alerts || alerts.length === 0) return "";
+
+        const reportData: AlertReportDTO[] = alerts.map(a => ({
+            source: a.source,
+            severity: a.severity,
+            status: a.status,
+            createdAt: a.createdAt.toLocaleString(),
+            description: a.source 
+        }));
+
+        return await PdfGenerator.createAlertReport(reportData);
+    } catch (error) {
+        console.error("Error in generateAlertsPdfReport:", error);
+        throw error;
+    }
+}
+
 }

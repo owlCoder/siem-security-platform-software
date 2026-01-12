@@ -60,13 +60,11 @@ void (async () => {
   // Servisi
   loggerService = new LoggerService();
   queryRepositoryService = new QueryRepositoryService(cacheRepository, loggerService, eventRepository);
-  const queryService = new QueryService(queryRepositoryService);
   queryAlertRepositoryService = new QueryAlertRepositoryService(cacheAlertRepository, loggerService, alertRepository);
-  
+const queryService = new QueryService(queryRepositoryService, queryAlertRepositoryService);  
 
   // WebAPI rute
-  const queryController = new QueryController(queryService, queryRepositoryService);
-
+const queryController = new QueryController(queryService, queryRepositoryService);
   // Registracija ruta
   app.use('/api/v1', queryController.getRouter());
 })();
@@ -100,7 +98,7 @@ process.on('SIGINT', async () => {
     loggerService.log(`Error during shutdown: ${err}`);
     process.exit(1);
   }
-
+  
 });
 
 export default app;

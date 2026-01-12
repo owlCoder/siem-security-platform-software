@@ -1,7 +1,6 @@
 import { CacheEntryDTO } from "../DTOs/CacheEntryDTO";
 import { Alert } from "../models/Alert";
 import { CacheAlertEntry } from "../models/CacheAlertEntry";
-// u IQueryAlertRepositoryService su metode za rad sa bazom podataka
 
 export interface IQueryAlertRepositoryService{
     getAllAlerts(): Promise<Alert[]>
@@ -15,4 +14,11 @@ export interface IQueryAlertRepositoryService{
     getLastThreeAlerts(): Promise<Alert[]>;
     getAlertsCount(): number;
     getLastProcessedId(): number;    
+   getFilteredAlerts(
+        severity: string, 
+        status?: string, 
+        source?: string, 
+        dateFrom?: string, 
+        dateTo?: string
+    ): Promise<Alert[]>;
 }
