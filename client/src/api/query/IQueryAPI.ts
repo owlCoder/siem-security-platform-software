@@ -1,9 +1,8 @@
 import { EventDTO } from "../../models/events/EventDTO";
 import { EventsResultDTO } from "../../models/events/EventsResultDTO";
 import { TopSourceDTO } from "../../models/events/TopSourceDTO";
-import { AlertStatisticsDTO } from "../../models/query/AlertStatisticsDTO";
 import { DistributionDTO } from "../../models/query/DistributionDTO";
-import { EventStatisticsDTO } from "../../models/query/EventStatisticsDTO";
+import { HourlyStatisticsDTO } from "../../models/query/HourlyStatisticsDTO";
 
 export interface IQueryAPI {
   getAllEvents(token: string): Promise<EventDTO[]>;
@@ -15,7 +14,7 @@ export interface IQueryAPI {
   getErrorCount(token: string): Promise<number>;
   getTopEventSource(token:string):Promise<TopSourceDTO>;
   //statistics:
-  getEventStatistics(token: string): Promise<EventStatisticsDTO[]>;
-  getAlertStatistics(token: string): Promise<AlertStatisticsDTO[]>;
+  getEventStatistics(token: string): Promise<HourlyStatisticsDTO[]>;
+  getAlertStatistics(token: string): Promise<HourlyStatisticsDTO[]>;
   getEventDistribution(token: string): Promise<DistributionDTO>;
 }

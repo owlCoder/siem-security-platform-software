@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuthHook";
-import { EventStatisticsDTO } from "../../models/query/EventStatisticsDTO";
-import { AlertStatisticsDTO } from "../../models/query/AlertStatisticsDTO";
 import { DistributionDTO } from "../../models/query/DistributionDTO";
 import { TopArchiveDTO } from "../../models/storage/TopArchiveDTO";
 import { ArchiveVolumeDTO } from "../../models/storage/ArchiveVolumeDTO";
@@ -11,63 +9,22 @@ import EventDistribution from "../statistics/EventDistribution";
 import TopArchives from "../statistics/TopArchives";
 import ArchiveVolume from "../statistics/ArchiveVolume";
 import { StatisticsProps } from "../../types/props/statistics/StatisticsProps";
+import { HourlyStatisticsDTO } from "../../models/query/HourlyStatisticsDTO";
 
 export default function Statistics({ queryApi, storageApi }: StatisticsProps) {
-    /* =======================
-       TEST DATA
-       ======================= */
-
-    const testData: DistributionDTO = {
-        notifications: 35,
-        warnings: 35,
-        errors: 30,
-    };
-
-    const testEvent: EventStatisticsDTO[] = [
-        { date: "10/12", count: 10 },
-        { date: "11/12", count: 15 },
-        { date: "12/12", count: 7 },
-        { date: "13/12", count: 12 },
-        { date: "14/12", count: 9 },
-    ];
-
-    const testAlert: AlertStatisticsDTO[] = [
-        { date: "10/12", count: 8 },
-        { date: "11/12", count: 5 },
-        { date: "12/12", count: 13 },
-        { date: "13/12", count: 7 },
-        { date: "14/12", count: 6 },
-    ];
-
-    const testTopArchives: TopArchiveDTO[] = [
-        { id: 1, fileName: "logs_2025_12_14_22_00.tar", count: 120 },
-        { id: 2, fileName: "auth_logs_2025_12_14.tar", count: 95 },
-        { id: 3, fileName: "system_events_2025_12_13.tar", count: 78 },
-        { id: 4, fileName: "app_errors_2025_12_12.tar", count: 54 },
-        { id: 5, fileName: "network_2025_12_11.tar", count: 33 },
-    ];
-
-    const testArchiveVolume: ArchiveVolumeDTO[] = [
-        { label: "10/12", size: 1024 },
-        { label: "11/12", size: 850 },
-        { label: "12/12", size: 1200 },
-        { label: "13/12", size: 640 },
-        { label: "14/12", size: 980 },
-    ];
-
     /* =======================
        STATE & EFFECTS
        ======================= */
 
-    const { token } = useAuth();
-
+    //const { token } = useAuth();
+    const token = "sdasda";
     const [archiveType, setArchiveType] = useState<"events" | "alerts">("events");
     const [volumePeriod, setVolumePeriod] = useState<
         "daily" | "monthly" | "yearly"
     >("daily");
 
-    const [eventStats, setEventStats] = useState<EventStatisticsDTO[]>([]);
-    const [alertStats, setAlertStats] = useState<AlertStatisticsDTO[]>([]);
+    const [eventStats, setEventStats] = useState<HourlyStatisticsDTO[]>([]);
+    const [alertStats, setAlertStats] = useState<HourlyStatisticsDTO[]>([]);
     const [distribution, setDistribution] = useState<DistributionDTO | null>(null);
     const [topArchives, setTopArchives] = useState<TopArchiveDTO[]>([]);
     const [archiveVolume, setArchiveVolume] = useState<ArchiveVolumeDTO[]>([]);
@@ -80,13 +37,7 @@ export default function Statistics({ queryApi, storageApi }: StatisticsProps) {
             setIsLoading(true);
 
             try {
-                const [
-                    eventsData,
-                    alertsData,
-                    distributionData,
-                    topArchivesData,
-                    volumeData,
-                ] = await Promise.all([
+                const results = await Promise.allSettled([
                     queryApi.getEventStatistics(token),
                     queryApi.getAlertStatistics(token),
                     queryApi.getEventDistribution(token),
@@ -94,11 +45,32 @@ export default function Statistics({ queryApi, storageApi }: StatisticsProps) {
                     storageApi.getArchiveVolume(token, volumePeriod),
                 ]);
 
-                setEventStats(eventsData);
-                setAlertStats(alertsData);
-                setDistribution(distributionData);
-                setTopArchives(topArchivesData);
-                setArchiveVolume(volumeData);
+                const [
+                    eventsRes,
+                    alertsRes,
+                    distRes,
+                    topRes,
+                    volumeRes,
+                ] = results;
+
+                
+                if (eventsRes.status === "fulfilled") setEventStats(eventsRes.value);
+                else console.error("getEventStatistics failed:", eventsRes.reason);
+
+                if (alertsRes.status === "fulfilled") setAlertStats(alertsRes.value);
+                else console.error("getAlertStatistics failed:", alertsRes.reason);
+
+                if (distRes.status === "fulfilled") setDistribution(distRes.value);
+                else console.error("getEventDistribution failed:", distRes.reason);
+
+                
+
+                if (topRes.status === "fulfilled") setTopArchives(topRes.value);
+                else console.error("getTopArchives failed:", topRes.reason);
+
+                if (volumeRes.status === "fulfilled") setArchiveVolume(volumeRes.value);
+                else console.error("getArchiveVolume failed:", volumeRes.reason);
+
             } catch (error) {
                 console.error(error);
             } finally {
@@ -116,33 +88,33 @@ export default function Statistics({ queryApi, storageApi }: StatisticsProps) {
     return (
         <div className="p-6">
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
-                
+
                 {/*Statistics*/}
                 <div className="flex flex-col min-h-[380px] rounded-lg border-2 border-[#282A28] bg-[#1f2123] p-6">
-                    <StatisticsChart 
-                        eventData={testEvent} 
-                        alertData={testAlert} />
+                    <StatisticsChart
+                        eventData={eventStats}
+                        alertData={alertStats} />
                 </div>
 
                 {/*Top Archives*/}
                 <div className="flex flex-col min-h-[380px] rounded-lg border-2 border-[#282A28] bg-[#1f2123] p-6">
-                    <TopArchives 
-                        data={testTopArchives} 
-                        type={archiveType} 
+                    <TopArchives
+                        data={topArchives}
+                        type={archiveType}
                         onTypeChange={setArchiveType} />
                 </div>
 
                 {/*Event Distribution*/}
                 <div className="flex flex-col min-h-[380px] rounded-lg border-2 border-[#282A28] bg-[#1f2123] p-6">
-                    <EventDistribution 
-                        data={testData} />
+                    <EventDistribution
+                        data={distribution ?? { notifications: 0, warnings: 0, errors: 0 }} />
                 </div>
 
                 {/*Archive Volume*/}
                 <div className="flex flex-col min-h-[380px] rounded-lg border-2 border-[#282A28] bg-[#1f2123] p-6">
-                    <ArchiveVolume 
-                        data={testArchiveVolume} 
-                        period={volumePeriod} 
+                    <ArchiveVolume
+                        data={archiveVolume}
+                        period={volumePeriod}
                         onPeriodChange={setVolumePeriod} />
                 </div>
 
@@ -150,3 +122,4 @@ export default function Statistics({ queryApi, storageApi }: StatisticsProps) {
         </div>
     );
 }
+

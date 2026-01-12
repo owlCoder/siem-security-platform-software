@@ -31,11 +31,8 @@ export class QueryController {
         this.router.get("/query/statistics/events", this.getEventStatistics.bind(this));
         this.router.get("/query/statistics/alerts", this.getAlertStatistics.bind(this));
         this.router.get("/query/pdfReport", this.getPdfReport.bind(this));
-<<<<<<< HEAD
         this.router.get("/query/alertsPdfReport", this.getAlertsPdfReport.bind(this));
-=======
 
->>>>>>> c911f976b5ff22e881896a86c4a3702f9b125037
     }
 
     private async getOldEvents(req: Request, res: Response): Promise<void> {

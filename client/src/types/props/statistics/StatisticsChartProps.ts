@@ -1,7 +1,6 @@
-import { AlertStatisticsDTO } from "../../../models/query/AlertStatisticsDTO";
-import { EventStatisticsDTO } from "../../../models/query/EventStatisticsDTO";
+import { HourlyStatisticsDTO } from "../../../models/query/HourlyStatisticsDTO";
 
 export interface StatisticsChartProps  {
-    eventData: EventStatisticsDTO[];
-    alertData: AlertStatisticsDTO[];
+    eventData: HourlyStatisticsDTO[];
+    alertData: HourlyStatisticsDTO[];
 }

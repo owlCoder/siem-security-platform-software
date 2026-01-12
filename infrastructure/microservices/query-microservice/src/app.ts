@@ -63,12 +63,9 @@ void (async () => {
 const queryService = new QueryService(queryRepositoryService, queryAlertRepositoryService);  
 
   // WebAPI rute
-<<<<<<< HEAD
-const queryController = new QueryController(queryService, queryRepositoryService);
-=======
+
   const queryController = new QueryController(queryService, queryRepositoryService, queryAlertRepositoryService);
 
->>>>>>> c911f976b5ff22e881896a86c4a3702f9b125037
   // Registracija ruta
   app.use('/api/v1', queryController.getRouter());
 })();

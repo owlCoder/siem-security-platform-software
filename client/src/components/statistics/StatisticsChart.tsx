@@ -25,7 +25,7 @@ export default function StatisticsChart({
        DATA NORMALIZATION
        ======================= */
     const combinedData = eventData.map((event, index) => ({
-        date: event.date,
+        hour: event.hour,
         events: event.count,
         alerts: alertData[index]?.count || 0,
     }));
@@ -53,7 +53,7 @@ export default function StatisticsChart({
         let cursorY = margin;
 
         doc.setFontSize(14);
-        doc.text("Events per day", margin, cursorY + 6);
+        doc.text("Events per hour", margin, cursorY + 6);
         cursorY += 10;
 
         const imgProps = (doc as any).getImageProperties(imgData);
@@ -71,7 +71,7 @@ export default function StatisticsChart({
             {/* HEADER */}
             <div className="flex justify-between items-center m-4!">
                 <span className="text-white text-lg font-semibold">
-                    Events per day
+                    Events per hour
                 </span>
 
                 <div className="flex gap-2">
@@ -124,7 +124,7 @@ export default function StatisticsChart({
                             </defs>
 
                             <XAxis
-                                dataKey="date"
+                                dataKey="hour"
                                 axisLine={false}
                                 tickLine={false}
                                 tick={{ fill: "#ffffff", fontSize: 13, fontWeight: "bold" }}

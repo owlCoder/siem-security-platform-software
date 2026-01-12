@@ -1,4 +1,4 @@
-import  { useRef } from "react";
+import { useRef } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
@@ -48,13 +48,13 @@ export default function EventDistribution({ data }: EventDistributionProps) {
     doc.addImage(imgData, "PNG", margin, cursorY, pdfImgW, pdfImgH);
     doc.save("event-distribution.pdf");
   };
-
+  
   /* =======================
      RENDER
      ======================= */
   return (
-    <div ref={printRef}>
-      {/* HEADER */}
+    <div>
+      {/* HEADER  */}
       <div className="flex justify-between items-center m-4!">
         <span className="text-white text-lg font-semibold">
           Event distribution
@@ -69,55 +69,52 @@ export default function EventDistribution({ data }: EventDistributionProps) {
         </button>
       </div>
 
-      {/* CONTENT */}
-      <div className="flex h-[350px] items-center gap-10 p-6 pr-10!">
-        {/* PIE */}
-        <div className="h-full w-[55%]">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={chartData}
-                cx="50%"
-                cy="50%"
-                outerRadius={95}
-                labelLine={false}
-                dataKey="value"
-              >
-                {chartData.map((entry, index) => (
-                  <Cell key={index} fill={entry.color} />
-                ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
+      {/* INNER PANEL  */}
+      <div ref={printRef}>
+        <div className="flex h-[350px] items-center gap-10 p-6 pr-10!">
+          {/* PIE */}
+          <div className="h-full w-[55%]">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={chartData}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={95}
+                  labelLine={false}
+                  dataKey="value"
+                >
+                  {chartData.map((entry, index) => (
+                    <Cell key={index} fill={entry.color} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
 
-        {/* LEGEND */}
-        <div className="flex w-[45%] max-w-[380px] flex-col gap-4">
-          {chartData.map((item, index) => (
-            <div
-              key={index}
-              className="
-                flex items-center justify-between
-                bg-[#313338]
-                rounded-[14px]
-                px-5! py-3!
-              "
-            >
-              <div className="flex items-center gap-2">
-                <div
-                  className="h-5 w-5 rounded-md"
-                  style={{ backgroundColor: item.color }}
-                />
-                <span className="text-base font-semibold text-white">
-                  {item.name}
+          {/* LEGEND */}
+          <div className="flex w-[45%] max-w-[380px] flex-col gap-4">
+            {chartData.map((item, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between bg-[#313338] rounded-[14px] px-5! py-3!"
+              >
+                <div className="flex items-center gap-2">
+                  <div
+                    className="h-5 w-5 rounded-md"
+                    style={{ backgroundColor: item.color }}
+                  />
+                  <span className="text-base font-semibold text-white">
+                    {item.name}
+                  </span>
+                </div>
+
+                <span className="text-sm font-semibold text-[#c5c5c5]">
+                  {item.value}%
                 </span>
               </div>
-
-              <span className="text-sm font-semibold text-[#c5c5c5]">
-                {item.value}%
-              </span>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </div>
