@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
 import { IGatewayService } from "../../Domain/services/IGatewayService";
 import { requireSysAdmin } from "../../Middlewares/authorization/AuthorizeMiddleware";
+import { ReqParams } from "../../Domain/types/ReqParams";
 
 export class ParserGatewayController {
   private readonly router: Router;
@@ -26,9 +27,9 @@ export class ParserGatewayController {
     }
   }
 
-  private async getParserEvent(req: Request, res: Response): Promise<void> {
+  private async getParserEvent(req: Request<ReqParams<'id'>>, res: Response): Promise<void> {
     try {
-      const id = Number(req.params.id);
+      const id = parseInt(req.params.id, 10);
       const response = await this.gatewayService.getParserEventById(id);
       res.status(200).json(response);
     } catch (err) {
@@ -47,9 +48,9 @@ export class ParserGatewayController {
     }
   }
 
-  private async deleteParserEvent(req: Request, res: Response): Promise<void> {
+  private async deleteParserEvent(req: Request<ReqParams<'id'>>, res: Response): Promise<void> {
     try {
-      const id = Number(req.params.id);
+      const id = parseInt(req.params.id, 10);
       const response = await this.gatewayService.deleteById(id);
       res.status(200).json(response);
     } catch (err) {

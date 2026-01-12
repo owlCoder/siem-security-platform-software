@@ -6,7 +6,6 @@ dotenv.config({ quiet: true });// da bi se ucitale env prije gateway
 import { IGatewayService } from './Domain/services/IGatewayService';
 import { GatewayService } from './Services/gateway/GatewayService';
 import { AuthGatewayController } from './WebAPI/controllers/AuthGatewayController';
-import { UserGatewayController } from './WebAPI/controllers/UserGatewayController';
 import { AlertGatewayController } from './WebAPI/controllers/AlertGatewayController';
 import { QueryGatewayController } from './WebAPI/controllers/QueryGatewayController';
 import { StorageGatewayController } from './WebAPI/controllers/StorageGatewayController';
@@ -52,7 +51,6 @@ const authenticate = createAuthMiddleware(gatewayService);
 
 // WebAPI routes
 app.use('/api/v1', new AuthGatewayController(gatewayService).getRouter());
-app.use('/api/v1', new UserGatewayController(gatewayService, authenticate).getRouter());
 app.use('/api/v1', new AlertGatewayController(gatewayService, authenticate,loggerService).getRouter());
 app.use('/api/v1', new QueryGatewayController(gatewayService, authenticate).getRouter());
 app.use('/api/v1', new StorageGatewayController(gatewayService, authenticate).getRouter());

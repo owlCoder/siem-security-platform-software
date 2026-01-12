@@ -1,7 +1,6 @@
 import { IGatewayService } from "../../Domain/services/IGatewayService";
 import { GatewayService } from "./GatewayService";
 import { AuthGatewayService } from "../domains/AuthGatewayService";
-import { UserGatewayService } from "../domains/UserGatewayService";
 import { AlertGatewayService } from "../domains/AlertGatewayService";
 import { QueryGatewayService } from "../domains/QueryGatewayService";
 import { StorageGatewayService } from "../domains/StorageGatewayService";
@@ -17,7 +16,6 @@ export class GatewayServiceFactory {
   static create(): IGatewayService {
     return new GatewayService(
       new AuthGatewayService(),
-      new UserGatewayService(),
       new AlertGatewayService(),
       new QueryGatewayService(),
       new StorageGatewayService(),

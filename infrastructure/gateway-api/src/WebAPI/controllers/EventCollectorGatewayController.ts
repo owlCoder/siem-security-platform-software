@@ -3,6 +3,7 @@ import { IGatewayService } from "../../Domain/services/IGatewayService";
 import { ILogerService } from "../../Domain/services/ILogerService";
 import { requireSysAdmin } from "../../Middlewares/authorization/AuthorizeMiddleware";
 import { EventDTO } from "../../Domain/DTOs/EventDTO";
+import { ReqParams } from "../../Domain/types/ReqParams";
 
 
 export class EventCollectorGatewayController{
@@ -98,11 +99,9 @@ export class EventCollectorGatewayController{
         }
     }
 
-    private async getEventById(req: Request, res: Response): Promise<void> {
+    private async getEventById(req: Request<ReqParams<'id'>>, res: Response): Promise<void> {
         try {
-            const id = Number(req.params.id);
-
-           
+            const id = parseInt(req.params.id, 10);
 
             const event = await this.gatewayService.getById(id);
            
@@ -113,11 +112,9 @@ export class EventCollectorGatewayController{
         }
     }
 
-    private async deleteEvent(req: Request, res: Response): Promise<void> {
+    private async deleteEvent(req: Request<ReqParams<'id'>>, res: Response): Promise<void> {
         try {
-            const id = Number(req.params.id);
-
-           
+            const id = parseInt(req.params.id);
 
             const deleted = await this.gatewayService.deleteById(id);
             if (!deleted) {
@@ -146,12 +143,11 @@ export class EventCollectorGatewayController{
         }
     }
 
-    private async getEventsFromId1ToId2(req: Request, res: Response): Promise<void> {
+    private async getEventsFromId1ToId2(req: Request<ReqParams<'fromId' | 'toId'>>, res: Response): Promise<void> {
         try {
-            const fromId = Number(req.params.fromId);
-            const toId = Number(req.params.toId);
+            const fromId = parseInt(req.params.fromId, 10);
+            const toId = parseInt(req.params.toId, 10);
 
-            
             const events = await this.gatewayService.getEventsFromId1ToId2(fromId, toId)
             res.status(200).json(events);
 

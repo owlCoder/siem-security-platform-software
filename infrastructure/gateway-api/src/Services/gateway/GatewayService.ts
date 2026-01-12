@@ -1,7 +1,6 @@
 import { IGatewayService } from "../../Domain/services/IGatewayService";
 import { LoginUserDTO } from "../../Domain/DTOs/LoginUserDTO";
 import { AuthResponseType } from "../../Domain/types/AuthResponse";
-import { UserDTO } from "../../Domain/DTOs/UserDTO";
 import { AlertDTO } from "../../Domain/DTOs/AlertDTO";
 import { AlertQueryDTO } from "../../Domain/DTOs/AlertQueryDTO";
 import { PaginatedAlertsDTO } from "../../Domain/DTOs/PaginatedAlertsDTO";
@@ -36,7 +35,6 @@ import { HourlyStatisticsDTO } from "../../Domain/DTOs/HourlyStatisticsDTO";
 export class GatewayService implements IGatewayService {
   constructor(
     private readonly authService: IAuthGatewayService,
-    private readonly userService: IUserGatewayService,
     private readonly alertService: IAlertGatewayService,
     private readonly queryService: IQueryGatewayService,
     private readonly storageService: IStorageGatewayService,
@@ -114,15 +112,6 @@ export class GatewayService implements IGatewayService {
     error?: string;
   }> {
     return this.authService.validateToken(token);
-  }
-
-  // User microservice
-  async getAllUsers(): Promise<UserDTO[]> {
-    return this.userService.getAllUsers();
-  }
-
-  async getUserById(id: number): Promise<UserDTO> {
-    return this.userService.getUserById(id);
   }
 
   // Alert Service

@@ -4,6 +4,7 @@ import { AlertQueryDTO } from "../../Domain/DTOs/AlertQueryDTO";
 import { IGatewayService } from "../../Domain/services/IGatewayService";
 import { requireSysAdmin } from "../../Middlewares/authorization/AuthorizeMiddleware";
 import { ILogerService } from "../../Domain/services/ILogerService";
+import { ReqParams } from "../../Domain/types/ReqParams";
 
 export class AlertGatewayController {
   private readonly router: Router;
@@ -105,7 +106,7 @@ export class AlertGatewayController {
     }
   }
 
-  private async getAlertById(req: Request, res: Response): Promise<void> {
+  private async getAlertById(req: Request<ReqParams<'id'>>, res: Response): Promise<void> {
     try {
       const id = parseInt(req.params.id, 10);
       const alert = await this.gatewayService.getAlertById(id);
@@ -136,7 +137,7 @@ export class AlertGatewayController {
     }
   }
 
-  private async resolveAlert(req: Request, res: Response): Promise<void> {
+  private async resolveAlert(req: Request<ReqParams<'id'>>, res: Response): Promise<void> {
     try {
       const id = parseInt(req.params.id, 10);
       const resolvedBy = req.user?.username || "Unknown";
@@ -149,7 +150,7 @@ export class AlertGatewayController {
     }
   }
 
-  private async updateAlertStatus(req: Request, res: Response): Promise<void> {
+  private async updateAlertStatus(req: Request<ReqParams<'id'>>, res: Response): Promise<void> {
     try {
       const id = parseInt(req.params.id, 10);
       const { status } = req.body;
