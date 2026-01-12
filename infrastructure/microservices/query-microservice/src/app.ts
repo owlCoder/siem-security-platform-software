@@ -14,7 +14,6 @@ import { QueryController } from './WebAPI/controllers/QueryController';
 import { saveQueryState } from './Utils/StateManager';
 import { Alert } from './Domain/models/Alert';
 import { QueryAlertRepositoryService } from './Services/QueryAlertRepositoryService';
-import { saveQueryAlertState } from './Utils/StateAlertManager';
 import { CacheAlertEntry } from './Domain/models/CacheAlertEntry';
 
 
@@ -65,7 +64,7 @@ void (async () => {
   
 
   // WebAPI rute
-  const queryController = new QueryController(queryService, queryRepositoryService);
+  const queryController = new QueryController(queryService, queryRepositoryService, queryAlertRepositoryService);
 
   // Registracija ruta
   app.use('/api/v1', queryController.getRouter());

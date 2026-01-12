@@ -5,6 +5,10 @@ import { CacheAlertEntry } from "../Domain/models/CacheAlertEntry";
 import { ILoggerService } from "../Domain/services/ILoggerService";
 import { InvertedIndexStructureForAlerts } from "../Utils/InvertedIndexStructureForAlerts";
 import { CacheEntryDTO } from "../Domain/DTOs/CacheEntryDTO";
+import { HourlyStatisticsDTO } from "../Domain/DTOs/HourlyStatisticsDTO";
+import { buildLast24HourBuckets } from "../Utils/BuildLast24HourBucket";
+import { floorToHour } from "../Utils/FloorToHour";
+import { formatHourHH } from "../Utils/FormatHour";
 
 const emptyCacheEntry: CacheAlertEntry = {
     _id: "",
@@ -89,6 +93,33 @@ export class QueryAlertRepositoryService implements IQueryAlertRepositoryService
     public async getAlertsFromId1ToId2(fromId: number, toId: number): Promise<Alert[]> {
         return await this.alertRepository.find({where: {id: Between(fromId, toId)}, order: { id: "ASC" }});
     }
+
+    public async getHourlyAlertStatistics(): Promise<HourlyStatisticsDTO[]> {
+    const now = new Date();
+    const buckets = buildLast24HourBuckets(now);
+
+    const from = buckets[0]; 
+    const to = now;
+
+    const rows = await this.alertRepository.find({
+      select: ["createdAt"],
+      where: { createdAt: Between(from, to) },
+    });
+
+    const countsByBucketStartMs = new Map<number, number>();
+    for (const r of rows) {
+      const bucketStart = floorToHour(new Date(r.createdAt)).getTime();
+      countsByBucketStartMs.set(
+        bucketStart,
+        (countsByBucketStartMs.get(bucketStart) ?? 0) + 1
+      );
+    }
+
+    return buckets.map((b) => ({
+      hour: formatHourHH(b),
+      count: countsByBucketStartMs.get(b.getTime()) ?? 0,
+    }));
+  }
 
     async getAllAlerts(): Promise<Alert[]> {
         return this.alertRepository.find();

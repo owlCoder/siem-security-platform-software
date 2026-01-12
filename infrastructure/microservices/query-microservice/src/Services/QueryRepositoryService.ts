@@ -5,6 +5,10 @@ import { Event } from "../Domain/models/Event";
 import { CacheEntryDTO } from "../Domain/DTOs/CacheEntryDTO";
 import { ILoggerService } from "../Domain/services/ILoggerService";
 import { InvertedIndexStructureForEvents } from "../Utils/InvertedIndexStructureForEvents";
+import { HourlyStatisticsDTO } from "../Domain/DTOs/HourlyStatisticsDTO";
+import { buildLast24HourBuckets } from "../Utils/BuildLast24HourBucket";
+import { floorToHour } from "../Utils/FloorToHour";
+import { formatHourHH } from "../Utils/FormatHour";
 
 // princip pretrage:
 // imamo recnik koji mapira reci iz eventa na event id-eve
@@ -144,4 +148,31 @@ export class QueryRepositoryService implements IQueryRepositoryService {
             order: { timestamp: "DESC" }
         });
     }
+
+    public async getHourlyEventStatistics(): Promise<HourlyStatisticsDTO[]> {
+    const now = new Date();
+    const buckets = buildLast24HourBuckets(now);
+
+    const from = buckets[0];
+    const to = now;
+
+    const rows = await this.eventRepository.find({
+      select: ["timestamp"],
+      where: { timestamp: Between(from, to) },
+    });
+
+    const countsByBucketStartMs = new Map<number, number>();
+    for (const r of rows) {
+      const bucketStart = floorToHour(new Date(r.timestamp)).getTime();
+      countsByBucketStartMs.set(
+        bucketStart,
+        (countsByBucketStartMs.get(bucketStart) ?? 0) + 1
+      );
+    }
+
+    return buckets.map((b) => ({
+      hour: formatHourHH(b),
+      count: countsByBucketStartMs.get(b.getTime()) ?? 0,
+    }));
+  }
 }

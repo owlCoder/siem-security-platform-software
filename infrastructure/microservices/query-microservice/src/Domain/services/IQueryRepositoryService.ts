@@ -2,6 +2,7 @@ import { Int32 } from "typeorm";
 import { CacheEntryDTO } from "../DTOs/CacheEntryDTO";
 import { CacheEntry } from "../models/CacheEntry";
 import { Event } from "../models/Event";
+import { HourlyStatisticsDTO } from "../DTOs/HourlyStatisticsDTO";
 
 export interface IQueryRepositoryService {
     addEntry(entry : CacheEntryDTO) : Promise<CacheEntry>;
@@ -21,4 +22,5 @@ export interface IQueryRepositoryService {
     getErrorCount(): number;
     getLastProcessedId(): number;
     getFilteredEvents(dateFrom: string, dateTo: string, eventType: string): Promise<any[]>;
+    getHourlyEventStatistics(): Promise<HourlyStatisticsDTO[]>;
 }

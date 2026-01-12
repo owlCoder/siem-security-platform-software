@@ -1,4 +1,5 @@
 import { CacheEntryDTO } from "../DTOs/CacheEntryDTO";
+import { HourlyStatisticsDTO } from "../DTOs/HourlyStatisticsDTO";
 import { Alert } from "../models/Alert";
 import { CacheAlertEntry } from "../models/CacheAlertEntry";
 // u IQueryAlertRepositoryService su metode za rad sa bazom podataka
@@ -15,4 +16,6 @@ export interface IQueryAlertRepositoryService{
     getLastThreeAlerts(): Promise<Alert[]>;
     getAlertsCount(): number;
     getLastProcessedId(): number;    
+    getHourlyAlertStatistics(): Promise<HourlyStatisticsDTO[]>;
+
 }
