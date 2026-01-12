@@ -16,7 +16,6 @@ import { ParserEventDto } from "../DTOs/ParserEventDTO";
 import { StorageLogResponseDTO } from "../DTOs/StorageLogResponseDTO";
 import { TopArchiveDTO } from "../DTOs/TopArchiveDTO";
 import { TopSourceDTO } from "../DTOs/TopSourceDTO";
-import { UserDTO } from "../DTOs/UserDTO";
 import { AuthJwtResponse } from "../types/AuthJwtResponse";
 import { AuthResponseType } from "../types/AuthResponse";
 
@@ -33,10 +32,6 @@ export interface IGatewayService {
     isSysAdmin?: boolean;
     error?: string;
   }>;
-
-  // Users
-  getAllUsers(): Promise<UserDTO[]>;
-  getUserById(id: number): Promise<UserDTO>;
 
   // Alerts
   getAllAlerts(): Promise<AlertDTO[]>;
