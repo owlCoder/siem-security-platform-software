@@ -14,7 +14,10 @@ export class BackupValidationController{
     }
 
     private initializeRoutes(): void {
-
+        this.router.post("/backup/validate", this.runValidation.bind(this));
+        this.router.get("/backup/logs", this.getAllLogs.bind(this));
+        this.router.get("/backup/last", this.getLastValidation.bind(this));
+        this.router.get("/backup/summary", this.getSummary.bind(this));
     }
 
     private async runValidation(req: Request, res: Response): Promise<void> {

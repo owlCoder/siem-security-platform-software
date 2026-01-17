@@ -4,6 +4,7 @@ import { BackupValidationResultDTO } from "../Domain/DTOs/BackupValidationResult
 import { BackupValidationStatus } from "../Domain/enums/BackupValidationStatus";
 import { IBackupValidationQueryService } from "../Domain/services/IBackupValidationQueryService";
 import { ILogerService } from "../Domain/services/ILogerService";
+import { BackupValidationLogDTO } from "../Domain/DTOs/BackupValidationLogDTO";
 
 export class BackupValidationQueryService implements IBackupValidationQueryService {
     constructor(
@@ -11,23 +12,41 @@ export class BackupValidationQueryService implements IBackupValidationQueryServi
         private readonly logger: ILogerService
     ) {}
 
-    public async getAllLogs(): Promise<BackupValidationLog[]> {
+    public async getAllLogs(): Promise<BackupValidationLogDTO[]> {
         await this.logger.log("Fetching backup logs...");
-        return await this.backupLogRepo.find({
+        const logs = await this.backupLogRepo.find({
             order: {
                 createdAt: "DESC"
             }
         });
+
+        return logs.map(l => ({
+            backupValidationLogId: l.backupValidationLogId,
+            status: l.status,
+            errorMessage: l.errorMessage,
+            createdAt: l.createdAt.toISOString()
+        }));
     }
 
-    public async getLastValidation(): Promise<BackupValidationLog | null> {
-        const result = await this.backupLogRepo.findOne({
+    public async getLastValidation(): Promise<BackupValidationLogDTO | null> {
+        await this.logger.log("Fetching last backup...");
+        const result = await this.backupLogRepo.find({
             order: {
                 createdAt: "DESC"
-            }
+            }, 
+            take: 1
         });
 
-        return result ?? null;
+        const last = result[0];
+        if (!last)
+            return null;
+
+        return {
+            backupValidationLogId: last.backupValidationLogId,
+            status: last.status,
+            errorMessage: last.errorMessage,
+            createdAt: last.createdAt.toISOString()
+        };
     }
 
     public async getSummary(): Promise<BackupValidationResultDTO> {
@@ -47,7 +66,7 @@ export class BackupValidationQueryService implements IBackupValidationQueryServi
             totalRuns,
             successRuns,
             failedRuns,
-            lastCheckAt: lastLog ? lastLog.createdAt.toISOString() : null,
+            lastCheckAt: lastLog ? lastLog.createdAt : null,
             lastStatus: lastLog ? lastLog.status : null
         };
     }

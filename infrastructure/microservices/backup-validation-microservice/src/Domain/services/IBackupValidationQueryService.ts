@@ -1,8 +1,8 @@
+import { BackupValidationLogDTO } from "../DTOs/BackupValidationLogDTO";
 import { BackupValidationResultDTO } from "../DTOs/BackupValidationResultDTO";
-import { BackupValidationLog } from "../models/BackupValidationLog";
 
 export interface IBackupValidationQueryService {
-    getAllLogs(): Promise<BackupValidationLog[]>;
-    getLastValidation(): Promise<BackupValidationLog | null>;
+    getAllLogs(): Promise<BackupValidationLogDTO[]>;
+    getLastValidation(): Promise<BackupValidationLogDTO | null>;
     getSummary(): Promise<BackupValidationResultDTO>;
 }

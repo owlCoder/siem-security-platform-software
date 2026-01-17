@@ -1,6 +1,6 @@
 import { BackupValidationStatus } from "../enums/BackupValidationStatus";
 
-export interface BackupValidationLog {
+export interface BackupValidationLogDTO {
     backupValidationLogId: number;
     status: BackupValidationStatus;
     errorMessage: string | null;
