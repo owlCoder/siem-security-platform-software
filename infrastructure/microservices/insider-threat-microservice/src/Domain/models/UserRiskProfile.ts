@@ -1,8 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn, Index } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn } from "typeorm";
 import { RiskLevel } from "../enums/RiskLevel";
 
 @Entity("user_risk_profiles")
-@Index(["userId"], { unique: true })
 export class UserRiskProfile {
   @PrimaryGeneratedColumn()
   id!: number;
