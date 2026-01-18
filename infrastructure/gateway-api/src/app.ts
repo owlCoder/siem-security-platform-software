@@ -19,7 +19,7 @@ import { GatewayServiceFactory } from "./Services/gateway/GatewayServiceFactory"
 import { SimulatorGatewayService } from "./Services/domains/SimulatorGatewayService";
 import { SimulatorGatewayController } from "./WebAPI/controllers/SimulatorGatewayController";
 import { BackupGatewayController } from './WebAPI/controllers/BackupGatewayController';
-
+import { InsiderThreatGatewayController } from './WebAPI/controllers/InsiderThreatGatewayController';
 
 const app = express();
 
@@ -63,5 +63,6 @@ app.use('/api/v1', new ParserGatewayController(gatewayService).getRouter());
 app.use('/api/v1', new AnalysisGatewayController(gatewayService, authenticate,loggerService).getRouter());
 app.use('/api/v1', new SimulatorGatewayController(simulatorService, authenticate).getRouter());
 app.use('/api/v1', new BackupGatewayController(gatewayService, authenticate).getRouter());
+app.use('/api/v1', new InsiderThreatGatewayController(gatewayService, authenticate, loggerService).getRouter());
 
 export default app;

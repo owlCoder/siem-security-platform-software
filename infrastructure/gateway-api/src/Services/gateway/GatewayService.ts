@@ -30,6 +30,11 @@ import { HourlyStatisticsDTO } from "../../Domain/DTOs/HourlyStatisticsDTO";
 import { IBackupGatewayService } from "../../Domain/services/IBackupGatewayService";
 import { BackupValidationLogDTO } from "../../Domain/DTOs/BackupValidationLogDTO";
 import { BackupValidationResultDTO } from "../../Domain/DTOs/BackupValidationResultDTO";
+import { IInsiderThreatGatewayService } from "../../Domain/services/IInsiderThreatGatewayService";
+import { InsiderThreatDTO } from "../../Domain/DTOs/InsiderThreatDTO";
+import { PaginatedThreatsDTO, ThreatQueryDTO } from "../../Domain/DTOs/ThreatQueryDTO";
+import { UserRiskProfileDTO } from "../../Domain/DTOs/UserRiskProfileDTO";
+import { UserRiskAnalysisDTO } from "../../Domain/DTOs/UserRiskAnalysisDTO";
 
 /**
  * Facade that delegates to domain-specific gateway services.
@@ -44,7 +49,8 @@ export class GatewayService implements IGatewayService {
     private readonly parserService: IParserGatewayService,
     private readonly analysisService: IAnalysisGatewayService,
     private readonly eventService: IEventCollectorGatewayService,
-    private readonly backupService: IBackupGatewayService
+    private readonly backupService: IBackupGatewayService,
+    private readonly insiderThreatService: IInsiderThreatGatewayService
   ) { }
 
   // Event Collector
@@ -237,4 +243,49 @@ export class GatewayService implements IGatewayService {
   async getSummary(): Promise<BackupValidationResultDTO> {
     return this.backupService.getSummary();
   }
+
+  async getAllInsiderThreats(): Promise<InsiderThreatDTO[]> {
+  return await this.insiderThreatService.getAllThreats();
+}
+
+async getInsiderThreatById(id: number): Promise<InsiderThreatDTO> {
+  return await this.insiderThreatService.getThreatById(id);
+}
+
+async getInsiderThreatsByUserId(userId: string): Promise<InsiderThreatDTO[]> {
+  return await this.insiderThreatService.getThreatsByUserId(userId);
+}
+
+async getUnresolvedInsiderThreats(): Promise<InsiderThreatDTO[]> {
+  return await this.insiderThreatService.getUnresolvedThreats();
+}
+
+async searchInsiderThreats(query: ThreatQueryDTO): Promise<PaginatedThreatsDTO> {
+  return await this.insiderThreatService.searchThreats(query);
+}
+
+async resolveInsiderThreat(id: number, resolvedBy: string, resolutionNotes?: string): Promise<InsiderThreatDTO> {
+  return await this.insiderThreatService.resolveThreat(id, resolvedBy, resolutionNotes);
+}
+
+
+async getAllUserRiskProfiles(): Promise<UserRiskProfileDTO[]> {
+  return await this.insiderThreatService.getAllUserRiskProfiles();
+}
+
+async getHighRiskUsers(): Promise<UserRiskProfileDTO[]> {
+  return await this.insiderThreatService.getHighRiskUsers();
+}
+
+async getUserRiskProfile(userId: string): Promise<UserRiskProfileDTO> {
+  return await this.insiderThreatService.getUserRiskProfile(userId);
+}
+
+async getUserRiskAnalysis(userId: string): Promise<UserRiskAnalysisDTO> {
+  return await this.insiderThreatService.getUserRiskAnalysis(userId);
+}
+
+async recalculateUserRisk(userId: string): Promise<UserRiskProfileDTO> {
+  return await this.insiderThreatService.recalculateUserRisk(userId);
+}
 }

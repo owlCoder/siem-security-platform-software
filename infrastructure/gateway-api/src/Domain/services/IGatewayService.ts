@@ -8,6 +8,7 @@ import { DistributionDTO } from "../DTOs/DistributionDTO";
 import { EventDTO } from "../DTOs/EventDTO";
 import { EventsResultDTO } from "../DTOs/EventsResultDTO";
 import { HourlyStatisticsDTO } from "../DTOs/HourlyStatisticsDTO";
+import { InsiderThreatDTO } from "../DTOs/InsiderThreatDTO";
 import { LargestArchiveDTO } from "../DTOs/LargestArchiveDTO";
 import { LoginUserDTO } from "../DTOs/LoginUserDTO";
 import { NormalizedEventDTO } from "../DTOs/NormalizedEventDTO";
@@ -16,8 +17,11 @@ import { OTPVerificationDTO } from "../DTOs/OtpVerificationDTO";
 import { PaginatedAlertsDTO } from "../DTOs/PaginatedAlertsDTO";
 import { ParserEventDto } from "../DTOs/ParserEventDTO";
 import { StorageLogResponseDTO } from "../DTOs/StorageLogResponseDTO";
+import { PaginatedThreatsDTO, ThreatQueryDTO } from "../DTOs/ThreatQueryDTO";
 import { TopArchiveDTO } from "../DTOs/TopArchiveDTO";
 import { TopSourceDTO } from "../DTOs/TopSourceDTO";
+import { UserRiskAnalysisDTO } from "../DTOs/UserRiskAnalysisDTO";
+import { UserRiskProfileDTO } from "../DTOs/UserRiskProfileDTO";
 import { AuthJwtResponse } from "../types/AuthJwtResponse";
 import { AuthResponseType } from "../types/AuthResponse";
 
@@ -96,4 +100,19 @@ export interface IGatewayService {
   getAllLogs(): Promise<BackupValidationLogDTO[]>;
   getLastValidation(): Promise<BackupValidationLogDTO | null>;
   getSummary(): Promise<BackupValidationResultDTO>;
+
+  //insider threat detection
+  getAllInsiderThreats(): Promise<InsiderThreatDTO[]>;
+  getInsiderThreatById(id: number): Promise<InsiderThreatDTO>;
+  getInsiderThreatsByUserId(userId: string): Promise<InsiderThreatDTO[]>;
+  getUnresolvedInsiderThreats(): Promise<InsiderThreatDTO[]>;
+  searchInsiderThreats(query: ThreatQueryDTO): Promise<PaginatedThreatsDTO>;
+  resolveInsiderThreat(id: number, resolvedBy: string, resolutionNotes?: string): Promise<InsiderThreatDTO>;
+
+  //user risk analysis
+  getAllUserRiskProfiles(): Promise<UserRiskProfileDTO[]>;
+  getHighRiskUsers(): Promise<UserRiskProfileDTO[]>;
+  getUserRiskProfile(userId: string): Promise<UserRiskProfileDTO>;
+  getUserRiskAnalysis(userId: string): Promise<UserRiskAnalysisDTO>;
+  recalculateUserRisk(userId: string): Promise<UserRiskProfileDTO>;
 }
