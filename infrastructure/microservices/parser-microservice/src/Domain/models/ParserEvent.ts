@@ -14,6 +14,6 @@ export class ParserEvent {
     @Column({ type: "timestamp" })
     timestamp!: Date;
 
-    @Column({ type: "varchar", length: 45, nullable: true, default: "0.0.0.0" })
+    @Column({ type: "varchar", length: 45, nullable: true})
     ipAddress?: string;
 }

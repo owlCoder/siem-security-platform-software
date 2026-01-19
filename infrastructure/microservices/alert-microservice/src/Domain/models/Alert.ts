@@ -40,6 +40,6 @@ export class Alert {
   @Column({ type: "text", nullable: true })
   resolutionNotes!: string | null;
 
-  @Column({ type: "varchar", length: 45, nullable: true, default: "0.0.0.0" })
+  @Column({ type: "varchar", length: 45, nullable: true })
   ipAddress?: string;
 }
