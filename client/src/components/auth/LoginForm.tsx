@@ -29,11 +29,11 @@ export default function LoginForm({ authAPI, handleLoginSuccess, handleOtpSucces
     try {
       const response = await authAPI.login(formData);
 
-      if (response.success && response.otp_required && response.session && !response.token) {
+      if (response.success && response.otp_required && response.session && !response["siem-token"]) {
         handleLoginSuccess({ session_id: response.session?.session_id, user_id: response.session?.user_id });
 
-      } else if (response.token && response.success) {
-        handleOtpSuccess(response.token);//if otp (mailing) microservice is down, they just send the token
+      } else if (response["siem-token"] && response.success) {
+        handleOtpSuccess(response["siem-token"]);//if otp (mailing) microservice is down, they just send the token
       } else {
         //console.log(response);
         //console.log(response.success, response.otp_required, response.session?.session_id, response.session?.user_id);

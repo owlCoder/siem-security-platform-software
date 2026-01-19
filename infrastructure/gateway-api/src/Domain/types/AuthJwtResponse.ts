@@ -1,5 +1,5 @@
 export type AuthJwtResponse = {
     success: boolean,
-    token: string,
+    "siem-token": string,
     message: string
 }

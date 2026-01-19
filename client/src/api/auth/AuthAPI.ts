@@ -16,9 +16,7 @@ export class AuthAPI implements IAuthAPI {
   async login(data: LoginUserDTO): Promise<AuthResponseType> {
     const response: AxiosResponse = await this.axiosInstance.post("/login", data);
 
-    console.log(response);
-    //const typedResponse = response.data;
-    //console.log(typedResponse);
+    console.log(response.data);
 
     return response.data;
   }

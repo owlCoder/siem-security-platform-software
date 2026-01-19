@@ -26,8 +26,8 @@ export class AuthGatewayService implements IAuthGatewayService {
 
   async login(data: LoginUserDTO): Promise<AuthResponseType> {
     try {
-      const response = await this.client.post<AuthResponseType>("/login", data);
-      console.log("AM I REACHING THIS???????");
+      const response = await this.client.post<AuthResponseType>("/siem/login", data);
+      console.log(response.data);
       return response.data;
     } catch (error: any) {
       return {
@@ -50,7 +50,7 @@ export class AuthGatewayService implements IAuthGatewayService {
 
       return {
         success: false,
-        token: "",
+        "siem-token": "",
         message,
       };
     }
