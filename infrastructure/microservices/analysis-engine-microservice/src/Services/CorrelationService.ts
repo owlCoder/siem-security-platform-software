@@ -1,13 +1,13 @@
 import { In, Repository } from "typeorm";
 import axios, { AxiosInstance } from "axios";
 import { ICorrelationService } from "../Domain/services/ICorrelationService";
-import { ILLMChatAPIService } from "../Domain/Services/ILLMChatAPIService";
+import { ILLMChatAPIService } from "../Domain/services/ILLMChatAPIService";
 import { Correlation } from "../Domain/models/Correlation";
 import { CorrelationEventMap } from "../Domain/models/CorrelationEventMap";
 import { CorrelationDTO } from "../Domain/types/CorrelationDTO";
 import { createAxiosClient } from "../Infrastructure/helpers/axiosClient";
 import { extractNumericEventIds } from "../Infrastructure/helpers/extractNumericEventIds";
-import { ILoggerService } from "../Domain/Services/ILoggerService";
+import { ILoggerService } from "../Domain/services/ILoggerService";
 
 export class CorrelationService implements ICorrelationService {
   private readonly alertClient: AxiosInstance;
@@ -54,7 +54,7 @@ export class CorrelationService implements ICorrelationService {
       return;
     }
 
-    if (candidates.length === 0) {
+    if (!candidates || candidates.length === 0) {
       await this.loggerService.info(`[CorrelationService] No correlation candidates returned`);
       return;
     }

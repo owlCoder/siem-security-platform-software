@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios";
 import dotenv from "dotenv";
-import { ILLMChatAPIService } from "../Domain/Services/ILLMChatAPIService";
+import { ILLMChatAPIService } from "../Domain/services/ILLMChatAPIService";
 import { ChatMessage } from "../Domain/types/ChatMessage";
 import { EventDTO } from "../Domain/types/EventDTO";
 import { CorrelationDTO } from "../Domain/types/CorrelationDTO";
@@ -11,7 +11,7 @@ import { EventResponseSchema } from "../Infrastructure/schemas/EventResponse.sch
 import { CorrelationResponseSchema } from "../Infrastructure/schemas/CorrelationResponse.schema";
 import { NORMALIZATION_PROMPT } from "../Infrastructure/prompts/normalization.prompt";
 import { CORRELATION_PROMPT } from "../Infrastructure/prompts/correlation.prompt";
-import { ILoggerService } from "../Domain/Services/ILoggerService";
+import { ILoggerService } from "../Domain/services/ILoggerService";
 dotenv.config();
 
 export class LLMChatAPIService implements ILLMChatAPIService {
@@ -97,7 +97,11 @@ export class LLMChatAPIService implements ILLMChatAPIService {
   ): Promise<unknown> {
     const url = `${this.apiUrl}/models/${modelId}:generateContent`;
 
-    const generationConfig: any = { temperature: 0.0 };
+    const generationConfig: {
+      temperature: number;
+      responseMimeType?: string;
+      responseSchema?: object;
+    } = { temperature: 0.0 };
 
     if (schema) {
       generationConfig.responseMimeType = "application/json";
