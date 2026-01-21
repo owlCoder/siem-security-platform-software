@@ -26,4 +26,6 @@ export interface IQueryGatewayService {
   getBurstAnomaly(entityType: RiskEntityType, entityId: string, hours: number): Promise<boolean>;
   getUniqueServicesCount(ipAddress: string): Promise<number>;
   getUniqueIpsCount(serviceName: string): Promise<number>;
+  getUniqueServices(): Promise<string[]>;
+  getUniqueIps(): Promise<string[]>;
 }

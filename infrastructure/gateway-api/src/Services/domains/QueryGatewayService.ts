@@ -139,4 +139,14 @@ export class QueryGatewayService implements IQueryGatewayService {
     });
     return response.data;
   }
+
+  async getUniqueServices(): Promise<string[]> {
+    const response = await this.client.get<string[]>("/query/statistics/uniqueServices", {});
+    return response.data;
+  }
+  
+  async getUniqueIps(): Promise<string[]> {
+    const response = await this.client.get<string[]>("/query/statistics/uniqueIps", {});
+    return response.data;
+  }
 }

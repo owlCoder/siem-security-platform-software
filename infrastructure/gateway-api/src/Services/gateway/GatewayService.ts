@@ -229,6 +229,14 @@ export class GatewayService implements IGatewayService {
     return this.queryService.getUniqueIpsCount(serviceName);
   }
 
+  async getUniqueServices(): Promise<string[]> {
+    return this.queryService.getUniqueServices();
+  }
+
+  async getUniqueIps(): Promise<string[]> {
+    return this.queryService.getUniqueIps();
+  }
+
   // Storage
   async getAllArchives(): Promise<StorageLogResponseDTO[]> {
     return this.storageService.getAllArchives();
@@ -329,6 +337,7 @@ export class GatewayService implements IGatewayService {
     return await this.insiderThreatService.recalculateUserRisk(userId);
   }
 
+  // Risk Score
   async calculateScore(entityType: RiskEntityType, entityId: string, hours: number): Promise<number> {
     return await this.riskScoreService.calculateScore(entityType, entityId, hours);
   }
@@ -339,5 +348,9 @@ export class GatewayService implements IGatewayService {
   
   async getScoreHistory(entityType: RiskEntityType, entityId: string, hours: number): Promise<{ score: number; createdAt: Date; }[]> {
     return await this.riskScoreService.getScoreHistory(entityType, entityId, hours);
+  }
+
+  async getGlobalScore(): Promise<number> {
+    return await this.riskScoreService.getGlobalScore();
   }
 }

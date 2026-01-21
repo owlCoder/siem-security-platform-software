@@ -35,4 +35,8 @@ export class RiskScoreGatewayService implements IRiskScoreGatewayService {
         return response.data;
     }
 
+    async getGlobalScore(): Promise<number> {
+        const response = await this.client.get<number>("/riskScore/getGlobalScore", {});
+        return response.data;
+    }
 }
