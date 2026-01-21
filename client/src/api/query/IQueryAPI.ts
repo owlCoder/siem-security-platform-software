@@ -17,4 +17,6 @@ export interface IQueryAPI {
   getEventStatistics(token: string): Promise<HourlyStatisticsDTO[]>;
   getAlertStatistics(token: string): Promise<HourlyStatisticsDTO[]>;
   getEventDistribution(token: string): Promise<DistributionDTO>;
+  getUniqueServices(token: string): Promise<string[]>;
+  getUniqueIps(token: string): Promise<string[]>;
 }

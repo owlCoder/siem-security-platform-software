@@ -16,7 +16,7 @@ export default function RecentEventsTable({ events }: { events: EventRow[] }) {
 
                 <tbody>
                     {events.map((e, index) => (
-                        <RecentEventsTableRow e={e} index={index} />
+                        <RecentEventsTableRow e={e} index={index} key={e.id}/>
                     ))}
                 </tbody>
             </table>

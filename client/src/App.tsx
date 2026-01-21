@@ -16,6 +16,8 @@ import { StorageAPI } from "./api/storage/StorageAPI";
 import { DesktopNotificationService } from "./services/DesktopNotificationService";
 import { ISimulatorAPI } from "./api/simulator/ISimulatorAPI";
 import { SimulatorAPI } from "./api/simulator/SimulatorAPI";
+import { IRiskScoreAPI } from "./api/risk-score/IRiskScoreAPI";
+import { RiskScoreAPI } from "./api/risk-score/RiskScoreAPI";
 
 const auth_api: IAuthAPI = new AuthAPI();
 const user_api: IUserAPI = new UserAPI();
@@ -25,6 +27,7 @@ const query_api:IQueryAPI=new QueryAPI();
 const storage_api:IStorageAPI=new StorageAPI();
 const simulator_api: ISimulatorAPI = new SimulatorAPI();
 const desktopNotification = new DesktopNotificationService();
+const risk_score_api: IRiskScoreAPI = new RiskScoreAPI();
 
 function App() {
   return (
@@ -42,7 +45,9 @@ function App() {
 
         {/* Temporary unprotected route — should require authentication */}
         <Route path="/mainLayout" element={<MainLayout alertsAPI={alerts_api}
-                  parserAPI={parser_api} queryAPI={query_api} storageAPI={storage_api} simulatorAPI={simulator_api} desktopNotification={desktopNotification} />} />
+                  parserAPI={parser_api} queryAPI={query_api} storageAPI={storage_api} 
+                  simulatorAPI={simulator_api} desktopNotification={desktopNotification} 
+                  riskScoreApi={risk_score_api}/>} />
       </Routes>
     </>
   );

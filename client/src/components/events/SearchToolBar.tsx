@@ -7,7 +7,7 @@ export function SearchToolBar({ value, onSearchText, value1, onEventType, value2
             <div className="flex flex-row items-end gap-[10px] ml-[10px]! w-full pr-[20px]">
                 
                 <div className="flex flex-col gap-[4px] w-[32%]">
-                    <label className="px-1! block text-[11px] text-gray-400 mb-1 uppercase tracking-wider font-semibold">Search Source</label>
+                    <label className="px-1! block text-[11px] text-gray-400 mb-1 uppercase tracking-wider font-semibold">Search Source or Description</label>
                     <input
                         className="px-3! py-2 h-[40px] rounded-[10px] border border-[rgba(255,255,255,0.12)] bg-[rgba(0,0,0,0.3)] text-white text-[13px] outline-none w-full"
                         placeholder="Source..."

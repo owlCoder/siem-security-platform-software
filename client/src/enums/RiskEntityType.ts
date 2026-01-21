@@ -1,0 +1,1 @@
+export enum RiskEntityType { IP_ADDRESS = "IP_ADDRESS"  , SERVICE = "SERVICE"};

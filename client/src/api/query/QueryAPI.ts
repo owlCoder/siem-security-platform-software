@@ -107,4 +107,21 @@ export class QueryAPI implements IQueryAPI {
 
     return response.data.distribution;
   }
+
+  async getUniqueServices(token: string): Promise<string[]> {
+    const response = await this.client.get<string[]>(
+      "/siem/query/uniqueServices",
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    return response.data;
+  }
+
+  async getUniqueIps(token: string): Promise<string[]> {
+    const response = await this.client.get<string[]>("/siem/query/uniqueIps", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    return response.data;
+  }
 }

@@ -9,9 +9,10 @@ import Simulator from '../components/views/Simulator';
 import InsiderThreats from '../components/views/InsiderThreats';
 import { MainLayoutProps } from '../types/props/pages/MainLayoutProps';
 import { InsiderThreatAPI } from '../api/insider-threat/InsiderThreatAPI'; 
+import RiskScore from '../components/views/RiskScore';
 
 interface ExtendedMainLayoutProps extends MainLayoutProps {
-  insiderThreatAPI: InsiderThreatAPI;
+  //insiderThreatAPI: InsiderThreatAPI;
 }
 
 export default function MainLayout({
@@ -22,6 +23,7 @@ export default function MainLayout({
   simulatorAPI,
   insiderThreatAPI,
   desktopNotification,
+  riskScoreApi
 }: ExtendedMainLayoutProps) {
   const [sideMenuPage, setSideMenuPage] = useState<number>(0);
 
@@ -51,6 +53,9 @@ export default function MainLayout({
         )}
         {sideMenuPage === 6 && (
           <InsiderThreats insiderThreatApi={insiderThreatAPI} />
+        )}
+        {sideMenuPage === 7 && (
+          <RiskScore riskScoreApi={riskScoreApi} queryApi={queryAPI}/>
         )}
       </div>
     </div>

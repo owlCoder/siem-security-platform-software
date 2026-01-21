@@ -31,46 +31,61 @@ export class RiskScoreGatwayController {
         // requireSysAdmin,
         this.getScoreHistory.bind(this)
         );
+        this.router.get(
+        "/siem/riskScore/getGlobalScore",
+        // this.authenticate,
+        // requireSysAdmin,
+        this.getGlobalScore.bind(this)
+        );
     }
 
     private async calculateScore(req: Request, res: Response): Promise<void> {
         try {
-        const { entityType, entityId, hours } = req.body;
+            const { entityType, entityId, hours } = req.body;
 
-        const result = await this.gatewayService.calculateScore(
-            entityType as RiskEntityType,
-            entityId,
-            Number(hours)
-        );
+            const result = await this.gatewayService.calculateScore(
+                entityType as RiskEntityType,
+                entityId,
+                Number(hours)
+            );
 
-        res.status(201).json(result);
+            res.status(201).json(result);
         } catch (err) {
-        res.status(500).json({ message: "Error while calculating risk score." });
+            res.status(500).json({ message: "Error while calculating risk score." });
         }
     }
 
     private async getLatestScore(req: Request, res: Response): Promise<void> {
         try {
-        const entityType = req.query.entityType as RiskEntityType;
-        const entityId = req.query.entityId as string;
+            const entityType = req.query.entityType as RiskEntityType;
+            const entityId = req.query.entityId as string;
 
-        const result = await this.gatewayService.getLatestScore(entityType, entityId);
-        res.status(200).json(result);
+            const result = await this.gatewayService.getLatestScore(entityType, entityId);
+            res.status(200).json(result);
         } catch(err) {
-        res.status(500).json({message: "Error while retreiving latest risk score."});
+            res.status(500).json({message: "Error while retreiving latest risk score."});
         }
     }
 
     private async getScoreHistory(req: Request, res: Response): Promise<void> {
         try {
-        const entityType = req.query.entityType as RiskEntityType;
-        const entityId = req.query.entityId as string;
-        const hours = Number(req.query.hours);
+            const entityType = req.query.entityType as RiskEntityType;
+            const entityId = req.query.entityId as string;
+            const hours = Number(req.query.hours);
 
-        const result = await this.gatewayService.getScoreHistory(entityType, entityId, hours);
-        res.status(200).json(result);
+            const result = await this.gatewayService.getScoreHistory(entityType, entityId, hours);
+            res.status(200).json(result);
         } catch(err) {
-        res.status(500).json({message: "Error while retreiving risk score history."});
+            res.status(500).json({message: "Error while retreiving risk score history."});
+        }
+    }
+
+    private async getGlobalScore(req: Request, res: Response): Promise<void> {
+        try {
+            const result = await this.gatewayService.getGlobalScore();
+            res.status(200).json(result);
+        } catch(err) {
+            res.status(500).json({message: "Error while retreiving global risk score."});
         }
     }
 
