@@ -33,55 +33,41 @@ export default function FirewallRuleManager({ addRule }: FirewallRuleManagerProp
     };
 
     return (
-        <div className="bg-[#1f1f1f] rounded-[14px] px-5 py-4 shadow-md border border-[#333] w-full h-full flex flex-col">
-            <h3 className="text-[#d0d0d0] font-semibold text-[16px] mb-4">
+        <div className="flex flex-col flex-1 justify-center items-center gap-6 w-full max-w-sm">
+            <h3 className="text-white text-lg font-semibold mb-6 self-center">
                 Add Firewall Rule
             </h3>
 
-            <div className="flex flex-col gap-4 flex-1">
-                <input
-                    type="text"
-                    placeholder="IP Address"
-                    value={ipAddress}
-                    onChange={(e) => setIpAddress(e.target.value)}
-                    className="px-4 py-3 rounded-[10px] bg-[#2a2a2a] border border-[#333] text-[#d0d0d0]
-                           focus:outline-none focus:border-[#555]"
-                />
+            <input
+                type="text"
+                placeholder="IP Address"
+                value={ipAddress}
+                onChange={(e) => setIpAddress(e.target.value)}
+                className="w-full px-4 py-2 rounded-[10px] border-2 border-[#333] bg-[#1f1f1f] text-white placeholder:text-[#a6a6a6] focus:outline-none focus:border-[#007a55] transition-colors duration-200"
+            />
 
-                <input
-                    type="number"
-                    placeholder="Port"
-                    value={port}
-                    onChange={(e) =>
-                        setPort(e.target.value ? Number(e.target.value) : "")
-                    }
-                    className="px-4 py-3 rounded-[10px] bg-[#2a2a2a] border border-[#333] text-[#d0d0d0]
-                           focus:outline-none focus:border-[#555]"
-                />
+            <input
+                type="number"
+                placeholder="Port"
+                value={port}
+                onChange={(e) => setPort(e.target.value ? Number(e.target.value) : "")}
+                className="w-full px-4 py-2 rounded-[10px] border-2 border-[#333] bg-[#1f1f1f] text-white placeholder:text-[#a6a6a6] focus:outline-none focus:border-[#007a55] transition-colors duration-200"
+            />
 
-                <button
-                    onClick={handleAdd}
-                    disabled={isSaving}
-                    className={`mt-auto w-full h-[40px] rounded-[10px] font-semibold text-white transition-colors ${isSaving
-                        ? "bg-[#313338] cursor-not-allowed"
-                        : "bg-[#007a55] hover:bg-[#009166]"
-                        }`}
-                >
-                    {isSaving ? "Adding..." : "Add Rule"}
-                </button>
+            <button
+                onClick={handleAdd}
+                disabled={isSaving}
+                className={`w-full px-5 py-2 rounded-[10px] text-white text-sm font-semibold transition-all duration-200 ${isSaving ? "bg-[#313338] cursor-not-allowed" : "bg-[#007a55] hover:bg-[#008b65]"
+                    }`}
+            >
+                {isSaving ? "Adding..." : "Add Rule"}
+            </button>
 
-                {message && (
-                    <div
-                        className={`pt-2 text-sm ${message.isError
-                            ? "text-red-400"
-                            : "text-green-400"
-                            }`}
-                    >
-                        {message.text}
-                    </div>
-                )}
-            </div>
+            {message && (
+                <div className="text-sm text-green-500 mt-2">
+                    {message.text}
+                </div>
+            )}
         </div>
     );
-
 }

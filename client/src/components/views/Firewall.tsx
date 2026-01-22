@@ -73,43 +73,45 @@ export default function Firewall({ firewallApi }: FirewallViewProps) {
     };
 
     return (
-        <div className="flex flex-col gap-8 p-6">
-            {/* Row 1: Mode + Add Rule */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-                <div className="h-full">
-                    <FirewallModeSwitcher
-                        mode={mode}
-                        onSave={handleModeSave}
-                    />
-                </div>
+        <div className="p-6 flex flex-col gap-3">
 
-                <div className="h-full">
+            {/* Row 1: Firewall Mode (full width) */}
+            <div className="flex flex-col justify-center items-center min-h-[180px] rounded-lg border-2 border-[#282A28] bg-[#1f2123] p-6">
+                <FirewallModeSwitcher
+                    mode={mode}
+                    onSave={handleModeSave}
+                />
+            </div>
+
+            {/* Row 2: Add Rule + Test Connection */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+                <div className="flex flex-col justify-center items-center min-h-[320px] rounded-lg border-2 border-[#282A28] bg-[#1f2123] p-6">
                     <FirewallRuleManager
                         addRule={handleAddRule}
                     />
                 </div>
-            </div>
 
-            {/* Row 2: Test Connection + Rules */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-                <div className="h-full">
+                <div className="flex flex-col justify-center items-center min-h-[320px] rounded-lg border-2 border-[#282A28] bg-[#1f2123] p-6">
                     <FirewallConnectionTester
                         testConnection={handleTestConnection}
                     />
                 </div>
+            </div>
 
-                <div className="h-full">
+            {/* Row 3: Firewall Rules + Logs */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+                <div className="flex flex-col justify-center items-center min-h-[400px] rounded-lg border-2 border-[#282A28] bg-[#1f2123] p-6 overflow-hidden">
                     <FirewallRulesTable
                         rules={rules}
                         deleteRule={handleDeleteRule}
                     />
                 </div>
+
+                <div className="flex flex-col justify-center items-center min-h-[400px] max-h-[380px] rounded-lg border-2 border-[#282A28] bg-[#1f2123] p-6 overflow-y-auto">
+                    <FirewallLogsTable logs={logs} />
+                </div>
             </div>
 
-            {/* Row 3: Logs - full width */}
-            <div className="w-full">
-                <FirewallLogsTable logs={logs} />
-            </div>
         </div>
     );
 }

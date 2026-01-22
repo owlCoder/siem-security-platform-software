@@ -21,26 +21,24 @@ export default function FirewallRulesTable({ rules, deleteRule }: FirewallRulesT
     };
 
     return (
-        <div className="bg-[#1f1f1f] rounded-[14px] shadow-md border border-[#333] w-full h-full flex flex-col">
-            {/* Header */}
-            <div className="px-4 py-3 border-b border-[#333]">
-                <h3 className="text-[#d0d0d0] font-semibold text-[16px]">
-                    Firewall Rules
-                </h3>
-            </div>
+        <div className="p-6 rounded-lg border-2 border-[#282A28] bg-[#1f2123] h-full w-full">
+            <h3 className="text-white text-lg font-semibold mb-6 text-center">
+                Firewall Rules
+            </h3>
 
-            {/* Table */}
-            <div className="overflow-y-auto h-[300px]">
-                <table className="w-full border-collapse text-[14px]">
-                    <thead className="bg-[#2a2a2a] sticky top-0 z-10">
+            <div className="overflow-auto w-full h-full">
+                <table className="w-full table-fixed border-collapse text-sm">
+                    <thead className="bg-[#2a2a2a]">
                         <tr>
-                            <th className="px-4 py-2 text-left text-[#bdbdbd] font-semibold border-b border-[#333]">
+                            <th className="w-1/3 px-4 py-2 text-white text-center border-b border-[#2d2d2d]">
                                 IP Address
                             </th>
-                            <th className="px-4 py-2 text-left text-[#bdbdbd] font-semibold border-b border-[#333]">
+                            <th className="w-1/3 px-4 py-2 text-white text-center border-b border-[#2d2d2d]">
                                 Port
                             </th>
-                            <th className="px-4 py-2 border-b border-[#333]"></th>
+                            <th className="w-1/3 px-4 py-2 text-white text-center border-b border-[#2d2d2d]">
+                                Actions
+                            </th>
                         </tr>
                     </thead>
 
@@ -49,7 +47,7 @@ export default function FirewallRulesTable({ rules, deleteRule }: FirewallRulesT
                             <tr>
                                 <td
                                     colSpan={3}
-                                    className="px-4 py-10 text-center text-[#a6a6a6]"
+                                    className="px-10 py-10 text-center text-[#a6a6a6] border-b border-[#2d2d2d]"
                                 >
                                     No rules found
                                 </td>
@@ -57,27 +55,22 @@ export default function FirewallRulesTable({ rules, deleteRule }: FirewallRulesT
                         ) : (
                             rules.map((rule) => {
                                 const isLoading = loadingIds.includes(rule.id);
-
                                 return (
                                     <tr
                                         key={rule.id}
-                                        className="hover:bg-[#2d2d2d] transition-colors border-b border-[#2a2a2a]"
+                                        className="transition-colors duration-200 hover:bg-[#2a2a2a]"
                                     >
-                                        <td className="px-4 py-2 text-[#d0d0d0]">
+                                        <td className="w-1/3 px-4 py-2 text-white text-center border-b border-[#2d2d2d] truncate">
                                             {rule.ipAddress}
                                         </td>
-
-                                        <td className="px-4 py-2 text-[#d0d0d0]">
+                                        <td className="w-1/3 px-4 py-2 text-white text-center border-b border-[#2d2d2d] truncate">
                                             {rule.port}
                                         </td>
-
-                                        <td className="px-4 py-2">
+                                        <td className="w-1/3 px-4 py-2 text-center border-b border-[#2d2d2d]">
                                             <button
                                                 onClick={() => handleDelete(rule.id)}
                                                 disabled={isLoading}
-                                                className={`w-full h-[32px] rounded-[10px] font-semibold text-white transition-colors ${isLoading
-                                                    ? "bg-[#313338] cursor-not-allowed"
-                                                    : "bg-[#313338] hover:bg-[#404249]"
+                                                className={`bg-transparent border-0 p-0 text-red-400 text-sm font-semibold underline-offset-2 hover:underline ${isLoading ? "cursor-not-allowed opacity-60" : ""
                                                     }`}
                                             >
                                                 {isLoading ? "Deleting..." : "Delete"}

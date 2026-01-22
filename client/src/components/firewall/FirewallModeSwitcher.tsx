@@ -26,33 +26,33 @@ export default function FirewallModeSwitcher({ mode, onSave }: FirewallModeSwitc
     };
 
     return (
-        <div className="bg-[#1f1f1f] rounded-[14px] px-5 py-4 shadow-md border border-[#333] w-full h-full flex flex-col">
-            <h3 className="text-[#d0d0d0] font-semibold text-[16px] mb-4">
+        <div className="flex flex-col h-full p-6">
+            <h3 className="text-white text-lg font-semibold mb-6 self-center">
                 Firewall Mode
             </h3>
 
-            <div className="flex flex-col gap-4 flex-1">
-                <div className="flex items-center gap-6">
-                    <label className="flex items-center gap-2 text-[#d0d0d0]">
+            <div className="flex flex-col flex-1 justify-center items-center gap-6">
+                <div className="flex gap-6">
+                    <label className="flex items-center gap-2 text-white font-medium">
                         <input
                             type="radio"
                             name="firewallMode"
                             value="WHITELIST"
                             checked={selectedMode === "WHITELIST"}
                             onChange={() => setSelectedMode("WHITELIST")}
-                            className="accent-[#4ade80]"
+                            className="accent-[#007a55] w-4 h-4"
                         />
                         Whitelist
                     </label>
 
-                    <label className="flex items-center gap-2 text-[#d0d0d0]">
+                    <label className="flex items-center gap-2 text-white font-medium">
                         <input
                             type="radio"
                             name="firewallMode"
                             value="BLACKLIST"
                             checked={selectedMode === "BLACKLIST"}
                             onChange={() => setSelectedMode("BLACKLIST")}
-                            className="accent-[#f87171]"
+                            className="accent-[#007a55] w-4 h-4"
                         />
                         Blacklist
                     </label>
@@ -61,9 +61,7 @@ export default function FirewallModeSwitcher({ mode, onSave }: FirewallModeSwitc
                 <button
                     onClick={handleSave}
                     disabled={isSaving}
-                    className={`mt-auto w-full h-[40px] rounded-[10px] font-semibold text-white transition-colors ${isSaving
-                            ? "bg-[#313338] cursor-not-allowed"
-                            : "bg-[#007a55] hover:bg-[#009166]"
+                    className={`px-5 py-2 rounded-[10px] text-white text-sm font-semibold transition-all duration-200 ${isSaving ? "bg-[#313338] cursor-not-allowed" : "bg-[#007a55] hover:bg-[#008b65]"
                         }`}
                 >
                     {isSaving ? "Saving..." : "Save"}
@@ -71,5 +69,4 @@ export default function FirewallModeSwitcher({ mode, onSave }: FirewallModeSwitc
             </div>
         </div>
     );
-
 }
