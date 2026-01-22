@@ -1,127 +1,137 @@
-import axios, { AxiosInstance } from "axios";
-import { EventDTO } from "../../models/events/EventDTO";
+import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { IQueryAPI } from "./IQueryAPI";
+import { EventDTO } from "../../models/events/EventDTO";
 import { DistributionDTO } from "../../models/query/DistributionDTO";
-import { CountResponseDTO } from "../../models/query/CountResponseDTO";
 import { TopSourceDTO } from "../../models/events/TopSourceDTO";
 import { EventsResultDTO } from "../../models/events/EventsResultDTO";
 import { HourlyStatisticsDTO } from "../../models/query/HourlyStatisticsDTO";
-import { DistributionResponse } from "../../models/query/DistributionResponse";
 
 export class QueryAPI implements IQueryAPI {
-  private readonly client: AxiosInstance;
+  private readonly axiosInstance: AxiosInstance;
 
-  constructor(client?: AxiosInstance) {
-    this.client =
-      client ??
-      axios.create({
-        baseURL: import.meta.env.VITE_GATEWAY_URL,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+  constructor() {
+    this.axiosInstance = axios.create({
+      baseURL: import.meta.env.VITE_FIREWALL_URL,
+      headers: { "Content-Type": "application/json" },
+      timeout: 30000,
+    });
   }
+
   async getTopEventSource(token: string): Promise<TopSourceDTO> {
-    const response = await this.client.get<TopSourceDTO>("/events/topSource", { //CHANGE ROUTE WITH QUERY 
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: "events/topSource",
+      method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });
-    return response.data;
+    return response.data.response;
   }
 
   async getAllEvents(token: string): Promise<EventDTO[]> {
-    const response = await this.client.get<EventDTO[]>("/query/events", {
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: "query/events",
+      method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });
-    return response.data;
+    return response.data.response;
   }
 
   async getEventsByQuery(query: string, token: string, targetPage: number, limit: number): Promise<EventsResultDTO> {
-    const response = await this.client.get<EventsResultDTO>("/query/search", {
-      params: { q: query, p: targetPage, l: limit },
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: "query/search",
+      method: "GET",
       headers: { Authorization: `Bearer ${token}` },
+      params: { q: query, p: targetPage, l: limit },
     });
-    return response.data;
+    return response.data.response;
   }
 
   async getLastThreeEvents(token: string): Promise<EventDTO[]> {
-    const response = await this.client.get<EventDTO[]>(
-      "/query/lastThreeEvents",
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-    return response.data;
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: "query/lastThreeEvents",
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data.response;
   }
 
   async getEventsCount(token: string): Promise<number> {
-    const response = await this.client.get<CountResponseDTO>("/query/eventsCount", {
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: "query/eventsCount",
+      method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });
-    return response.data.count;
+    return response.data.response.count;
   }
 
   async getInfoCount(token: string): Promise<number> {
-    const response = await this.client.get<CountResponseDTO>("/query/infoCount", {
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: "query/infoCount",
+      method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });
-    return response.data.count;
+    return response.data.response.count;
   }
 
   async getWarningCount(token: string): Promise<number> {
-    const response = await this.client.get<CountResponseDTO>("/query/warningCount", {
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: "query/warningCount",
+      method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });
-    return response.data.count;
+    return response.data.response.count;
   }
 
   async getErrorCount(token: string): Promise<number> {
-    const response = await this.client.get<CountResponseDTO>("/query/errorCount", {
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: "query/errorCount",
+      method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });
-    return response.data.count;
+    return response.data.response.count;
   }
 
-  //statistics:
   async getEventStatistics(token: string): Promise<HourlyStatisticsDTO[]> {
-    const response = await this.client.get<HourlyStatisticsDTO[]>(
-      "/query/statistics/events",
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    return response.data;
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: "query/statistics/events",
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data.response;
   }
 
   async getAlertStatistics(token: string): Promise<HourlyStatisticsDTO[]> {
-    const response = await this.client.get<HourlyStatisticsDTO[]>(
-      "/query/statistics/alerts",
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    return response.data;
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: "query/statistics/alerts",
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data.response;
   }
 
   async getEventDistribution(token: string): Promise<DistributionDTO> {
-    const response = await this.client.get<DistributionResponse>("/query/distribution", {
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: "query/distribution",
+      method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });
-
-    return response.data.distribution;
+    return response.data.response.distribution;
   }
 
   async getUniqueServices(token: string): Promise<string[]> {
-    const response = await this.client.get<string[]>(
-      "/query/uniqueServices",
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    return response.data;
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: "query/uniqueServices",
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data.response;
   }
 
   async getUniqueIps(token: string): Promise<string[]> {
-    const response = await this.client.get<string[]>("/query/uniqueIps", {
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: "query/uniqueIps",
+      method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });
-
-    return response.data;
+    return response.data.response;
   }
 }

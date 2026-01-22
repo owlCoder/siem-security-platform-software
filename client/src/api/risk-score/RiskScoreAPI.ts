@@ -1,49 +1,54 @@
-import axios, { AxiosInstance } from "axios";
+import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { RiskEntityType } from "../../enums/RiskEntityType";
 import { IRiskScoreAPI } from "./IRiskScoreAPI";
 
 export class RiskScoreAPI implements IRiskScoreAPI {
-    private readonly client: AxiosInstance;
+    private readonly axiosInstance: AxiosInstance;
 
-    constructor(client?: AxiosInstance) {
-        this.client =
-            client ??
-            axios.create({
-                baseURL: import.meta.env.VITE_GATEWAY_URL,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
+    constructor() {
+        this.axiosInstance = axios.create({
+            baseURL: import.meta.env.VITE_FIREWALL_URL,
+            headers: { "Content-Type": "application/json" },
+            timeout: 30000,
+        });
     }
 
     async calculateScore(token: string, entityType: RiskEntityType, entityId: string, hours: number): Promise<number> {
-        const response = await this.client.post<number>("/riskScore/calculateScore", {
-            entityType, entityId, hours,
+        const response: AxiosResponse = await this.axiosInstance.post("", {
+            url: "riskScore/calculateScore",
+            method: "POST",
             headers: { Authorization: `Bearer ${token}` },
+            data: { entityType, entityId, hours },
         });
-        return response.data;
+        return response.data.response;
     }
 
     async getLatestScore(token: string, entityType: RiskEntityType, entityId: string): Promise<number | null> {
-        const response = await this.client.get<number | null>("/riskScore/getLatestScore", {
-            params: { entityType: entityType, entityId: entityId },
+        const response: AxiosResponse = await this.axiosInstance.post("", {
+            url: "riskScore/getLatestScore",
+            method: "GET",
             headers: { Authorization: `Bearer ${token}` },
+            params: { entityType, entityId },
         });
-        return response.data;
+        return response.data.response;
     }
 
-    async getScoreHistory(token: string, entityType: RiskEntityType, entityId: string, hours: number): Promise<{ score: number; createdAt: Date; }[]> {
-        const response = await this.client.get<{ score: number; createdAt: Date; }[]>("/riskScore/getScoreHistory", {
-            params: { entityType: entityType, entityId: entityId, hours: hours },
+    async getScoreHistory(token: string, entityType: RiskEntityType, entityId: string, hours: number): Promise<{ score: number; createdAt: Date }[]> {
+        const response: AxiosResponse = await this.axiosInstance.post("", {
+            url: "riskScore/getScoreHistory",
+            method: "GET",
             headers: { Authorization: `Bearer ${token}` },
+            params: { entityType, entityId, hours },
         });
-        return response.data;
+        return response.data.response;
     }
 
     async getGlobalScore(token: string): Promise<number> {
-        const response = await this.client.get<number>("/riskScore/getGlobalScore", {
+        const response: AxiosResponse = await this.axiosInstance.post("", {
+            url: "riskScore/getGlobalScore",
+            method: "GET",
             headers: { Authorization: `Bearer ${token}` },
         });
-        return response.data;
+        return response.data.response;
     }
 }

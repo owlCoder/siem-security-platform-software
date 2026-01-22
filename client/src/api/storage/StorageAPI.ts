@@ -4,66 +4,70 @@ import { ArchiveVolumeDTO } from "../../models/storage/ArchiveVolumeDTO";
 import { LargestArchiveDTO } from "../../models/storage/LargestArchiveDTO";
 import { TopArchiveDTO } from "../../models/storage/TopArchiveDTO";
 import { IStorageAPI } from "./IStorageAPI";
-import axios, { AxiosInstance } from "axios";
+import axios, { AxiosInstance, AxiosResponse } from "axios";
 
 export class StorageAPI implements IStorageAPI {
-    private readonly client: AxiosInstance;
+    private readonly axiosInstance: AxiosInstance;
 
-    constructor(){
-        this.client = axios.create({
-            baseURL: import.meta.env.VITE_GATEWAY_URL,
-            headers: {
-                "Content-Type": "application/json"
-            },
+    constructor() {
+        this.axiosInstance = axios.create({
+            baseURL: import.meta.env.VITE_FIREWALL_URL,
+            headers: { "Content-Type": "application/json" },
+            timeout: 30000,
         });
     }
 
-    async getAllArchives(/*token: string*/): Promise<StorageLogResponseDTO[]> {
-        const response = await this.client.get<StorageLogResponseDTO[]>("/storageLog", {
-            //headers: { Authorization: `Bearer ${token}` }
+    async getAllArchives(): Promise<StorageLogResponseDTO[]> {
+        const response: AxiosResponse = await this.axiosInstance.post("", {
+            url: "storageLog",
+            method: "GET",
         });
-        return response.data;
+        return response.data.response;
     }
 
-    async getStats(/*token: string*/): Promise<ArchiveStatsDTO> {
-        const response = await this.client.get<ArchiveStatsDTO>("/storageLog/stats", {
-            //headers: { Authorization: `Bearer ${token}` }
+    async getStats(): Promise<ArchiveStatsDTO> {
+        const response: AxiosResponse = await this.axiosInstance.post("", {
+            url: "storageLog/stats",
+            method: "GET",
         });
-        return response.data;
+        return response.data.response;
     }
 
-    async downloadArchive(/*token: string,*/ id: number): Promise<ArrayBuffer> {
-        const response = await this.client.get(`/storageLog/file/${id}`, {
-            responseType: "blob",
-            //headers: { Authorization: `Bearer ${token}` }
+    async downloadArchive(id: number): Promise<ArrayBuffer> {
+        const response: AxiosResponse = await this.axiosInstance.post("", {
+            url: `storageLog/file/${id}`,
+            method: "GET",
+            responseType: "arraybuffer",
         });
-        return response.data;
+        return response.data.response;
     }
 
-    //STATISTICS METODA
     async getTopArchives(token: string, type: "events" | "alerts", limit: number): Promise<TopArchiveDTO[]> {
-        const response = await this.client.get<TopArchiveDTO[]>("/storageLog/top", {
-            params: {type, limit},
-            headers: {Authorization: `Bearer ${token}`}
+        const response: AxiosResponse = await this.axiosInstance.post("", {
+            url: "storageLog/top",
+            method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
+            params: { type, limit },
         });
-        return response.data;
+        return response.data.response;
     }
 
-    //STATISTICS METODA
-    async getArchiveVolume(token: string, period: "daily" | "monthly" | "yearly"): Promise<ArchiveVolumeDTO[]>{
-       const response = await this.client.get<ArchiveVolumeDTO[]>("/storageLog/volume", {
-            params: {period},
-            headers: {Authorization: `Bearer ${token}`}
-       });
-
-       return response.data;
+    async getArchiveVolume(token: string, period: "daily" | "monthly" | "yearly"): Promise<ArchiveVolumeDTO[]> {
+        const response: AxiosResponse = await this.axiosInstance.post("", {
+            url: "storageLog/volume",
+            method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
+            params: { period },
+        });
+        return response.data.response;
     }
 
-    //STATISTICS METODA
     async getLargestArchive(token: string): Promise<LargestArchiveDTO> {
-        const response = await this.client.get(`/storageLog/largest`, {
-            headers: { Authorization: `Bearer ${token}` }
+        const response: AxiosResponse = await this.axiosInstance.post("", {
+            url: "storageLog/largest",
+            method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
         });
-        return response.data;
+        return response.data.response;
     }
 }

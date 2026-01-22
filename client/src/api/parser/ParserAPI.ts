@@ -15,7 +15,7 @@ export class ParserAPI implements IParserAPI {
     }
 
     async getParserEventById(id: number, token: string): Promise<ParserEventDTO> {
-        const response: AxiosResponse<any> = await this.axiosInstance.post("", {
+        const response: AxiosResponse = await this.axiosInstance.post("", {
             url: `parserEvents/${id}`,
             method: "GET",
             headers: {

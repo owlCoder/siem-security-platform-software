@@ -1,56 +1,71 @@
-import axios, { AxiosInstance } from "axios";
+import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { IAlertAPI } from "./IAlertAPI";
 import { AlertDTO } from "../../models/alerts/AlertDTO";
 import { AlertQueryDTO, PaginatedAlertsDTO } from "../../models/alerts/AlertQueryDTO";
 
 export class AlertAPI implements IAlertAPI {
-  private readonly client: AxiosInstance;
-  private readonly basePath = "/alerts";
+  private readonly axiosInstance: AxiosInstance;
+  private readonly basePath = "alerts";
 
   constructor() {
-    this.client = axios.create({
-      baseURL: import.meta.env.VITE_GATEWAY_URL,
+    this.axiosInstance = axios.create({
+      baseURL: import.meta.env.VITE_FIREWALL_URL,
       headers: { "Content-Type": "application/json" },
-      timeout: 30000, // sprečava beskonačne requeste
+      timeout: 30000,
     });
   }
 
   async getAllAlerts(token: string): Promise<AlertDTO[]> {
-    const response = await this.client.get<AlertDTO[]>(this.basePath, {
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: `${this.basePath}`,
+      method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });
-    return response.data;
+
+    return response.data.response;
   }
 
   async getAlertById(id: number, token: string): Promise<AlertDTO> {
-    const response = await this.client.get<AlertDTO>(`${this.basePath}/${id}`, {
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: `${this.basePath}/${id}`,
+      method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });
-    return response.data;
+
+    return response.data.response;
   }
 
   async searchAlerts(query: AlertQueryDTO, token: string): Promise<PaginatedAlertsDTO> {
-    const response = await this.client.get<PaginatedAlertsDTO>(`${this.basePath}/search`, {
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: `${this.basePath}/search`,
+      method: "GET",
       headers: { Authorization: `Bearer ${token}` },
       params: this.sanitizeQuery(query),
     });
-    return response.data;
+
+    return response.data.response;
   }
 
   async resolveAlert(id: number, resolvedBy: string, status: string, token: string): Promise<AlertDTO> {
-    const response = await this.client.put<AlertDTO>(`${this.basePath}/${id}/resolve`,
-      { resolvedBy, status },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    return response.data;
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: `${this.basePath}/${id}/resolve`,
+      method: "PUT",
+      headers: { Authorization: `Bearer ${token}` },
+      data: { resolvedBy, status },
+    });
+
+    return response.data.response;
   }
 
   async updateAlertStatus(id: number, status: string, token: string): Promise<AlertDTO> {
-    const response = await this.client.put<AlertDTO>(`${this.basePath}/${id}/status`,
-      { status },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    return response.data;
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: `${this.basePath}/${id}/status`,
+      method: "PUT",
+      headers: { Authorization: `Bearer ${token}` },
+      data: { status },
+    });
+
+    return response.data.response;
   }
 
   /** Uklanja undefined, null ili prazne vrednosti iz query parametara */
