@@ -19,8 +19,6 @@ export class FirewallRuleRepositoryService implements IFirewallRuleRepository {
     async getByIpAndPort(ipAddress: string, port: number): Promise<FirewallRuleDTO> {
         const rule = await this.firewallRuleRepository.findOne({ where: { ipAddress, port } });
         if (!rule) {
-            await this.logger.log(`FirewallRule not found for ${ipAddress}:${port}`);
-
             const emptyRule: FirewallRuleDTO = {
                 id: -1,
             };

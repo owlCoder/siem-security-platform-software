@@ -37,7 +37,6 @@ export class FirewallProxyController {
 
             const sourceAllowed = await this.firewallService.checkAndLogAccess(sourceIp, sourcePort);
             if (!sourceAllowed) {
-                await this.logger.log(`Blocked request from ${sourceIp}:${sourcePort}`);
                 res.status(403).json({ message: "Access blocked by firewall (source)" });
                 return;
             }
