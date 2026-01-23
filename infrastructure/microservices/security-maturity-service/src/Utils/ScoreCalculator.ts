@@ -1,12 +1,27 @@
 import { ScoreInput } from "../Domain/types/ScoreInput";
 
+function limitValue(value: number, min = 0, max = 1): number {
+  return Math.min(Math.max(value, min), max);
+}
+
 export function calculateScore(input: ScoreInput): number {
-  let score = 100;
+  const { mttdMinutes, mttrMinutes, falseAlarmRate, totalAlerts } = input;
 
-  if (input.mttdMinutes && input.mttdMinutes > 60) score -= 20;
-  if (input.mttrMinutes && input.mttrMinutes > 120) score -= 20;
-  if (input.falseAlarmRate > 0.3) score -= 20;
-  if (input.totalAlerts > 100) score -= 20;
+  const normalizedMTTD =
+    mttdMinutes === null ? 0.5 : limitValue(1 - mttdMinutes / 120);
 
-  return Math.max(0, Math.min(100, score));
+  const normalizedMTTR =
+    mttrMinutes === null ? 0.5 : limitValue(1 - mttrMinutes / 240);
+
+  const normalizedFalseAlarm = limitValue(1 - falseAlarmRate);
+
+  const noramlizedVolume = limitValue(Math.log10(totalAlerts + 1) / 2);
+
+  const score =
+    normalizedMTTD * 30 +
+    normalizedMTTR * 30 +
+    normalizedFalseAlarm * 25 +
+    noramlizedVolume * 15;
+
+  return Math.round(score);
 }
