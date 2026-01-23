@@ -28,7 +28,7 @@ app.use(cors({
   methods: corsMethods,
 }));
 
-const BACKUP_INTERVAL = 60 * 60 * 1000;
+const BACKUP_INTERVAL = 6 * 60 * 60 * 1000; // svakih sest sati
 
 // inicijalizacija baze
 void (async () => {

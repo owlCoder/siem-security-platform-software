@@ -18,6 +18,8 @@ export class BackupValidationController{
         this.router.get("/backup/logs", this.getAllLogs.bind(this));
         this.router.get("/backup/last", this.getLastValidation.bind(this));
         this.router.get("/backup/summary", this.getSummary.bind(this));
+        this.router.get("/backup/health", this.getHealth.bind(this));
+        this.router.get("/backup/stats", this.getStats.bind(this));
     }
 
     private async runValidation(req: Request, res: Response): Promise<void> {
@@ -50,6 +52,25 @@ export class BackupValidationController{
     private async getSummary(req: Request, res: Response): Promise<void> {
         try {
             const response = await this.backupValidationQueryService.getSummary();
+            res.status(200).json(response);
+        } catch(err) {
+            res.status(500).json({ message: (err as Error).message });
+        }
+    }
+
+    private async getHealth(req: Request, res: Response): Promise<void> {
+        try {
+            const response = await this.backupValidationQueryService.getHealth();
+            res.status(200).json(response);
+        } catch(err) {
+            res.status(500).json({ message: (err as Error).message });
+        }
+    }
+
+    private async getStats(req: Request, res: Response): Promise<void> {
+        try {
+            const range = Number(req.query.range ?? 7);
+            const response = await this.backupValidationQueryService.getStats(range);
             res.status(200).json(response);
         } catch(err) {
             res.status(500).json({ message: (err as Error).message });
