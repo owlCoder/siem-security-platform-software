@@ -1,10 +1,10 @@
 import { Repository } from "typeorm";
-
 import { IKpiRepositoryService } from "../Domain/services/IKpiRepositoryService";
 import { KpiSnapshot } from "../Domain/models/KpiSnapshot";
 import { KpiSnapshotCategoryCount } from "../Domain/models/KpiSnapshotCategoryCount";
 import { Db } from "../Database/DBConnectionPool";
-import { normalizeAlertCategory } from "../Infrastructure/helpers/normalizeAlertCategory";
+import { AlertCategory } from "../Domain/enums/AlertCategory";
+
 
 export class KpiRepositoryService implements IKpiRepositoryService {
   private readonly snapshotRepo: Repository<KpiSnapshot>;
@@ -65,7 +65,7 @@ export class KpiRepositoryService implements IKpiRepositoryService {
 
   public async replaceCategoryCounts(
     snapshotId: number,
-    categoryCounts: Record<string, number>
+    categoryCounts: Partial<Record<AlertCategory, number>>
   ): Promise<boolean> {
     try {
       await this.categoryRepo.delete({ snapshotId });
@@ -74,11 +74,11 @@ export class KpiRepositoryService implements IKpiRepositoryService {
       return false;
     }
 
-    const rows = Object.entries(categoryCounts).map(([rawCategory, count]) => {
+    const rows = Object.entries(categoryCounts).map(([category, count]) => {
       const row = new KpiSnapshotCategoryCount();
       row.snapshotId = snapshotId;
-      row.category = normalizeAlertCategory(rawCategory);
-      row.count = count;
+      row.category = category as AlertCategory;
+      row.count = count as number;
       return row;
     });
 

@@ -7,6 +7,10 @@ import { MaturityLevel } from "../Domain/enums/MaturityLevel";
 
 export class SecurityMaturityService implements ISecurityMaturityService {
   async calculateCurrentMaturity(input: ScoreInput): Promise<SMScore> {
+
+    //treba paziti mttd i mttr mogu biti null
+    //ukoliko nema korelacija u zadatom periodu
+    //skontati kako to utice na score
     const score = calculateScore({//ScoreInput
       mttdMinutes: 45,
       mttrMinutes: 90,

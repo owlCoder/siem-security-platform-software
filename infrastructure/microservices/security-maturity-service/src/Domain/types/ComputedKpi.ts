@@ -1,3 +1,4 @@
+import { AlertCategory } from "../enums/AlertCategory";
 import { MaturityLevel } from "../enums/MaturityLevel";
 
 export type ComputedKpi = {
@@ -16,5 +17,5 @@ export type ComputedKpi = {
   scoreValue: number;
   maturityLevel: MaturityLevel;
 
-  categoryCounts: Record<string, number>;
+  categoryCounts: Partial<Record<AlertCategory, number>>;
 };
