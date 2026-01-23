@@ -86,7 +86,7 @@ export default function DropDownMenu({ OnSortTypeChange,sortName1,sortName2,sort
                                 </svg>
                             </span>
                         </li>
-
+                        
                         <li
                         onClick={() => sortChange(sortName2, 3)}
                             className="flex justify-between items-center h-[40px] px-[8px]! py-[4px]! text-white cursor-pointer border-b border-[#5a5a5a] hover:bg-[#9ca3af]!">
@@ -119,39 +119,42 @@ export default function DropDownMenu({ OnSortTypeChange,sortName1,sortName2,sort
                                 </svg>
                             </span>
                         </li>
-
-                        <li
-                        onClick={() => sortChange(sortName3, 5)}
-                            className="flex justify-between items-center h-[40px] px-[8px]! py-[4px]! text-white cursor-pointer border-b border-[#5a5a5a] hover:bg-[#9ca3af]!">
-                            <span>{sortName3}</span>
-                            <span><svg
-                                width="14"
-                                height="14"
-                                viewBox="0 0 16 16"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="#fff"
-                            >
-                                <path d="M6 8L2 8L2 6L8 0L14 6L14 8L10 8L10 16L6 16L6 8Z" />
-                            </svg>
-                            </span>
-                        </li>
-
-                        <li
-                        onClick={() => sortChange(sortName3, 6)}
-                            className="flex justify-between items-center h-[40px] px-[8px]! py-[4px]! text-white cursor-pointer border-b border-[#5a5a5a] hover:bg-[#9ca3af]!">
-                            <span >{sortName3}</span>
-                            <span>
-                                <svg
+                        {sortName3 && (
+                            <>
+                            <li
+                            onClick={() => sortChange(sortName3, 5)}
+                                className="flex justify-between items-center h-[40px] px-[8px]! py-[4px]! text-white cursor-pointer border-b border-[#5a5a5a] hover:bg-[#9ca3af]!">
+                                <span>{sortName3}</span>
+                                <span><svg
                                     width="14"
                                     height="14"
                                     viewBox="0 0 16 16"
                                     xmlns="http://www.w3.org/2000/svg"
                                     fill="#fff"
                                 >
-                                    <path d="M10 8L14 8V10L8 16L2 10V8H6V0L10 4.76995e-08V8Z" />
+                                    <path d="M6 8L2 8L2 6L8 0L14 6L14 8L10 8L10 16L6 16L6 8Z" />
                                 </svg>
-                            </span>
-                        </li>
+                                </span>
+                            </li>
+
+                            <li
+                            onClick={() => sortChange(sortName3, 6)}
+                                className="flex justify-between items-center h-[40px] px-[8px]! py-[4px]! text-white cursor-pointer border-b border-[#5a5a5a] hover:bg-[#9ca3af]!">
+                                <span >{sortName3}</span>
+                                <span>
+                                    <svg
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 16 16"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="#fff"
+                                    >
+                                        <path d="M10 8L14 8V10L8 16L2 10V8H6V0L10 4.76995e-08V8Z" />
+                                    </svg>
+                                </span>
+                            </li>
+                            </>
+                        )}
                     </ul>
                 </div>
             )}

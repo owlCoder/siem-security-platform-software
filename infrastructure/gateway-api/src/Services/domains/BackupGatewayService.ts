@@ -4,7 +4,6 @@ import { serviceConfig } from "../../Domain/constants/ServiceConfig";
 import { defaultAxiosClient } from "../../Domain/constants/AxiosClient";
 import { BackupValidationLogDTO } from "../../Domain/DTOs/BackupValidationLogDTO";
 import { BackupValidationResultDTO } from "../../Domain/DTOs/BackupValidationResultDTO";
-import { response } from "express";
 import { BackupHealthDTO } from "../../Domain/DTOs/BackupHealthDTO";
 import { BackupStatsDTO } from "../../Domain/DTOs/BackupStatsDTO";
 

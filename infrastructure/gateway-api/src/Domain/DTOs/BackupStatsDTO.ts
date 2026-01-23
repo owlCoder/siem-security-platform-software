@@ -1,5 +1,5 @@
 export interface BackupStatsDTO {
     date: string;
-    succes: number;
+    success: number;
     failed: number;
 }

@@ -3,9 +3,20 @@ import { BackupValidationResultDTO } from "../../models/backup/BackupValidationR
 import { BackupProps } from "../../types/props/backup/BackupProps";
 import BackupStats from "../backup/BackupStats";
 import { emptyBackupStats } from "../../constants/backupEmptyStats";
+import BackupChart from "../backup/BackupChart";
+import BackupLogsToolbar from "../backup/BackupLogsToolbar";
+import BackupLogsTable from "../tables/backup/BackupLogsTable";
+import { BackupValidationLogDTO } from "../../models/backup/BackupValidationLogDTO";
 
 export default function Backup({ backupApi}: BackupProps) {
     const [stats, setStats] = useState<BackupValidationResultDTO | null>(null);
+
+    const [allLogs, setAllLogs] = useState<BackupValidationLogDTO[]>([]);
+    const [logs, setLogs] = useState<BackupValidationLogDTO[]>([]);
+
+    const [search, setSearch] = useState("");
+    const [status, setStatus] = useState("");
+
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -13,8 +24,13 @@ export default function Backup({ backupApi}: BackupProps) {
         const fetchData = async () => {
             try {
                 setIsLoading(true);
+
                 const summary = await backupApi.getSummary();
+                const logsResponse = await backupApi.getAllLogs();
+
                 setStats(summary);
+                setAllLogs(logsResponse ?? []);
+                setLogs(logsResponse ?? []);
             } catch (err) {
                 console.error("Failed to load backup summary:", err);
                 setError("Failed to load backup statistics");
@@ -24,6 +40,26 @@ export default function Backup({ backupApi}: BackupProps) {
         };
         fetchData();
     }, []);
+
+    useEffect(() => {
+        let result = allLogs;
+
+        if (status) {
+            result = result.filter(l => l.status === status);
+        }
+
+        if (search) {
+            result = result.filter(l => l.errorMessage?.toLowerCase().includes(search.toLowerCase()));
+        }
+
+        setLogs(result);
+    }, [search, status, allLogs]);
+
+    const handleReset = () => {
+        setSearch("");
+        setStatus("");
+        setLogs(allLogs);
+    };
 
     return(
         <div className="border-2 border-[#282A28] bg-transparent rounded-[10px]!">
@@ -46,8 +82,48 @@ export default function Backup({ backupApi}: BackupProps) {
                 </div>
             )}
 
-            <BackupStats stats={stats ?? emptyBackupStats}/>
-            
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+                <div className="xl:col-span-2 flex flex-col rounded-lg border-2 border-[#282A28] bg-[#1f2123] p-6">
+                    <BackupStats stats={stats ?? emptyBackupStats}/>
+                </div>
+                
+                <div className="flex flex-col min-h-[300px] rounded-lg border-2 border-[#282A28] bg-[#1f2123] p-3">
+                    <BackupChart data={{
+                        success: stats?.successRuns ?? 0,
+                        failed: stats?.failedRuns ?? 0
+                    }}/>
+                </div>
+
+                <div className="flex flex-col min-h-[300px] rounded-lg border-2 border-[#282A28] bg-[#1f2123] p-3">
+                    <BackupLogsToolbar
+                        onSort={(sortType: number) => {
+                            let sortedLogs = [...logs];
+                            switch(sortType) {
+                                case 1:
+                                    sortedLogs.sort((a,b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+                                    break;
+                                case 2:
+                                    sortedLogs.sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+                                    break;
+                                case 3:
+                                    sortedLogs.sort((a,b) => a.status.localeCompare(b.status));
+                                    break;
+                                case 4:
+                                    sortedLogs.sort((a,b) => b.status.localeCompare(a.status));
+                                    break;
+                                default:
+                                    break;
+                            }
+                            setLogs(sortedLogs);
+                        }}
+                        onReset={handleReset}
+                        />
+                    
+                    <div className="mt-3">
+                        <BackupLogsTable logs={logs}/>
+                    </div>
+                </div>
+            </div>
         </div>
     )
 }

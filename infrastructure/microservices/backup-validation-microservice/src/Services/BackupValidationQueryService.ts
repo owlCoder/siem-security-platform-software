@@ -99,10 +99,10 @@ export class BackupValidationQueryService implements IBackupValidationQueryServi
             const date = log.createdAt.toISOString().split("T")[0];
 
             if (!grouped[date]) {
-                grouped[date] = { date, succes: 0, failed: 0};
+                grouped[date] = { date, success: 0, failed: 0};
             }
 
-            log.status === BackupValidationStatus.SUCCESS ? grouped[date].succes++ : grouped[date].failed++;
+            log.status === BackupValidationStatus.SUCCESS ? grouped[date].success++ : grouped[date].failed++;
         }
 
         return Object.values(grouped);
