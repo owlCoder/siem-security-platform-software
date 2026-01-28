@@ -1,4 +1,5 @@
 export interface SecurityMaturityTrendDTO {
-  bucketStart: Date;
-  value: number | null;
+  bucketStart: string;
+  value: number;
+  sampleCount: number;
 }
