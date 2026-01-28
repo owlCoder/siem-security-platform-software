@@ -7,8 +7,8 @@ import { UserRiskAnalysisDTO } from "../../models/insider-threat/UserRiskAnalysi
 
 export class InsiderThreatAPI implements IInsiderThreatAPI {
   private readonly axiosInstance: AxiosInstance;
-  private readonly basePath = "insider-threats";
-  private readonly riskPath = "siem/user-risk";
+  private readonly basePath = "api/v1/threats"; 
+  private readonly riskPath = "api/v1/user-risk-profiles"; 
 
   constructor() {
     this.axiosInstance = axios.create({
@@ -85,7 +85,7 @@ export class InsiderThreatAPI implements IInsiderThreatAPI {
 
   async getAllUserRiskProfiles(token: string): Promise<UserRiskProfileDTO[]> {
     const response: AxiosResponse = await this.axiosInstance.post("", {
-      url: `${this.riskPath}/profiles`,
+      url: this.riskPath, 
       method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });

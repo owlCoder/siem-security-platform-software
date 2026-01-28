@@ -13,9 +13,31 @@ export class ThreatDetectionService implements IThreatDetectionService {
 
   async analyzeEvents(eventIds: number[]): Promise<DetectionResult[]> {
     await this.logger.log(`Analyzing ${eventIds.length} events for insider threats`);
-    
-   
-    return [];
+
+    const results: DetectionResult[] = [];
+
+    // PRIVREMENO: userId hardkodiran (kasnije ide iz JWT-a)
+    const userId = "1";
+
+    const authResults = await this.correlateWithAuthEvents(userId, eventIds);
+    results.push(...authResults);
+
+    const offHours = await detectOffHoursAccess(userId, eventIds);
+    if (offHours) {
+      results.push(offHours);
+    }
+
+    const massRead = await detectMassDataRead(userId, eventIds);
+    if (massRead) {
+      results.push(massRead);
+    }
+
+    const permissionChange = await detectPermissionChange(userId, eventIds);
+    if (permissionChange) {
+      results.push(permissionChange);
+    }
+
+    return results;
   }
 
   async detectMassDataRead(userId: string, eventIds: number[]): Promise<DetectionResult | null> {
@@ -57,13 +79,6 @@ export class ThreatDetectionService implements IThreatDetectionService {
 
   async correlateWithAuthEvents(userId: string, eventIds: number[]): Promise<DetectionResult[]> {
     await this.logger.log(`Correlating events with auth data for user ${userId}`);
-    
-    const results = await correlateAuthEvents(userId, eventIds);
-    
-    if (results.length > 0) {
-      await this.logger.log(`Found ${results.length} correlations with auth events for user ${userId}`);
-    }
-    
-    return results;
+    return correlateAuthEvents(userId, eventIds);
   }
 }

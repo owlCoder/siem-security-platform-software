@@ -12,22 +12,18 @@ import RiskScore from '../components/views/RiskScore';
 import Firewall from '../components/views/Firewall';
 import Backup from '../components/views/Backup';
 
-interface ExtendedMainLayoutProps extends MainLayoutProps {
-  //insiderThreatAPI: InsiderThreatAPI;
-}
-
 export default function MainLayout({
   alertsAPI,
   parserAPI,
   queryAPI,
   storageAPI,
   simulatorAPI,
-  insiderThreatAPI,
+  insiderThreatApi, 
   desktopNotification,
   riskScoreApi,
   firewallApi,
   backupApi
-}: ExtendedMainLayoutProps) {
+}: MainLayoutProps) {  
   const [sideMenuPage, setSideMenuPage] = useState<number>(0);
 
   return (
@@ -55,7 +51,7 @@ export default function MainLayout({
           <Simulator simulatorApi={simulatorAPI} />
         )}
         {sideMenuPage === 6 && (
-          <InsiderThreats insiderThreatApi={insiderThreatAPI} />
+          <InsiderThreats insiderThreatApi={insiderThreatApi} />
         )}
         {sideMenuPage === 7 && (
           <RiskScore riskScoreApi={riskScoreApi} queryApi={queryAPI} />

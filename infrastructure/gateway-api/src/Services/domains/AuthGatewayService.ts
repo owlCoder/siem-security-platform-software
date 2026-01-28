@@ -7,10 +7,12 @@ import { OTPVerificationDTO } from "../../Domain/DTOs/OtpVerificationDTO";
 import { AuthJwtResponse } from "../../Domain/types/AuthJwtResponse";
 import { IAuthGatewayService } from "../../Domain/services/IAuthGatewayService";
 import { OTPResendDTO } from "../../Domain/DTOs/OTPResendDTO";
+import { jwtDecode } from "jwt-decode";
 
 export class AuthGatewayService implements IAuthGatewayService {
   private readonly client: AxiosInstance;
   private readonly siemAuthClient: AxiosInstance;
+  private readonly insiderThreatClient: AxiosInstance;
 
   constructor() {
     this.client = axios.create({
@@ -20,6 +22,11 @@ export class AuthGatewayService implements IAuthGatewayService {
 
     this.siemAuthClient = axios.create({
       baseURL: serviceConfig.siemAuth,
+      ...defaultAxiosClient
+    });
+
+    this.insiderThreatClient = axios.create({
+      baseURL: serviceConfig.insiderThreat,
       ...defaultAxiosClient
     });
   }
@@ -43,6 +50,11 @@ export class AuthGatewayService implements IAuthGatewayService {
   async verifyOtp(data: OTPVerificationDTO): Promise<AuthJwtResponse> {
     try {
       const response = await this.client.post<AuthJwtResponse>("/verify-otp", data);
+      
+      if (response.data.success && response.data["siem-token"]) {
+        await this.registerUserInInsiderThreat(response.data["siem-token"]);
+      }
+      
       return response.data;
     } catch (error: any) {
       const message =
@@ -96,6 +108,28 @@ export class AuthGatewayService implements IAuthGatewayService {
       };
     } catch (error: any) {
       return { valid: false, error: error };
+    }
+  }
+
+
+  private async registerUserInInsiderThreat(token: string): Promise<void> {
+    try {
+      const decoded: any = jwtDecode(token);
+      
+      if (!decoded || !decoded.id || !decoded.username || decoded.role === undefined) {
+        console.log("[AuthGateway] Invalid JWT structure, skipping Insider Threat registration");
+        return;
+      }
+
+      await this.insiderThreatClient.post("/internal/register-user", {
+        userId: decoded.id,
+        username: decoded.username,
+        role: decoded.role
+      });
+
+      console.log(`[AuthGateway]  User ${decoded.username} registered in Insider Threat service`);
+    } catch (error: any) {
+      console.error(`[AuthGateway]  Failed to register user in Insider Threat: ${error.message}`);
     }
   }
 }

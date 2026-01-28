@@ -7,15 +7,17 @@ import { DesktopNotificationService } from "../../../services/DesktopNotificatio
 import { IRiskScoreAPI } from "../../../api/risk-score/IRiskScoreAPI";
 import { IFirewallAPI } from "../../../api/firewall/IFirewallAPI";
 import { IBackupValidationAPI } from "../../../api/backup/IBackupValdationAPI";
+import { IInsiderThreatAPI } from "../../../api/insider-threat/IInsiderThreatAPI";
 
 export interface MainLayoutProps {
-    alertsAPI: IAlertAPI;
-    parserAPI: IParserAPI;
-    queryAPI: IQueryAPI;
-    storageAPI: IStorageAPI;
-    simulatorAPI: ISimulatorAPI;
-    desktopNotification: DesktopNotificationService;
-    riskScoreApi: IRiskScoreAPI;
-    firewallApi: IFirewallAPI;
-    backupApi: IBackupValidationAPI;
+  alertsAPI: IAlertAPI;
+  parserAPI: IParserAPI;
+  queryAPI: IQueryAPI;
+  storageAPI: IStorageAPI;
+  simulatorAPI: ISimulatorAPI;
+  desktopNotification: DesktopNotificationService;
+  riskScoreApi: IRiskScoreAPI;
+  firewallApi: IFirewallAPI;
+  backupApi: IBackupValidationAPI;
+  insiderThreatApi: IInsiderThreatAPI; 
 }
