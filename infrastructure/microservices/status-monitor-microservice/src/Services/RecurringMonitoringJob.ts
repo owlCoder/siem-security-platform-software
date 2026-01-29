@@ -1,9 +1,9 @@
-import { IMonitoringService } from "../Domain/services/IMonitoringService";
+import { IMonitoringOrchestrator } from "../Domain/services/IMonitoringOrchestrator";
 
 export class RecurringMonitoringJob {
-    constructor(private monitoringService: IMonitoringService) {}
+    constructor(private orchestrator: IMonitoringOrchestrator) {}
 
     async run(): Promise<void> {
-        await this.monitoringService.runChecks();
+        await this.orchestrator.run();
     }
 }
