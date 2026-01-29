@@ -3,6 +3,7 @@ import { Recommendation } from "../../Domain/types/Recommendation";
 import { RecommendationPayloadDto } from "../../Domain/types/RecommendationPayloadDto";
 import { mapRecommendationPayloadDto } from "../mappers/recommendationPayloadMapper";
 import { createAxiosClient } from "../helpers/createAxiosClient";
+import { RecommendationContextDto } from "../../Domain/types/recommendationContext/RecommendationContext";
 
 export class AnalysisEngineClient {
   private readonly client: AxiosInstance;
@@ -10,10 +11,10 @@ export class AnalysisEngineClient {
   constructor(baseUrl: string) {
     this.client = createAxiosClient(baseUrl);
   }
-  public async fetchRecommendations(): Promise<Recommendation[]> {
+  public async fetchRecommendations(context: RecommendationContextDto): Promise<Recommendation[]> {
     try {
       const response: AxiosResponse<RecommendationPayloadDto[]> =
-        await this.client.get("/recommendations");
+        await this.client.post("/recommendations", context);
 
       if (!Array.isArray(response.data)) {
         console.error("[AnalysisEngineClient] Invalid response shape (not array).");

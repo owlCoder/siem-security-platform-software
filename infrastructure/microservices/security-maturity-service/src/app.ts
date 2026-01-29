@@ -24,6 +24,9 @@ import { SecurityMaturityController } from "./WebAPI/controllers/SecurityMaturit
 import { CalculateHourlyKpiSnapshotJob } from "./Application/jobs/CalculateHourlyKpiSnapshotJob";
 import { HourlyAlignedScheduler } from "./Infrastructure/schedulers/HourlyAlignedScheduler";
 import { AnalysisEngineClient } from "./Infrastructure/clients/AnalysisEngineClient";
+import { RecommendationContextService } from "./Services/RecommendationContextService";
+import { IRecommendationContextService } from "./Domain/services/IRecommendaitonContextService";
+import { RecommendationContextQuery } from "./Application/queries/RecommendationContextQuery";
 
 dotenv.config();
 
@@ -80,10 +83,7 @@ export async function createApp(): Promise<Express> {
 
     const analysisEngineClient = new AnalysisEngineClient(process.env.ANALYSIS_ENGINE_API ?? "");
 
-    const recommendationService: IRecommendationService = new RecommendationService(
-      recommendationRepositoryService,
-      analysisEngineClient
-    );
+
 
     // 4) Scheduler start
     try {
@@ -100,6 +100,22 @@ export async function createApp(): Promise<Express> {
       kpiRepositoryService,
       kpiAggregationService
     );
+
+    const recommendationContextQuery = new RecommendationContextQuery(
+      kpiRepositoryService,
+      kpiAggregationService
+    );
+
+    const recommendationContextService: IRecommendationContextService =
+      new RecommendationContextService(recommendationContextQuery);
+
+    const recommendationService: IRecommendationService = new RecommendationService(
+      recommendationRepositoryService,
+      analysisEngineClient,
+      recommendationContextService
+    );
+
+
 
     const securityMaturityController = new SecurityMaturityController(
       kpiSnapshotQuery,

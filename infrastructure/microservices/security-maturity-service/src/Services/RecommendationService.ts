@@ -3,14 +3,22 @@ import { IRecommendationRepositoryService } from "../Domain/services/IRecommenda
 import { Recommendation } from "../Domain/types/Recommendation";
 import { RecommendationSnapshot } from "../Domain/types/RecommendationSnapshot";
 import { AnalysisEngineClient } from "../Infrastructure/clients/AnalysisEngineClient";
+import { IRecommendationContextService } from "../Domain/services/IRecommendaitonContextService";
 
 export class RecommendationService implements IRecommendationService {
   private static readonly CACHE_VALIDITY_MS: number = 24 * 60 * 60 * 1000;
-
+  private readonly recommendationRepositoryService: IRecommendationRepositoryService;
+    private readonly analysisEngineClient: AnalysisEngineClient;
+    private readonly recommendationContextService: IRecommendationContextService;
   constructor(
-    private readonly recommendationRepositoryService: IRecommendationRepositoryService,
-    private readonly analysisEngineClient: AnalysisEngineClient
-  ) {}
+     recommendationRepositoryService: IRecommendationRepositoryService,
+     analysisEngineClient: AnalysisEngineClient,
+      recommendationContextService: IRecommendationContextService
+  ) {
+    this.recommendationRepositoryService = recommendationRepositoryService;
+    this.analysisEngineClient = analysisEngineClient;
+    this.recommendationContextService = recommendationContextService;
+  }
 
   public async getRecommendations(): Promise<Recommendation[]> {
     try {
@@ -47,7 +55,14 @@ export class RecommendationService implements IRecommendationService {
 
   private async regenerateAndPersist(): Promise<Recommendation[]> {
     try {
-      const recommendations: Recommendation[] = await this.analysisEngineClient.fetchRecommendations();
+
+      const{fromUtc, toUtc} = await this.resolveRecommendationWindowUtc();
+      const context = await this.recommendationContextService.buildContext(fromUtc, toUtc);
+      if(context.series.length ===0){
+        console.error("[RecommendationService] Recommendation context is empty, cannot generate recommendations.");
+        return [];
+      }
+      const recommendations: Recommendation[] = await this.analysisEngineClient.fetchRecommendations(context);
 
       if (!Array.isArray(recommendations) || recommendations.length === 0) {
         console.error("[RecommendationService] Analysis-engine returned no recommendations.");
@@ -81,5 +96,20 @@ export class RecommendationService implements IRecommendationService {
     const nowMs = Date.now();
     const generatedMs = snapshot.generatedAtUtc.getTime();
     return nowMs - generatedMs >= RecommendationService.CACHE_VALIDITY_MS;
+  }
+  private resolveRecommendationWindowUtc(): { fromUtc: Date; toUtc: Date } {
+    const now = new Date();
+
+    const toUtc = new Date(Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate(),
+      now.getUTCHours(),
+      0, 0, 0
+    ));
+
+    const fromUtc = new Date(toUtc.getTime() - 24 * 60 * 60 * 1000);
+
+    return { fromUtc, toUtc };
   }
 }

@@ -11,8 +11,9 @@ import { TrendPointDto } from "../../Domain/types/TrendPointDto";
 import { parseAlertCategory } from "../../Domain/parsers/parseAlertCategory";
 import { mapScoreToLevel } from "../../Utils/MapScoreToLevel";
 import { NOT_FOUND } from "../../Domain/constants/Sentinels";
+import { IKpiSnapshotQuery } from "../contracts/IKpiSnapshotQuery";
 
-export class KpiSnapshotQuery {
+export class KpiSnapshotQuery implements IKpiSnapshotQuery {
   private readonly kpiRepository: IKpiRepositoryService;
   private readonly kpiAggregation: IKpiAggregationService;
 
