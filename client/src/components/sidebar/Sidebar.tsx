@@ -12,6 +12,7 @@ import { TbSquareLetterI } from "react-icons/tb";
 import { TbSquareLetterE } from "react-icons/tb";
 import { TbSquareLetterM } from "react-icons/tb";
 import { SidebarProps } from "../../types/props/dashboard/SiedbarProps";
+import { PiShieldStarFill } from "react-icons/pi";
 
 
 export default function Sidebar({ setSideMenuPage }: SidebarProps) {
@@ -179,6 +180,21 @@ export default function Sidebar({ setSideMenuPage }: SidebarProps) {
                             <LuDatabaseBackup size={22}/>
                             Backup
                             <MdKeyboardArrowRight size={20}/>
+                    </button>
+
+                    <button
+                        className={itemClass(10)}
+                        style={{marginLeft: "20px", borderRadius: "0.75rem"}}
+                        onClick={() => {
+                            setSideMenuPage(10);
+                            setSelectedButton(10);
+                        }}
+                        onMouseEnter={() => setHover(10)}
+                        onMouseLeave={() => setHover(null)}
+                        >
+                            <PiShieldStarFill size={22} />
+                            Security Maturity
+                            <MdKeyboardArrowRight size={20} />
                     </button>
                 </div>
             )}

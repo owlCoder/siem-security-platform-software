@@ -11,6 +11,7 @@ import { MainLayoutProps } from '../types/props/pages/MainLayoutProps';
 import RiskScore from '../components/views/RiskScore';
 import Firewall from '../components/views/Firewall';
 import Backup from '../components/views/Backup';
+import SecurityMaturity from '../components/views/SecurityMaturity';
 
 export default function MainLayout({
   alertsAPI,
@@ -22,7 +23,8 @@ export default function MainLayout({
   desktopNotification,
   riskScoreApi,
   firewallApi,
-  backupApi
+  backupApi,
+  securityMaturityApi
 }: MainLayoutProps) {  
   const [sideMenuPage, setSideMenuPage] = useState<number>(0);
 
@@ -61,6 +63,9 @@ export default function MainLayout({
         )}
         {sideMenuPage === 9 && (
           <Backup backupApi={backupApi}/>
+        )}
+        {sideMenuPage === 10 && (
+          <SecurityMaturity securityMaturityApi={securityMaturityApi}/>
         )}
       </div>
     </div>
