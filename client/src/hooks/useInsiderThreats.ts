@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { IInsiderThreatAPI } from "../api/insider-threat/IInsiderThreatAPI";
 import { InsiderThreatDTO } from "../models/insider-threat/InsiderThreatDTO";
 import { UserRiskProfileDTO } from "../models/insider-threat/UserRiskProfileDTO";
@@ -6,7 +6,13 @@ import { ThreatQueryDTO } from "../models/insider-threat/ThreatQueryDTO";
 import { useAuth } from "./useAuthHook";
 
 export const useInsiderThreats = (insiderThreatAPI: IInsiderThreatAPI) => {
-  const { token } = useAuth(); 
+  const { token: authToken } = useAuth(); 
+    const getToken = useCallback(() => {
+    const token = authToken || localStorage.getItem("token");
+    console.log("[useInsiderThreats]  Token source:", authToken ? "useAuth" : "localStorage");
+    console.log("[useInsiderThreats]  Token value:", token ? token.substring(0, 20) + "..." : "MISSING");
+    return token;
+  }, [authToken]);
   
   const [threats, setThreats] = useState<InsiderThreatDTO[]>([]);
   const [userRiskProfiles, setUserRiskProfiles] = useState<UserRiskProfileDTO[]>([]);
@@ -20,16 +26,16 @@ export const useInsiderThreats = (insiderThreatAPI: IInsiderThreatAPI) => {
     totalPages: number;
   } | null>(null);
 
-  // Initial load
-  useEffect(() => {
-    if (token) {
-      loadThreats();
-      loadUserRiskProfiles();
+  const loadThreats = useCallback(async () => {
+    const token = getToken();
+    
+    if (!token) {
+      console.error("[useInsiderThreats]  No token available - cannot load threats");
+      setError("Authentication required");
+      return;
     }
-  }, [token]);
-
-  const loadThreats = async () => {
-    if (!token) return;
+    
+    console.log("[useInsiderThreats]  Loading threats...");
     setIsLoading(true);
     setError(null);
     try {
@@ -41,20 +47,44 @@ export const useInsiderThreats = (insiderThreatAPI: IInsiderThreatAPI) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [getToken, insiderThreatAPI]);
 
-  const loadUserRiskProfiles = async () => {
-    if (!token) return;
+  const loadUserRiskProfiles = useCallback(async () => {
+    const token = getToken();
+    
+    if (!token) {
+      console.error("[useInsiderThreats]  No token available - cannot load user risk profiles");
+      return;
+    }
+    
+    console.log("[useInsiderThreats]  Loading user risk profiles...");
+    
     try {
       const data = await insiderThreatAPI.getAllUserRiskProfiles(token);
       setUserRiskProfiles(data);
-    } catch (err) {
-      console.error("Error loading user risk profiles:", err);
+    } catch (err: any) {
+      console.error("[useInsiderThreats]  Error loading user risk profiles:", err);
     }
-  };
+  }, [getToken, insiderThreatAPI]);
 
-  const searchThreats = async (query: ThreatQueryDTO) => {
-    if (!token) return;
+  useEffect(() => {
+    const token = getToken();
+    
+    if (token) {
+      loadThreats();
+      loadUserRiskProfiles();
+    } else {
+      console.warn("[useInsiderThreats]  No token - skipping initial load");
+    }
+  }, [authToken, loadThreats, loadUserRiskProfiles, getToken]);
+
+  const searchThreats = useCallback(async (query: ThreatQueryDTO) => {
+    const token = getToken();
+    if (!token) {
+      setError("Authentication required");
+      return;
+    }
+    
     setIsLoading(true);
     setError(null);
     try {
@@ -63,16 +93,16 @@ export const useInsiderThreats = (insiderThreatAPI: IInsiderThreatAPI) => {
       setPagination(result.pagination);
     } catch (err) {
       setError("Failed to search threats");
-      console.error("Error searching threats:", err);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [getToken, insiderThreatAPI]);
 
-  const resolveThreat = async (id: number, resolvedBy: string, resolutionNotes?: string) => {
+  const resolveThreat = useCallback(async (id: number, resolvedBy: string, resolutionNotes?: string) => {
+    const token = getToken();
     if (!token) {
       throw new Error("Not authenticated");
-    }
+    }    
     try {
       const updatedThreat = await insiderThreatAPI.resolveThreat(id, resolvedBy, resolutionNotes, token);
       
@@ -81,32 +111,34 @@ export const useInsiderThreats = (insiderThreatAPI: IInsiderThreatAPI) => {
       );
     } catch (err) {
       setError("Failed to resolve threat");
-      console.error("Error resolving threat:", err);
       throw err;
     }
-  };
+  }, [getToken, insiderThreatAPI]);
 
-  const getHighRiskUsers = async (): Promise<UserRiskProfileDTO[]> => {
+  const getHighRiskUsers = useCallback(async (): Promise<UserRiskProfileDTO[]> => {
+    const token = getToken();
     if (!token) return [];
     try {
-      return await insiderThreatAPI.getHighRiskUsers(token);
-    } catch (err) {
-      console.error("Error fetching high-risk users:", err);
+      const result = await insiderThreatAPI.getHighRiskUsers(token);
+      return result;
+    } catch (err: any) {
+      console.error("[useInsiderThreats]  Error fetching high-risk users:", err);
       return [];
     }
-  };
+  }, [getToken, insiderThreatAPI]);
 
-  const getUserRiskAnalysis = async (userId: string) => {
+  const getUserRiskAnalysis = useCallback(async (userId: string) => {
+    const token = getToken();
     if (!token) {
       throw new Error("Not authenticated");
     }
-    try {
+        try {
       return await insiderThreatAPI.getUserRiskAnalysis(userId, token);
     } catch (err) {
       console.error("Error fetching user risk analysis:", err);
       throw err;
     }
-  };
+  }, [getToken, insiderThreatAPI]);
 
   return {
     threats,

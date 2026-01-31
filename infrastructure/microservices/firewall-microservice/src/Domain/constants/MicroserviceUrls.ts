@@ -9,5 +9,6 @@ export const microserviceUrls: Record<string, string> = {
     "simulator": process.env.SIMULATOR_SERVICE_API!,
     "backup": process.env.BACKUP_SERVICE_API!,
     "insider-threats": process.env.INSIDER_THREAT_SERVICE_API!,
+    "siem": process.env.INSIDER_THREAT_SERVICE_API!,
     "riskScore": process.env.RISK_SCORE_API!
 };

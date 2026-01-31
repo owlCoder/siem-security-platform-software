@@ -20,6 +20,7 @@ export const createAuthMiddleware = (gatewayService: IGatewayService) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      console.log("[AuthMiddleware] 401 Token missing (no Authorization header)");
       res.status(401).json({ success: false, message: "Token is missing!" });
       return;
     }
@@ -29,6 +30,7 @@ export const createAuthMiddleware = (gatewayService: IGatewayService) => {
       const result = await gatewayService.validateToken(token);
 
       if (!result.valid) {
+        console.log("[AuthMiddleware] 401 Token validation failed:", result.error);
         res.status(401).json({ success: false, message: result.error });
         return;
       }

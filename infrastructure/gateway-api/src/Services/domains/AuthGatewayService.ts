@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from "axios";
+import jwt from "jsonwebtoken";
 import { LoginUserDTO } from "../../Domain/DTOs/LoginUserDTO";
 import { AuthResponseType } from "../../Domain/types/AuthResponse";
 import { defaultAxiosClient } from "../../Domain/constants/AxiosClient";
@@ -9,19 +10,25 @@ import { IAuthGatewayService } from "../../Domain/services/IAuthGatewayService";
 import { OTPResendDTO } from "../../Domain/DTOs/OTPResendDTO";
 import { jwtDecode } from "jwt-decode";
 
+function roleToNumber(role: string | number | undefined): number {
+  if (typeof role === "number" && Number.isInteger(role)) return role;
+  const s = String(role || "").toLowerCase();
+  if (s === "sysadmin" || s === "sys_admin") return 1;
+  if (s === "admin") return 0;
+  if (s === "analytics_manager") return 2;
+  if (s === "animation_worker") return 3;
+  if (s === "audio_stagist") return 4;
+  if (s === "project_manager") return 5;
+  return 0;
+}
+
 export class AuthGatewayService implements IAuthGatewayService {
   private readonly client: AxiosInstance;
-  private readonly siemAuthClient: AxiosInstance;
   private readonly insiderThreatClient: AxiosInstance;
 
   constructor() {
     this.client = axios.create({
       baseURL: serviceConfig.auth,
-      ...defaultAxiosClient
-    });
-
-    this.siemAuthClient = axios.create({
-      baseURL: serviceConfig.siemAuth,
       ...defaultAxiosClient
     });
 
@@ -89,25 +96,31 @@ export class AuthGatewayService implements IAuthGatewayService {
     isSysAdmin?: boolean;
     error?: string;
   }> {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      console.log("[AuthGateway] validateToken: JWT_SECRET not set");
+      return { valid: false, error: "Server auth configuration error." };
+    }
     try {
-      const response = await this.siemAuthClient.post<{
-        success: boolean;
-        valid: boolean;
-        isSysAdmin: boolean;
-        user: { user_id: number; username: string; role: number };
-      }>("/auth/validate", { token });
-
-      if (!response.data.success || !response.data.valid) {
-        return { valid: false, error: "Token validation failed." };
+      const decoded = jwt.verify(token, secret) as Record<string, unknown>;
+      const userId = Number(decoded.id ?? decoded.user_id ?? decoded.sub);
+      const username = String(decoded.username ?? decoded.name ?? "");
+      const role = roleToNumber((decoded.role as string | number) ?? 0);
+      if (!userId || !username) {
+        return { valid: false, error: "Token missing user id or username." };
       }
-
-      return {
-        valid: true,
-        payload: response.data.user,
-        isSysAdmin: response.data.isSysAdmin,
-      };
+      const payload = { user_id: userId, username, role };
+      const isSysAdmin = role === 0 || role === 1; // ADMIN or SYS_ADMIN
+      return { valid: true, payload, isSysAdmin };
     } catch (error: any) {
-      return { valid: false, error: error };
+      const msg = error?.message ?? String(error);
+      if (msg.includes("expired")) {
+        return { valid: false, error: "Token expired." };
+      }
+      if (msg.includes("invalid") || msg.includes("signature")) {
+        return { valid: false, error: "Invalid token." };
+      }
+      return { valid: false, error: msg };
     }
   }
 

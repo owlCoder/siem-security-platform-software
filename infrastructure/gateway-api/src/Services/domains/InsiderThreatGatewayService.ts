@@ -47,7 +47,7 @@ export class InsiderThreatGatewayService implements IInsiderThreatGatewayService
   }
 
   async resolveThreat(id: number, resolvedBy: string, resolutionNotes?: string): Promise<InsiderThreatDTO> {
-    const response = await this.client.put<InsiderThreatDTO>(`/threats/${id}/resolve`, {
+    const response = await this.client.post<InsiderThreatDTO>(`/threats/${id}/resolve`, {
       resolvedBy,
       resolutionNotes
     });
@@ -57,27 +57,27 @@ export class InsiderThreatGatewayService implements IInsiderThreatGatewayService
   // =============== USER RISK OPERATIONS ===============
 
   async getAllUserRiskProfiles(): Promise<UserRiskProfileDTO[]> {
-    const response = await this.client.get<UserRiskProfileDTO[]>("/risk/users");
+    const response = await this.client.get<UserRiskProfileDTO[]>("/user-risk-profiles");
     return response.data;
   }
 
   async getHighRiskUsers(): Promise<UserRiskProfileDTO[]> {
-    const response = await this.client.get<UserRiskProfileDTO[]>("/risk/users/high-risk");
+    const response = await this.client.get<UserRiskProfileDTO[]>("/user-risk-profiles/high-risk");
     return response.data;
   }
 
   async getUserRiskProfile(userId: string): Promise<UserRiskProfileDTO> {
-    const response = await this.client.get<UserRiskProfileDTO>(`/risk/users/${userId}`);
+    const response = await this.client.get<UserRiskProfileDTO>(`/user-risk-profiles/${userId}`);
     return response.data;
   }
 
   async getUserRiskAnalysis(userId: string): Promise<UserRiskAnalysisDTO> {
-    const response = await this.client.get<UserRiskAnalysisDTO>(`/risk/users/${userId}/analysis`);
+    const response = await this.client.get<UserRiskAnalysisDTO>(`/user-risk-profiles/${userId}/analysis`);
     return response.data;
   }
 
   async recalculateUserRisk(userId: string): Promise<UserRiskProfileDTO> {
-    const response = await this.client.post<UserRiskProfileDTO>(`/risk/users/${userId}/recalculate`);
+    const response = await this.client.post<UserRiskProfileDTO>(`/user-risk-profiles/${userId}/recalculate`);
     return response.data;
   }
 }
