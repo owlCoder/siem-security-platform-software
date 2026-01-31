@@ -85,6 +85,14 @@ export class QueryRepositoryService implements IQueryRepositoryService {
         return oldEvents;
     }
 
+    async getRecentEvents(hours: number): Promise<Event[]> {
+        const allEvents = await this.getAllEvents();
+        const lastXHours = new Date(Date.now() - hours * 60 * 60 * 1000);
+
+        const recentEvents = allEvents.filter(event => new Date(event.timestamp) >= lastXHours);
+        return recentEvents;
+    }
+
     public findEvents(query: string): Set<number> {
         const resultIds = this.invertedIndexStructureForEvents.getIdsForTokens(query);
         return resultIds;

@@ -20,6 +20,7 @@ export class QueryController {
 
     private initializeRoutes(): void {
         this.router.get("/query/oldEvents/:hours", this.getOldEvents.bind(this));
+        this.router.get("/query/recentEvents/:hours", this.getRecentEvents.bind(this));
         this.router.get("/query/search", this.searchEvents.bind(this));
         this.router.get("/query/lastThreeEvents", this.getLastThreeEvents.bind(this));
         this.router.get("/query/events", this.getAllEvents.bind(this));
@@ -32,7 +33,6 @@ export class QueryController {
         this.router.get("/query/statistics/alerts", this.getAlertStatistics.bind(this));
         this.router.get("/query/pdfReport", this.getPdfReport.bind(this));
         this.router.get("/query/alertsPdfReport", this.getAlertsPdfReport.bind(this));
-
     }
 
     private async getOldEvents(req: Request, res: Response): Promise<void> {
@@ -48,6 +48,22 @@ export class QueryController {
             res.status(200).json(oldEvents);
         } catch (err) {
             res.status(500).json({ message: "Error while retrieving old events." });
+        }
+    }
+
+    private async getRecentEvents(req:Request, res: Response): Promise<void> {
+        try{
+            const hours = Number(req.params.hours);
+
+            if(isNaN(hours) || hours <= 0){
+                res.status(400).json({message: "Invalid hours parameter."});
+                return;
+            }
+
+            const recentEvents = await this.queryRepositoryService.getRecentEvents(hours);
+            res.status(200).json(recentEvents);
+        }catch (err){
+            res.status(500).json({ message: "Error while retrieving recent events. "});
         }
     }
 

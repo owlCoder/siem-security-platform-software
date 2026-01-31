@@ -78,6 +78,8 @@ export function startRecurringJobs(): void {
   const recurringCorrelationJob = new RecurringCorrelationJob(correlationService, loggerService);
   const intervalMs = 60 * 60 * 1000;
 
+  recurringCorrelationJob.execute();
+
   const intervalScheduler = new IntervalScheduler(recurringCorrelationJob, intervalMs, loggerService);
   intervalScheduler.start();
 }

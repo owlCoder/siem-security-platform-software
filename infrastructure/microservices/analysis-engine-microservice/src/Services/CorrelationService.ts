@@ -28,7 +28,7 @@ export class CorrelationService implements ICorrelationService {
     this.queryClient = createAxiosClient(process.env.QUERY_SERVICE_API ?? "");
     this.alertClient = createAxiosClient(process.env.ALERT_SERVICE_API ?? "");
 
-    this.queryEventsPath = process.env.QUERY_EVENTS_PATH ?? "/query/oldEvents/1";
+    this.queryEventsPath = process.env.QUERY_EVENTS_PATH ?? "/query/recentEvents/1";
     this.alertPath = process.env.ALERT_CORRELATION_PATH ?? "/alerts/correlation";
     this.confidenceThreshold = Number(process.env.CORRELATION_CONFIDENCE_THRESHOLD ?? 0.51);
   }
