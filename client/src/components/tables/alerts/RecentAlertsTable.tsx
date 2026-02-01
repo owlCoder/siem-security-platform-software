@@ -4,7 +4,15 @@ import { BiMessageRounded } from "react-icons/bi";
 import { getSeverityColor, getStatusColor } from "../../../helpers/alertColorHelpers";
 import { RecentAlertsTableProps } from "../../../types/props/alerts/RecentAlertsTableProps";
 
-export default function RecentAlertsTable({alerts,onSelectAlert,onResolve,onUpdateStatus}: RecentAlertsTableProps) {
+export default function RecentAlertsTable({
+  alerts,
+  onSelectAlert,
+  onResolve,
+  onUpdateStatus,
+  sortBy,
+  sortOrder,
+  onSort,
+}: RecentAlertsTableProps) {
 
   return (
     <div className="bg-[#1f1f1f] rounded-[14px] overflow-hidden shadow-md border border-[#333]">

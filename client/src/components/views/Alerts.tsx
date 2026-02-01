@@ -28,9 +28,32 @@ export default function Alerts({ alertsApi }: AlertsProps) {
   const [pageSize, setPageSize] = useState<number>(50);
   const [totalItems, setTotalItems] = useState<number>(0);
 
+  const [sortBy, setSortBy] = useState<'createdAt' | 'severity' | 'status'>('createdAt');
+  const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('DESC');
+
   const totalPages = Math.ceil(totalItems / pageSize);
 
-  const loadAlertsWithQuery = async (targetPage: number = 1, currentLimit: number = pageSize) => {
+  // Sortiraj alerts lokalno
+  const sortedAlerts = [...alerts].sort((a, b) => {
+    let comparison = 0;
+
+    if (sortBy === 'createdAt') {
+      comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    } else if (sortBy === 'severity') {
+      const severityOrder = { CRITICAL: 4, HIGH: 3, MEDIUM: 2, LOW: 1, INFO: 0 };
+      comparison = (severityOrder[a.severity] || 0) - (severityOrder[b.severity] || 0);
+    } else if (sortBy === 'status') {
+      comparison = a.status.localeCompare(b.status);
+    }
+
+    return sortOrder === 'ASC' ? comparison : -comparison;
+  });
+
+  const loadAlertsWithQuery = async (
+    targetPage: number = 1, 
+    currentLimit: number = pageSize,
+    queryOverride?: AlertQueryDTO
+  ) => {
     if (!token) {
       console.error("No auth token available.");
       return;
@@ -40,27 +63,33 @@ export default function Alerts({ alertsApi }: AlertsProps) {
       setIsLoading(true);
       setError(null);
 
-      // Kreiraj AlertQueryDTO objekat
+      // Koristi queryOverride ako postoji, inače state
+      const querySeverity = queryOverride?.severity ?? severity;
+      const queryStatus = queryOverride?.status ?? status;
+      const querySource = queryOverride?.source ?? source;
+      const queryStartDate = queryOverride?.startDate ?? startDate;
+      const queryEndDate = queryOverride?.endDate ?? endDate;
+
       const query: AlertQueryDTO = {
         page: targetPage,
         limit: currentLimit,
       };
       
       // Dodaj opcione parametre ako postoje
-      if (severity && severity !== "all") {
-        query.severity = severity;
+      if (querySeverity && querySeverity !== "all") {
+        query.severity = querySeverity;
       }
-      if (status && status !== "all") {
-        query.status = status;
+      if (queryStatus && queryStatus !== "all") {
+        query.status = queryStatus;
       }
-      if (source && source.trim() !== "") {
-        query.source = source;
+      if (querySource && querySource.trim() !== "") {
+        query.source = querySource;
       }
-      if (startDate) {
-        query.startDate = startDate;
+      if (queryStartDate) {
+        query.startDate = queryStartDate;
       }
-      if (endDate) {
-        query.endDate = endDate;
+      if (queryEndDate) {
+        query.endDate = queryEndDate;
       }
       
       console.log("📤 Sending alert query:", query);
@@ -88,7 +117,18 @@ export default function Alerts({ alertsApi }: AlertsProps) {
     setSource(query.source || "");
     setStartDate(query.startDate);
     setEndDate(query.endDate);
-    loadAlertsWithQuery(1);
+    if (query.sortBy) setSortBy(query.sortBy);
+    if (query.sortOrder) setSortOrder(query.sortOrder);
+    loadAlertsWithQuery(1, pageSize, query);
+  };
+
+  const handleSort = (column: 'createdAt' | 'severity' | 'status') => {
+    if (sortBy === column) {
+      setSortOrder(sortOrder === 'ASC' ? 'DESC' : 'ASC');
+    } else {
+      setSortBy(column);
+      setSortOrder('DESC');
+    }
   };
 
   const handleSelectAlert = (id: number) => {
@@ -187,10 +227,13 @@ export default function Alerts({ alertsApi }: AlertsProps) {
       
       {!isLoading && alerts.length > 0 && (
         <RecentAlertsTable
-          alerts={alerts}
+          alerts={sortedAlerts}
           onSelectAlert={handleSelectAlert}
           onUpdateStatus={handleUpdateStatus}
           onResolve={handleResolve}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          onSort={handleSort}
         />
       )}
 

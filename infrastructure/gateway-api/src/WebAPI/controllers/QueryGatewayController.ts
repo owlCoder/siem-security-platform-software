@@ -429,11 +429,8 @@ export class QueryGatewayController {
 
   private async searchAlerts(req: Request, res: Response): Promise<void> {
     try {
-      
       const alertQueryDTO = req.body;
-      console.log(alertQueryDTO);
       const results = await this.gatewayService.searchAlertsFromQuery(alertQueryDTO);
-      //console.log(results);
       res.status(200).json(results);
     } catch (err) {
       res.status(500).json({ message: (err as Error).message });

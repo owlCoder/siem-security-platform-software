@@ -43,7 +43,6 @@ export class QueryAlertContoller{
     private async searchAlerts(req: Request, res: Response): Promise<void> {
         try {
             const alertQueryDTO = req.body;
-            console.log(alertQueryDTO.severity);
             const results = await this.queryAlertService.searchAlerts(alertQueryDTO);
             res.status(200).json(results);
         } catch (err) {
