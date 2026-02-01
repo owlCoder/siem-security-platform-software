@@ -53,7 +53,7 @@ export function SearchToolBar({ value, onSearchText, value1, onEventType, value2
                 <div className="w-[17.5%] ">
                     <button
                         className="bg-[#007a55] text-white w-full rounded-[10px]! h-[40px] font-semibold hover:bg-[#009166] transition-colors"
-                        onClick={onSearchClick}
+                        onClick={() => onSearchClick()}
                     >
                         Search
                     </button>

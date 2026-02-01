@@ -181,33 +181,33 @@ export default function Sidebar({ setSideMenuPage }: SidebarProps) {
                             Backup
                             <MdKeyboardArrowRight size={20}/>
                     </button>
-<<<<<<< HEAD
-                    <button
-                        className={itemClass(10)}
-                        style={{ marginLeft: '20px', borderRadius: '0.75rem'}}
-=======
-
                     <button
                         className={itemClass(10)}
                         style={{marginLeft: "20px", borderRadius: "0.75rem"}}
->>>>>>> 444230731870a6dc8da8d22514e62d2a5f2dcb36
                         onClick={() => {
                             setSideMenuPage(10);
                             setSelectedButton(10);
                         }}
                         onMouseEnter={() => setHover(10)}
                         onMouseLeave={() => setHover(null)}
-<<<<<<< HEAD
-                    >
-                        <PiShieldCheck size={22} />
-                        Integrity
-                        <MdKeyboardArrowRight size={20}/>
-=======
                         >
                             <PiShieldStarFill size={22} />
                             Security Maturity
                             <MdKeyboardArrowRight size={20} />
->>>>>>> 444230731870a6dc8da8d22514e62d2a5f2dcb36
+                    </button>
+                    <button
+                        className={itemClass(11)}
+                        style={{marginLeft: "20px", borderRadius: "0.75rem"}}
+                        onClick={() => {
+                            setSideMenuPage(11);
+                            setSelectedButton(11);
+                        }}
+                        onMouseEnter={() => setHover(11)}
+                        onMouseLeave={() => setHover(null)}
+                    >
+                        <PiShieldStarFill size={22} />
+                        Integrity
+                        <MdKeyboardArrowRight size={20} />
                     </button>
                 </div>
             )}

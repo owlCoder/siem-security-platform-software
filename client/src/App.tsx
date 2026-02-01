@@ -20,15 +20,12 @@ import { IFirewallAPI } from "./api/firewall/IFirewallAPI";
 import { FirewallAPI } from "./api/firewall/FirewallAPI";
 import { IBackupValidationAPI } from "./api/backup/IBackupValdationAPI";
 import { BackupValidationAPI } from "./api/backup/BackupValidationAPI";
-<<<<<<< HEAD
 import { IntegrityAPI } from "./api/integrity/IntegrityAPI";
 import { IIntegrityAPI } from "./api/integrity/IIntegrityAPI";
-=======
 import { IInsiderThreatAPI } from "./api/insider-threat/IInsiderThreatAPI";
 import { InsiderThreatAPI } from "./api/insider-threat/InsiderThreatAPI";
 import { ISecurityMaturityAPI } from "./api/security-maturity/ISecurityMaturityAPI";
 import { SecurityMaturityAPI } from "./api/security-maturity/SecurityMaturityAPI";
->>>>>>> 444230731870a6dc8da8d22514e62d2a5f2dcb36
 
 const auth_api: IAuthAPI = new AuthAPI();
 const alerts_api: IAlertAPI = new AlertAPI();
@@ -40,12 +37,9 @@ const desktopNotification = new DesktopNotificationService();
 const risk_score_api: IRiskScoreAPI = new RiskScoreAPI();
 const firewall_api: IFirewallAPI = new FirewallAPI();
 const backup_api: IBackupValidationAPI = new BackupValidationAPI();
-<<<<<<< HEAD
 const integrity_api: IIntegrityAPI = new IntegrityAPI();
-=======
 const insider_threat_api: IInsiderThreatAPI = new InsiderThreatAPI(); 
 const securityMaturityApi: ISecurityMaturityAPI = new SecurityMaturityAPI();
->>>>>>> 444230731870a6dc8da8d22514e62d2a5f2dcb36
 
 function App() {
   return (
@@ -65,13 +59,9 @@ function App() {
         <Route path="/mainLayout" element={<MainLayout alertsAPI={alerts_api}
           parserAPI={parser_api} queryAPI={query_api} storageAPI={storage_api}
           simulatorAPI={simulator_api} desktopNotification={desktopNotification}
-<<<<<<< HEAD
-          riskScoreApi={risk_score_api} firewallApi={firewall_api} backupApi={backup_api}
-          integrityApi={integrity_api}/>} />
-=======
           riskScoreApi={risk_score_api} firewallApi={firewall_api} backupApi={backup_api} 
-          insiderThreatApi={insider_threat_api} securityMaturityApi={securityMaturityApi}/>} />
->>>>>>> 444230731870a6dc8da8d22514e62d2a5f2dcb36
+          insiderThreatApi={insider_threat_api} securityMaturityApi={securityMaturityApi}
+          integrityApi={integrity_api}/>}/>
       </Routes>
     </>
   );
