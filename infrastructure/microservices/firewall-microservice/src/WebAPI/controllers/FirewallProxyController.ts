@@ -43,7 +43,6 @@ export class FirewallProxyController {
             }
 
             const { url, method = "GET", headers, data, params } = req.body;
-
             if (!url) {
                 res.status(400).json({ message: "Destination URL/path is required in body" });
                 return;

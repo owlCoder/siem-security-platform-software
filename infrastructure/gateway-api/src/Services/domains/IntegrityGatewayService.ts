@@ -1,27 +1,31 @@
+import axios, { AxiosInstance } from "axios";
 import { IIntegrityGatewayService } from "../../Domain/services/IIntegrityGatewayService";
+import { serviceConfig } from "../../Domain/constants/ServiceConfig";
+import { defaultAxiosClient } from "../../Domain/constants/AxiosClient";
 
 export class IntegrityGatewayService implements IIntegrityGatewayService {
-    private readonly apiUrl: string;
+    private readonly client: AxiosInstance;
 
     constructor() {
-        // Čitamo iz .env-a koji si malopre dopunila
-        this.apiUrl = process.env.INTEGRITY_SERVICE_API || "http://localhost:3005/api/v1";
+        this.client = axios.create({
+      baseURL: serviceConfig.query,
+      ...defaultAxiosClient
+    });
+        //this.apiUrl = process.env.INTEGRITY_SERVICE_API || "http://localhost:3005/api/v1";
     }
 
     async getStatus(): Promise<any> {
-        const response = await fetch(`${this.apiUrl}/integrity/status`);
-        return await response.json();
+        const response = await this.client.get<any[]>(`/integrity/status`);
+        return response.data;
     }
 
     async getCompromised(): Promise<any> {
-        const response = await fetch(`${this.apiUrl}/integrity/compromised`);
-        return await response.json();
+        const response = await this.client.get<any[]>(`/integrity/compromised`);
+        return response.data;
     }
 
     async verify(): Promise<any> {
-        const response = await fetch(`${this.apiUrl}/integrity/verify`, {
-            method: 'POST'
-        });
-        return await response.json();
+        const response = await this.client.get<any[]>(`/integrity/verify`);
+        return response.data;
     }
 }

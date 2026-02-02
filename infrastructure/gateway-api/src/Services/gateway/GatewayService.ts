@@ -206,7 +206,6 @@ export class GatewayService implements IGatewayService {
   }
 
   async searchAlertsFromQuery(alertQueryDTO: AlertQueryDTO): Promise<PaginatedAlertsDTO> {
-    console.log("Da loi ovde udje");
     return this.queryService.searchAlerts(alertQueryDTO);
   }
 
@@ -383,7 +382,13 @@ export class GatewayService implements IGatewayService {
   async getGlobalScore(): Promise<number> {
     return await this.riskScoreService.getGlobalScore();
   }
-  async getIntegrityStatus() { return await this.integrityService.getStatus(); }
-  async getCompromisedLogs() { return await this.integrityService.getCompromised(); }
-  async verifyIntegrity() { return await this.integrityService.verify(); }
+  async getIntegrityStatus(): Promise<void>  { 
+    return await this.integrityService.getStatus(); 
+  }
+  async getCompromisedLogs(): Promise<void>  { 
+    return await this.integrityService.getCompromised(); 
+  }
+  async verifyIntegrity(): Promise<void>  { 
+    return await this.integrityService.verify(); 
+  }
 }

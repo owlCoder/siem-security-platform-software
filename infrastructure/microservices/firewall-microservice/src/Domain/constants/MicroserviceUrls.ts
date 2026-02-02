@@ -10,5 +10,6 @@ export const microserviceUrls: Record<string, string> = {
     "backup": process.env.BACKUP_SERVICE_API!,
     "insider-threats": process.env.INSIDER_THREAT_SERVICE_API!,
     "siem": process.env.INSIDER_THREAT_SERVICE_API!,
-    "riskScore": process.env.RISK_SCORE_API!
+    "riskScore": process.env.RISK_SCORE_API!,
+    "integrity": process.env.INTEGRITY_SERVICE_API!
 };

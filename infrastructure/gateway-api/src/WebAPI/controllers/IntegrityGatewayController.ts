@@ -7,7 +7,7 @@ export class IntegrityGatewayController {
 
     constructor(
         private readonly gatewayService: IGatewayService,
-        private readonly authenticate: any,
+       // private readonly authenticate: any,
         private readonly logger: ILogerService
     ) {
         this.router = Router();
@@ -15,21 +15,57 @@ export class IntegrityGatewayController {
     }
 
     private initializeRoutes(): void {
-        // Koristimo anonimne funkcije da pozovemo konkretne metode iz gatewayService
-        this.router.get("/integrity/status", this.authenticate, this.getStatus.bind(this));
-        this.router.get("/integrity/compromised", this.authenticate, this.getCompromised.bind(this));
-        this.router.post("/integrity/verify", this.authenticate, this.verify.bind(this));
+
+        this.router.post("/", this.proxyRequest.bind(this));
+        this.router.post("/integrity/status", 
+            // this.authenticate,
+            // requireSysAdmin, 
+            this.getStatus.bind(this));
+
+        this.router.get("/integrity/compromised", 
+            // this.authenticate, 
+            // requireSysAdmin,
+            this.getCompromised.bind(this));
+
+        this.router.post("/integrity/verify", 
+            // this.authenticate, 
+            // requireSysAdmin,
+            this.verify.bind(this));
     }
 
-    private async getStatus(req: Request, res: Response): Promise<void> {
-        try {
-            // Ove metode (getIntegrityStatus itd.) ćemo dodati u IGatewayService
-            const data = await this.gatewayService.getIntegrityStatus();
-            res.json(data);
-        } catch (err) {
-            await this.handleError(err, res);
-        }
+    private async proxyRequest(req: Request, res: Response): Promise<void> {
+    const { url, method, data, headers } = req.body;
+
+    if (url === "integrity/status") {
+        return this.getStatus(req, res);
     }
+
+    if (url === "integrity/verify") {
+        return this.verify(req, res);
+    }
+
+    res.status(404).json({ message: `Integrity Proxy: Route ${url} not found` });
+}
+
+  
+
+   private async getStatus(req: Request, res: Response): Promise<void> {
+    console.log("Pozvan POST /integrity/status"); 
+
+    try {
+        const data = await this.gatewayService.getIntegrityStatus();
+
+        
+        res.json({
+            success: true,
+            response: data 
+        });
+
+    } catch (err) {
+        console.error("Greška u getStatus kontroleru:", err);
+        await this.handleError(err, res);
+    }
+}
 
     private async getCompromised(req: Request, res: Response): Promise<void> {
         try {

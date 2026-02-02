@@ -221,8 +221,7 @@ export class AlertController {
 
   private async getAlertsBySeverity(req: Request, res: Response): Promise<void> {
     try {
-      const severity = req.params.severity.toUpperCase();
-
+const severity = String(req.params.severity).toUpperCase();
       const validation = validateAlertSeverity(severity);
       if (!validation.success) {
         res.status(400).json({ success: false, message: validation.message });
@@ -241,8 +240,7 @@ export class AlertController {
 
   private async getAlertsByStatus(req: Request, res: Response): Promise<void> {
     try {
-      const status = req.params.status.toUpperCase();
-
+const status = String(req.params.status).toUpperCase();
       const validation = validateAlertStatus(status);
       if (!validation.success) {
         res.status(400).json({ success: false, message: validation.message });
