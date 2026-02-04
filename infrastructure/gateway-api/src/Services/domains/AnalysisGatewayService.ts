@@ -3,6 +3,8 @@ import { NormalizedEventDTO } from "../../Domain/DTOs/NormalizedEventDTO";
 import { serviceConfig } from "../../Domain/constants/ServiceConfig";
 import { defaultAxiosClient } from "../../Domain/constants/AxiosClient";
 import { IAnalysisGatewayService } from "../../Domain/services/IAnalysisGatewayService";
+import { BusinessLLMInputDto } from "../../Domain/DTOs/businessInsights/BusinessLLMInputDto";
+import { BusinessResponseDto } from "../../Domain/DTOs/businessInsights/BusinessResponseDto";
 
 export class AnalysisGatewayService implements IAnalysisGatewayService {
   private readonly client: AxiosInstance;
@@ -34,5 +36,12 @@ export class AnalysisGatewayService implements IAnalysisGatewayService {
     }
 
     return data.deletedCount;
+  }
+
+  async analysisEngineGenerateBusinessInsights(businessLLMInput: BusinessLLMInputDto): Promise<BusinessResponseDto>{
+    const response = await this.client.post<BusinessResponseDto>(
+      "/AnalysisEngine/generateBusinessInsights", businessLLMInput, { timeout: 60000 } );
+
+      return response.data;
   }
 }

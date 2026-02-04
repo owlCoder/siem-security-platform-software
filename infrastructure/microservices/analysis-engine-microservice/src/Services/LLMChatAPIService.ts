@@ -18,6 +18,11 @@ import { RECOMMENDATIONS_PROMPT } from "../Infrastructure/prompts/recommendation
 import { parseRecommendations } from "../Infrastructure/parsers/RecommendationParser";
 import { sendChatCompletion } from "../Infrastructure/helpers/sendChatCompletion";
 import { emptyEvent } from "../Infrastructure/helpers/emptyEvent";
+import { BusinessLLMInputDto } from "../Domain/types/businessInsights/BusinessDto";
+import { BusinessResponseDto } from "../Domain/types/businessInsights/BusinessResponseDto";
+import { BUSINESS_INSIGHTS_PROMPT } from "../Infrastructure/prompts/businessInsightsPrompt";
+import { BusinessInsightsResponseSchema } from "../Infrastructure/schemas/BusinessInsightsResponse.schema";
+import { parseBusinessInsights } from "../Infrastructure/parsers/BusinessInsightsParser";
 
 dotenv.config();
 
@@ -45,6 +50,37 @@ export class LLMChatAPIService implements ILLMChatAPIService {
       correlationModelId: this.correlationModelId,
       recommendationModelId: this.recommendationModelId,
     });
+  }
+
+  public async sendBusinessInsightsPrompt(businessData: BusinessLLMInputDto): Promise<BusinessResponseDto> {
+    const json = JSON.stringify(businessData);
+    const messages: ChatMessage[] = [
+      {
+        role: "user",
+        content: `${BUSINESS_INSIGHTS_PROMPT}${json}`.trim(),
+      },
+    ];
+
+    const raw = await sendChatCompletion(
+      this.apiUrl,
+      this.apiKey,
+      this.recommendationModelId,
+      messages,
+      this.loggerService,
+      this.timeoutMs,
+      this.maxRetries,
+      BusinessInsightsResponseSchema as JsonObject
+    );
+
+    if (!raw.ok) {
+      await this.loggerService.warn("[LLM] BusinessInsights failed: LLM request/parse error", {
+        error: raw.error,
+        modelId: this.recommendationModelId,
+      });
+      return { summary: "Business insights are temporarily unavalilable", recommendations: [], issues: [] };
+    }
+
+    return parseBusinessInsights(raw.value);
   }
 
   // =========================================================

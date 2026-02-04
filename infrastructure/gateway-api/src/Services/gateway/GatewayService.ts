@@ -40,6 +40,8 @@ import { IRiskScoreGatewayService } from "../../Domain/services/IRiskScoreGatewa
 import { BackupHealthDTO } from "../../Domain/DTOs/BackupHealthDTO";
 import { BackupStatsDTO } from "../../Domain/DTOs/BackupStatsDTO";
 import { IIntegrityGatewayService } from "../../Domain/services/IIntegrityGatewayService";
+import { BusinessLLMInputDto } from "../../Domain/DTOs/businessInsights/BusinessLLMInputDto";
+import { BusinessResponseDto } from "../../Domain/DTOs/businessInsights/BusinessResponseDto";
 
 /**
  * Facade that delegates to domain-specific gateway services.
@@ -293,6 +295,10 @@ export class GatewayService implements IGatewayService {
 
   async analysisEngineDeleteCorrelationsByEventIds(eventIds: number[]): Promise<number> {
     return this.analysisService.deleteCorrelationsByEventIds(eventIds);
+  }
+
+  async analysisEngineGenerateBusinessInsights(businessLLMInput: BusinessLLMInputDto): Promise<BusinessResponseDto>{
+    return this.analysisService.analysisEngineGenerateBusinessInsights(businessLLMInput);
   }
 
   // Backup

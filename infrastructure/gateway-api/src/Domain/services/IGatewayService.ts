@@ -6,6 +6,8 @@ import { BackupHealthDTO } from "../DTOs/BackupHealthDTO";
 import { BackupStatsDTO } from "../DTOs/BackupStatsDTO";
 import { BackupValidationLogDTO } from "../DTOs/BackupValidationLogDTO";
 import { BackupValidationResultDTO } from "../DTOs/BackupValidationResultDTO";
+import { BusinessLLMInputDto } from "../DTOs/businessInsights/BusinessLLMInputDto";
+import { BusinessResponseDto } from "../DTOs/businessInsights/BusinessResponseDto";
 import { DistributionDTO } from "../DTOs/DistributionDTO";
 import { EventDTO } from "../DTOs/EventDTO";
 import { EventsResultDTO } from "../DTOs/EventsResultDTO";
@@ -105,6 +107,7 @@ export interface IGatewayService {
   //Analysis Engine
   analysisEngineNormalize(rawMessage: string): Promise<NormalizedEventDTO>;
   analysisEngineDeleteCorrelationsByEventIds(eventIds: number[]): Promise<number>;
+  analysisEngineGenerateBusinessInsights(businessLLMInput: BusinessLLMInputDto): Promise<BusinessResponseDto>;
 
   //EventCollector
   createEvent(event: EventDTO): Promise<EventDTO>;
