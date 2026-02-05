@@ -1,13 +1,12 @@
-import { Repository } from "typeorm";
 import { Event } from "../Domain/models/Event";
 import { EventDTO } from "../Domain/DTOs/EventDTO";
 import { IEventsService } from "../Domain/services/IEventsService";
-import { Between } from "typeorm"
 import { EventType } from "../Domain/enums/EventType";
 import { toDTO } from "../Utils/Converters/ConvertToDTO";
 import { ArraytoDTO } from "../Utils/Converters/ConvertEventArrayToDTOarray";
 import { DistributionDTO } from "../Domain/DTOs/DIstributionDTO";
 import { TopSourceDTO } from "../Domain/DTOs/TopSourceDTO";
+import { Repository, Between, In, MoreThanOrEqual } from "typeorm";
 
 export class EventsService implements IEventsService {
     constructor(
@@ -140,6 +139,23 @@ export class EventsService implements IEventsService {
         });
         return ArraytoDTO(events);
     }
+
+    //za status-monitor korelaciju
+    async getFilteredEventsForCorrelation(serviceName: string, startTime: Date, severities: string[], limit: number): Promise<EventDTO[]> {
+    const events = await this.eventRepository.find({
+        where: {
+            source: serviceName, 
+            timestamp: MoreThanOrEqual(startTime), 
+            type: In(severities) 
+        },
+        order: {
+            timestamp: "DESC"
+        },
+        take: limit 
+    });
+
+    return ArraytoDTO(events);
+}
 
 
 }

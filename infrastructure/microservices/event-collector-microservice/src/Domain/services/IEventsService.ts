@@ -13,4 +13,5 @@ export interface IEventsService {
     getSortedEventsByDate(): Promise<EventDTO[]>
     getEventPercentagesByEvent(): Promise<DistributionDTO>
     getTopSourceEvent(): Promise<TopSourceDTO>
+    getFilteredEventsForCorrelation(serviceName: string, startTime: Date, severities: string[], limit: number): Promise<EventDTO[]>; 
 }
