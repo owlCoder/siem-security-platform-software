@@ -20,4 +20,10 @@ export class Event {
 
     @Column({ type: "varchar", length: 45, nullable: true})
     ipAddress?: string;
+
+    @Column({ type: "int", nullable: true })
+    userId?: number;
+
+    @Column({ type: "varchar", length: 100, nullable: true })
+    userRole?: string;
 }

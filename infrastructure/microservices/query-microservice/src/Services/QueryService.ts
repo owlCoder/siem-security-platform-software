@@ -79,7 +79,9 @@ export class QueryService implements IQueryService {
             type: e.type,
             description: e.description,
             timestamp: e.timestamp,
-            ipAddress: e.ipAddress
+            ipAddress: e.ipAddress,
+            userId: e.userId,
+            userRole: e.userRole
         }));
         
         const response: EventsResultDTO = {
@@ -111,7 +113,9 @@ export class QueryService implements IQueryService {
             type: e.type,
             description: e.description,
             timestamp: e.timestamp,
-            ipAddress: e.ipAddress
+            ipAddress: e.ipAddress,
+            userId: e.userId,
+            userRole: e.userRole
         }));
 
         return await PdfGenerator.createReport(data); 

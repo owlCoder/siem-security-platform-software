@@ -97,6 +97,8 @@ export class AlertController {
         source: "AnalysisEngine",
         detectionRule: `correlation_${data.category}_${windowKey}`,
         ipAddress: data.ipAddress,
+        userId: data.userId,
+        userRole: data.userRole,
         category: data.category,
         oldestEventTimestamp
       };

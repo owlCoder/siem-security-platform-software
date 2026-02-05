@@ -10,4 +10,6 @@ export interface CreateAlertFromCorrelationDTO {
   category: AlertCategory;
   oldestEventTimestamp: string;
   ipAddress?: string;
+  userId?: number;    
+  userRole?: string;
 }

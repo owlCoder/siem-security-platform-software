@@ -11,4 +11,6 @@ export interface CreateAlertDTO {
   ipAddress?: string;
   category: AlertCategory;
   oldestEventTimestamp: Date;
+  userId?: number;    
+  userRole?: string;
 }

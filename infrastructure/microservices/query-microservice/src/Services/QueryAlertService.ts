@@ -70,6 +70,8 @@ export class QueryAlertService implements IQueryAlertService {
             resolvedAt: a.resolvedAt,
             resolvedBy: a.resolvedBy,
             ipAddress: a.ipAddress,
+            userId: a.userId,
+            userRole: a.userRole,
         }));
 
         const response: PaginatedAlertsDTO = {

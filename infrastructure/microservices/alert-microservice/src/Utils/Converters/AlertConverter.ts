@@ -15,7 +15,9 @@ export function toAlertDTO(alert: Alert): AlertDTO {
     createdAt: alert.createdAt,
     resolvedAt: alert.resolvedAt,
     resolvedBy: alert.resolvedBy,
-    ipAddress: alert.ipAddress
+    ipAddress: alert.ipAddress,
+    userId: alert.userId,
+    userRole: alert.userRole
   };
 }
 
@@ -31,6 +33,8 @@ export function createEmptyAlertDTO(): AlertDTO {
     createdAt: new Date(),
     resolvedAt: null,
     resolvedBy: null,
-    ipAddress: undefined
+    ipAddress: undefined,
+    userId: undefined,
+    userRole: ""
   };
 }

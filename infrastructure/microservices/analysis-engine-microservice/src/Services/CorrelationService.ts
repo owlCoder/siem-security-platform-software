@@ -123,6 +123,7 @@ export class CorrelationService implements ICorrelationService {
     }
 
     const ipAddress = this.resolveIpAddress(candidate.correlatedEventIds, events);
+    const { userId, userRole } = this.resolveUserInfo(candidate.correlatedEventIds, events);
 
     return {
       correlationDetected: candidate.correlationDetected,
@@ -134,6 +135,8 @@ export class CorrelationService implements ICorrelationService {
       severity: candidate.severity,
       correlatedEventIds: candidate.correlatedEventIds,
       ipAddress,
+      userId,
+      userRole,
     };
   }
 
@@ -150,6 +153,23 @@ export class CorrelationService implements ICorrelationService {
     }
 
     return undefined;
+  }
+
+  private resolveUserInfo(eventIds: number[], events: QueryEventDTO[]): { userId?: number; userRole?: string } {
+    if (eventIds.length === 0) return {};
+
+    const firstId = eventIds[0];
+
+    for (const e of events) {
+      if (e.id === firstId) {
+        return {
+          userId: e.userId,
+          userRole: e.userRole,
+        };
+      }
+    }
+
+    return {};
   }
 
   private computeOldestEventTimestamp(eventIds: number[], events: QueryEventDTO[]): Result<Date> {
@@ -187,6 +207,8 @@ export class CorrelationService implements ICorrelationService {
       severity: dto.severity,
       correlatedEventIds: dto.correlatedEventIds,
       ipAddress: dto.ipAddress ?? "unknown",
+      userId: dto.userId,
+      userRole: dto.userRole,
     };
 
     try {

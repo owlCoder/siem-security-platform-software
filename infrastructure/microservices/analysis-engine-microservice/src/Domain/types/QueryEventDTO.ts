@@ -4,5 +4,7 @@ export interface QueryEventDTO {
   readonly type: string;
   readonly description: string;
   readonly timestamp: string; 
-  readonly ipAddress: string; 
+  readonly ipAddress: string;
+  readonly userId?: number;
+  readonly userRole?: string;
 }

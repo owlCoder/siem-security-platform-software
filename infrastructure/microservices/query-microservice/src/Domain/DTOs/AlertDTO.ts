@@ -13,4 +13,6 @@ export interface AlertDTO {
   resolvedAt: Date | null;
   resolvedBy: string | null;
   ipAddress?: string;
+  userId?: number;
+  userRole?: string;
 }
