@@ -1,5 +1,8 @@
+import { IntegrityStatusDTO } from "../DTOs/IntegrityStatusDTO";
+import { CompromisedLogDTO } from "../DTOs/CompromisedLogDTO";
+
 export interface IIntegrityGatewayService {
-    getStatus(): Promise<any>;
-    getCompromised(): Promise<any>;
-    verify(): Promise<any>;
+  initializeHashChain(): Promise<{ message: string }>;
+  verifyLogs(): Promise<IntegrityStatusDTO>;
+  getCompromisedLogs(): Promise<CompromisedLogDTO[]>;
 }

@@ -62,11 +62,11 @@ app.use('/api/v1', new AuthGatewayController(gatewayService).getRouter());
 app.use('/api/v1', new AlertGatewayController(gatewayService, authenticate, loggerService).getRouter());
 app.use('/api/v1', new QueryGatewayController(gatewayService, authenticate).getRouter());
 app.use('/api/v1', new StorageGatewayController(gatewayService, authenticate).getRouter());
+app.use('/api/v1', new IntegrityGatewayController(gatewayService, authenticate, loggerService).getRouter());
 
 const eventCollectorController = new EventCollectorGatewayController(gatewayService, authenticate, loggerService);
 app.use('/api/v1', authenticate, enrichRequestWithUserId, eventCollectorController.getRouter());
 
-app.use('/api/v1', new IntegrityGatewayController(gatewayService, /*authenticate,*/ loggerService).getRouter());
 app.use('/api/v1', new ParserGatewayController(gatewayService).getRouter());
 app.use('/api/v1', new AnalysisGatewayController(gatewayService, authenticate, loggerService).getRouter());
 app.use('/api/v1', new SimulatorGatewayController(simulatorService, authenticate).getRouter());
