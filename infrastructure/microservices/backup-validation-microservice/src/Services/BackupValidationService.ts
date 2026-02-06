@@ -4,12 +4,12 @@ import { ILogerService } from "../Domain/services/ILogerService";
 import { BackupValidationStatus } from "../Domain/enums/BackupValidationStatus";
 import { existsSync, statSync } from "fs";
 import path from "path";
-import { BACKUP_DIR, BACKUP_FILE_NAME, BACKUP_TABLES, PROD_DB_NAME, SHADOW_DB_NAME, ALERT_SERVICE_URL } from "../Domain/constants/BackupConstants";
+import { BACKUP_DIR, BACKUP_FILE_NAME, SHADOW_DB_NAME, BACKUP_SOURCES, TABLES } from "../Domain/constants/BackupConstants";
 import { IBackupValidationService } from "../Domain/services/IBackupValidationService";
 import { ensureMysqlToolsExist } from "../Utils/Service/EnsureMysqlToolsExist";
 import { ensureDirectoryExists } from "../Utils/Service/EnsureDirectoryExists";
 import { runShellCommand } from "../Utils/Service/RunShellCommand";
-import { CreateAlertDTO } from "../Domain/DTOs/CreateAlertDTO";
+import { CreateAlertFromCorrelationDTO } from "../Domain/DTOs/CreateAlertFromCorrelationDTO";
 import { AlertSeverity } from "../Domain/enums/AlertSeverity";
 import { AxiosInstance } from "axios";
 import { createAxiosClient } from "../Utils/Client/AxiosClient";
@@ -57,18 +57,21 @@ export class BackupValidationService implements IBackupValidationService {
     private createBackup(): boolean {
         try {
             this.logger.log("Creating MySQL dump...");
-
-            const dumpCommand = 
-                `${process.env.MYSQLDUMP_BIN} ` +
-                `-h ${process.env.MYSQL_HOST} ` +
-                `-P ${process.env.MYSQL_PORT} ` +
-                `-u ${process.env.MYSQL_USER} ` +
-                `-p${process.env.MYSQL_PASSWORD} ` +
-                `${PROD_DB_NAME} ` +
-                `--no-tablespaces ` +
-                `${BACKUP_TABLES.join(" ")} > "${this.backupFilePath}"`;
-
-            runShellCommand(dumpCommand);
+            for (const source of BACKUP_SOURCES) {
+                for (const table of source.tables) {
+                    const dumpCommand = 
+                    `${process.env.MYSQLDUMP_BIN} ` +
+                    `-h ${process.env.MYSQL_HOST} ` +
+                    `-P ${process.env.MYSQL_PORT} ` +
+                    `-u ${process.env.MYSQL_USER} ` +
+                    `-p${process.env.MYSQL_PASSWORD} ` +
+                    `${source.dbName} ${table} ` +
+                    `--no-tablespaces  >> "${this.backupFilePath}"`;
+                
+                runShellCommand(dumpCommand);
+            }
+            }
+           
             return true;
         } catch (err: any){
             console.log("DUMP ERROR:", err.message, err.stderr?.toString(), err.stdout?.toString());
@@ -97,16 +100,18 @@ export class BackupValidationService implements IBackupValidationService {
         try {
             this.logger.log("Simulating restore on shadow database...");
 
-            const dropCommand = 
-                `${process.env.MYSQL_BIN} ` +
-                `-h ${process.env.MYSQL_HOST} ` +
-                `-P ${process.env.MYSQL_PORT} ` +
-                `-u ${process.env.MYSQL_USER} ` +
-                `-p${process.env.MYSQL_PASSWORD} ` +
-                `${SHADOW_DB_NAME} ` +
-                `-e "DROP TABLE IF EXISTS ${BACKUP_TABLES.join(", ")};"`;
+            for (const table of TABLES) {
+                const dropCommand = 
+                    `${process.env.MYSQL_BIN} ` +
+                    `-h ${process.env.MYSQL_HOST} ` +
+                    `-P ${process.env.MYSQL_PORT} ` +
+                    `-u ${process.env.MYSQL_USER} ` +
+                    `-p${process.env.MYSQL_PASSWORD} ` +
+                    `${SHADOW_DB_NAME} ` +
+                    `-e "DROP TABLE IF EXISTS ${table};"`;
 
-            runShellCommand(dropCommand);
+                runShellCommand(dropCommand);
+            }
 
             const restoreCommand = 
                 `${process.env.MYSQL_BIN} ` +
@@ -145,18 +150,16 @@ export class BackupValidationService implements IBackupValidationService {
 
     private async sendAlert(message: string): Promise<void> {
         try {
-            const alertData: CreateAlertDTO = {
-                title: "Backup Validation Failed",
+            const alertData: CreateAlertFromCorrelationDTO = {
+                correlationId: 0,
                 description: message,
                 severity: AlertSeverity.HIGH,
-                source: "BackupValidationService",
-                detectionRule: "backup_validation",
+                correlatedEventIds: [],
                 category: AlertCategory.OTHER,
-                correlatedEvents: [],
-                oldestEventTimestamp: new Date()
+                oldestEventTimestamp: new Date().toISOString(),
             };
 
-            await this.alertClient.post("/alerts", alertData);
+            await this.alertClient.post("/alerts/correlation", alertData);
             await this.logger.log("Alert sent successfully to AlertService");
         } catch (err: any) {
             await this.logger.log("Failed to send alert to AlertService: " + err.message);
