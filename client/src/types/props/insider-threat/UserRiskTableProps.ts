@@ -2,5 +2,5 @@ import { UserRiskProfileDTO } from "../../../models/insider-threat/UserRiskProfi
 
 export interface UserRiskTableProps {
   profiles: UserRiskProfileDTO[];
-  onSelectUser: (userId: string) => void;
+  onSelectUser: (userId: number) => void;
 }

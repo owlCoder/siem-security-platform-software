@@ -1,13 +1,9 @@
 import { Cell, Pie, PieChart, ResponsiveContainer} from "recharts";
+import { BackupChartsProps } from "../../types/props/backup/BackupChartProps";
 
-interface Props {
-    data: {
-        success: number;
-        failed: number;
-    };
-}
 
-export default function BackupChart({ data }: Props) {
+
+export default function BackupChart({ data }: BackupChartsProps) {
     const chartData = [
         { name: "Successful", value: data.success, color: "#4ade80"},
         { name: "Failed", value: data.failed, color: "#f87171"}

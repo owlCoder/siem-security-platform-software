@@ -10,36 +10,30 @@ import { EventRow } from "../../types/events/EventRow";
 import { calculateMostEventType } from "../../helpers/calculateMostEvent";
 import { DashboardProps } from "../../types/props/dashboard/DashboardProps";
 
-export default function Dashboard({queryApi,storageApi}:DashboardProps) {
-    /* const events: EventRow[] = [
-         { id: 1, source: "Auth Service", time: "01:23:33   22/11/2025", type: EventType.INFO, description: "User login successful" },
-         { id: 2, source: "Auth Service", time: "01:25:49   22/11/2025", type: EventType.WARNING, description: "Multiple failed login attempts" },
-         { id: 3, source: "Database", time: "21:03:11   20/11/2025", type: EventType.ERROR, description: "Database connection lost" },
-     ];*/
+export default function Dashboard({ queryApi, storageApi }: DashboardProps) {
     const [eventsData, setEventsData] = useState<EventRow[]>([]);
     const [allEventsCount, setEventCount] = useState<number>(0);
     const [infoCount, setInfoCount] = useState<number>(0);
     const [warningCount, setWarningCount] = useState<number>(0);
     const [errorCount, setErrorCount] = useState<number>(0);
-    const [mostEventType,setMostEventType]=useState("-");
-    const [mostEventValue,setMostEventValue]=useState(0)
-    const [mostWeightArchive,setMostWeightArchive]=useState("-");
-    const [mostWeightArchiveValue,setMostWeightArchiveValue]=useState(0)
-    const [topEvent,setTopEvent]=useState("-");
-    const [topEventValue,setTopEventValue]=useState(0)
-    //const { token } = useAuth();
-    const token = "token";      // TODO: DELETE AFTER TESTING!
+    const [mostEventType, setMostEventType] = useState("-");
+    const [mostEventValue, setMostEventValue] = useState(0)
+    const [mostWeightArchive, setMostWeightArchive] = useState("-");
+    const [mostWeightArchiveValue, setMostWeightArchiveValue] = useState(0)
+    const [topEvent, setTopEvent] = useState("-");
+    const [topEventValue, setTopEventValue] = useState(0)
+    const { token } = useAuth();
 
     // types, interfaces and classes will be moved too
-    const getMostEventType=(infoCount:number,errorCount:number,warningCount:number)=>{
-        const result=calculateMostEventType(infoCount,errorCount,warningCount);
+    const getMostEventType = (infoCount: number, errorCount: number, warningCount: number) => {
+        const result = calculateMostEventType(infoCount, errorCount, warningCount);
         setMostEventValue(result.max)
         setMostEventType(result.type);
     }
     useEffect(() => {
         const fetchData = async () => {
-            //if (!token) return;           // TODO: DELETE COMMENT AFTER TESTING
-                                            //DON`T USE api=QueryApi() WE HAVE PROPS !!!
+            if (!token) return;
+
             try {
                 const recentEvents = await queryApi.getLastThreeEvents(token);
                 const mappedEvents: EventRow[] = recentEvents.map(event => ({
@@ -59,29 +53,30 @@ export default function Dashboard({queryApi,storageApi}:DashboardProps) {
                 setWarningCount(warningCount);
                 const errorCount = await queryApi.getErrorCount(token);
                 setErrorCount(errorCount);
-                getMostEventType(infoCount,errorCount,warningCount);
+                getMostEventType(infoCount, errorCount, warningCount);
                 console.log("Ucitani events");
-               /* const archive=await storageApi.getLargestArchive(token);
-                console.log("Arhiva largest ",archive)
+
+                const archive = await storageApi.getLargestArchive(token);
+                console.log("Arhiva largest ", archive)
                 setMostWeightArchive(archive.archiveName);
-                setMostWeightArchiveValue(archive.size);       
-                const event=await queryApi.getTopEventSource(token);
-                console.log("Top event ",event);
+                setMostWeightArchiveValue(archive.size);
+                const event = await queryApi.getTopEventSource(token);
+                console.log("Top event ", event);
                 setTopEvent(event.source!);
-                setTopEventValue(event.count!);    */  
+                setTopEventValue(event.count!);
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
         };
         fetchData();
-        const interval=window.setInterval(fetchData,5000);
-        return ()=>clearInterval(interval);
+        const interval = window.setInterval(fetchData, 5000);
+        return () => clearInterval(interval);
     }, [token]);
 
     return (
         <div className="border-2 border-[#282A28] bg-transparent rounded-[14px]">
             <h2 className="mt-[3px]! p-[5px]! m-[10px]!">Analytics</h2>
-             <div className="grid grid-cols-12 gap-5 p-2!">
+            <div className="grid grid-cols-12 gap-5 p-2!">
                 <div className="col-span-3">
                     <StatCard title="Total Raw Events" value={allEventsCount} icon={<BsDatabase />} iconColor="#60cdff" />
                 </div>
@@ -104,7 +99,7 @@ export default function Dashboard({queryApi,storageApi}:DashboardProps) {
             <div className="flex items-center gap-5 height-[20%] width-[100%] p-[10px]!">
                 <StatCard title="Top Event Source" subtitle={topEvent} value={topEventValue} valueDescription="events" />
                 <StatCard title="Most Event Type" subtitle={mostEventType} value={mostEventValue} valueDescription="events" />
-                <StatCard title="Most weight archive" subtitle={mostWeightArchive} value={mostWeightArchiveValue} valueDescription="MB" />
+                <StatCard title="Most weight archive" subtitle={mostWeightArchive} value={mostWeightArchiveValue} valueDescription="bytes" />
             </div>
             <h2 className="mt-[10px]! p-[5px]! m-[10px]!">Recent Events</h2>
             <RecentEventsTable events={eventsData} />

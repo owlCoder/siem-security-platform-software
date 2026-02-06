@@ -2,6 +2,7 @@ import { IoClose } from "react-icons/io5";
 import { EventRow } from "../../types/events/EventRow";
 import { IParserAPI } from "../../api/parser/IParserAPI";
 import { useEffect, useState } from "react";
+import { useAuth } from "../../hooks/useAuthHook";
 
 interface PropsEvent {
     parserApi: IParserAPI;
@@ -14,12 +15,11 @@ export default function EventDetailsPanel({
     onClose,
     e
 }: PropsEvent) {
-
-    const token = "token";      // TODO: DELETE AFTER TESTING!
+    const { token } = useAuth();
     const [rawMsg, setRawMsg] = useState<string>();
 
     useEffect(() => {
-        //if (!token) return;       // TODO: DELETE COMMENT AFTER TESTING!
+        if (!token) return;
 
         const loadEventRawMessage = async () => {
             if (!e || !e.id) return;

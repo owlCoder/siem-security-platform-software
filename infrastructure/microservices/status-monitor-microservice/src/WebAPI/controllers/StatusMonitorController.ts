@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { Repository } from "typeorm";
+import { IsNull, Repository } from "typeorm";
 
 import { ServiceCheck } from "../../Domain/models/ServiceCheck";
 import { ServiceIncident } from "../../Domain/models/ServiceIncident";
@@ -45,10 +45,20 @@ export class StatusMonitorController {
           order: { checkedAt: "DESC" },
         });
 
+        const activeIncident = await this.incidentRepo.findOne({
+                where: { serviceName: s.serviceName, endTime: IsNull() }
+            });
+
+            // POZIVAMO NOVU METODU
+            const history = await this.analyticsService.get30DayHistory(s.serviceName);
+
         result.push({
-          serviceName: s.serviceName,
-          pingUrl: s.pingUrl,
-          lastCheck: lastCheck ?? null,
+                serviceName: s.serviceName,
+                pingUrl: s.pingUrl,
+                lastCheck: lastCheck ?? null,
+                isDown: !!activeIncident,
+                incidentId: activeIncident ? activeIncident.id : null,
+                history: history 
         });
       }
 

@@ -5,25 +5,25 @@ import { AlertQueryDTO } from "../models/alerts/AlertQueryDTO";
 import { useAuth } from "./useAuthHook";
 
 export const useAlerts = (alertAPI: IAlertAPI) => {
- // const { token } = useAuth();
+  const { token } = useAuth();
   const [alerts, setAlerts] = useState<AlertDTO[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
- const token = "token"; 
+
   // Initial load - fetch all alerts
   useEffect(() => {
-    //if (token) {
+    if (token) {
       loadAlerts();
-   // }
+    }
   }, [token]);
 
   const loadAlerts = async () => {
     //if (!token) return;
-    
+
     setIsLoading(true);
     setError(null);
     try {
-      const data = await alertAPI.getAllAlerts(token);
+      const data = await alertAPI.getAllAlerts(token!);
       setAlerts(data);
     } catch (err) {
       setError("Failed to load alerts");
@@ -34,8 +34,8 @@ export const useAlerts = (alertAPI: IAlertAPI) => {
   };
 
   const searchAlerts = async (query: AlertQueryDTO) => {
-    //if (!token) return;
-    
+    if (!token) return;
+
     setIsLoading(true);
     setError(null);
     try {
@@ -51,13 +51,13 @@ export const useAlerts = (alertAPI: IAlertAPI) => {
   };
 
   const resolveAlert = async (id: number, resolvedBy: string, status: string) => {
-    //if (!token) return;
-    
+    if (!token) return;
+
     try {
-      const updatedAlert = await alertAPI.resolveAlert(id, resolvedBy, status, token);
-      
+      const updatedAlert = await alertAPI.resolveAlert(id, resolvedBy, status, token!);
+
       // Update local state
-      setAlerts(prev => 
+      setAlerts(prev =>
         prev.map(alert => alert.id === id ? updatedAlert : alert)
       );
     } catch (err) {
@@ -68,13 +68,13 @@ export const useAlerts = (alertAPI: IAlertAPI) => {
   };
 
   const updateStatus = async (id: number, status: string) => {
-   // if (!token) return;
-    
+    if (!token) return;
+
     try {
       const updatedAlert = await alertAPI.updateAlertStatus(id, status, token);
-      
+
       // Update local state
-      setAlerts(prev => 
+      setAlerts(prev =>
         prev.map(alert => alert.id === id ? updatedAlert : alert)
       );
     } catch (err) {
@@ -91,7 +91,7 @@ export const useAlerts = (alertAPI: IAlertAPI) => {
 
   // Method to update existing alert (for SSE)
   const updateAlert = (updatedAlert: AlertDTO) => {
-    setAlerts(prev => 
+    setAlerts(prev =>
       prev.map(alert => alert.id === updatedAlert.id ? updatedAlert : alert)
     );
   };

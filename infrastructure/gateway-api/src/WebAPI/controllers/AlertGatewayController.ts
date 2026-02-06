@@ -20,40 +20,40 @@ export class AlertGatewayController {
     // SSE Stream za real-time notifikacije
     this.router.get(
       "/alerts/notifications/stream",
-      /*this.authenticate,
-      requireSysAdmin,*/
+      this.authenticate,
+      requireSysAdmin,
       this.streamAlertNotifications.bind(this)
     );
 
     // Alert CRUD operacije
     this.router.get(
       "/alerts/search",
-      /*this.authenticate,
-      requireSysAdmin,*/
+      this.authenticate,
+      requireSysAdmin,
       this.searchAlerts.bind(this)
     );
     this.router.get(
       "/alerts",
-      /*this.authenticate,
-      requireSysAdmin,*/
+      this.authenticate,
+      requireSysAdmin,
       this.getAllAlerts.bind(this)
     );
     this.router.get(
       "/alerts/:id",
-      /*this.authenticate,
-      requireSysAdmin,*/
+      this.authenticate,
+      requireSysAdmin,
       this.getAlertById.bind(this)
     );
     this.router.put(
       "/alerts/:id/resolve",
-      /*this.authenticate,
-      requireSysAdmin,*/
+      this.authenticate,
+      requireSysAdmin,
       this.resolveAlert.bind(this)
     );
     this.router.put(
       "/alerts/:id/status",
-      /*this.authenticate,
-      requireSysAdmin,*/
+      this.authenticate,
+      requireSysAdmin,
       this.updateAlertStatus.bind(this)
     );
   }

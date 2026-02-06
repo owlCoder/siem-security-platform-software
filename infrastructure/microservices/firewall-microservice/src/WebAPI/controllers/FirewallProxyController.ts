@@ -2,7 +2,6 @@ import { Router, Request, Response } from "express";
 import axios, { Method } from "axios";
 import { IFirewallService } from "../../Domain/services/IFirewallService";
 import { ILogerService } from "../../Domain/services/ILogerService";
-import { microserviceUrls } from "../../Domain/constants/MicroserviceUrls";
 import { normalizeIpAddress } from "../../Utils/Proxy/NormalizeIp";
 import { getMicroserviceUrl } from "../../Utils/Proxy/GetMicroserviceUrl";
 import { parseUrl } from "../../Utils/Proxy/ParseUrl";

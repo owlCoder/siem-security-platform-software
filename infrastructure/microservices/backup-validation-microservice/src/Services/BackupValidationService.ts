@@ -13,6 +13,7 @@ import { CreateAlertDTO } from "../Domain/DTOs/CreateAlertDTO";
 import { AlertSeverity } from "../Domain/enums/AlertSeverity";
 import { AxiosInstance } from "axios";
 import { createAxiosClient } from "../Utils/Client/AxiosClient";
+import { AlertCategory } from "../Domain/enums/AlertCategory";
 
 export class BackupValidationService implements IBackupValidationService {
     private readonly backupFilePath: string;
@@ -149,7 +150,10 @@ export class BackupValidationService implements IBackupValidationService {
                 description: message,
                 severity: AlertSeverity.HIGH,
                 source: "BackupValidationService",
-                detectionRule: "backup_validation"
+                detectionRule: "backup_validation",
+                category: AlertCategory.OTHER,
+                correlatedEvents: [],
+                oldestEventTimestamp: new Date()
             };
 
             await this.alertClient.post("/alerts", alertData);

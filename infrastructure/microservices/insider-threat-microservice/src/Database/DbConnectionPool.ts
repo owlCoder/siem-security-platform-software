@@ -3,7 +3,6 @@ import { DataSource } from "typeorm";
 import dotenv from "dotenv";
 import { InsiderThreat } from "../Domain/models/InsiderThreat";
 import { UserRiskProfile } from "../Domain/models/UserRiskProfile";
-import { UserCache } from "../Domain/models/UserCache";
 
 dotenv.config();
 
@@ -16,6 +15,6 @@ export const Db = new DataSource({
   database: process.env.DB_NAME,
   ssl: { rejectUnauthorized: false },
   synchronize: true, 
-  logging: false, 
-  entities: [InsiderThreat, UserRiskProfile, UserCache],
+  logging: false,
+  entities: [InsiderThreat, UserRiskProfile],
 });

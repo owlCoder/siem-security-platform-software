@@ -8,6 +8,7 @@ import { IRiskScoreAPI } from "../../../api/risk-score/IRiskScoreAPI";
 import { IFirewallAPI } from "../../../api/firewall/IFirewallAPI";
 import { IBackupValidationAPI } from "../../../api/backup/IBackupValdationAPI";
 import { IIntegrityAPI } from "../../../api/integrity/IIntegrityAPI";
+import { IStatusMonitorAPI } from "../../../api/status-monitor/IStatusMonitorAPI";
 //import { IInsiderThreatAPI } from "../../../api/insider-threat/IInsiderThreatAPI";
 
 export interface MainLayoutProps {
@@ -21,6 +22,7 @@ export interface MainLayoutProps {
     firewallApi: IFirewallAPI;
     backupApi: IBackupValidationAPI;
     integrityApi: IIntegrityAPI;
+    statusMonitorApi: IStatusMonitorAPI;
 }
 /*
 import { ISecurityMaturityAPI } from "../../../api/security-maturity/ISecurityMaturityAPI";

@@ -10,5 +10,7 @@ export interface CorrelationDTO {
     severity: "CRITICAL"|"HIGH" | "MEDIUM" | "LOW";
     correlatedEventIds: number[];
     ipAddress?: string;
+    userId?: number;
+    userRole?: string;
 }
 

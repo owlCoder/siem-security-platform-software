@@ -1,5 +1,4 @@
-
-
+import { DistributionDTO } from "../Domain/DTOs/DistributionDTO";
 import { IQueryService } from "../Domain/services/IQueryService";
 import { IQueryRepositoryService } from "../Domain/services/IQueryRepositoryService";
 import { parseQueryString } from "../Utils/ParseQuery";
@@ -29,8 +28,8 @@ import { IQueryAlertRepositoryService } from "../Domain/services/IQueryAlertRepo
 export class QueryService implements IQueryService {
     constructor(
         private readonly queryRepositoryService: IQueryRepositoryService,
-        private readonly queryAlertRepositoryService: IQueryAlertRepositoryService 
-    ) {}
+        private readonly queryAlertRepositoryService: IQueryAlertRepositoryService
+    ) { }
 
     async searchEvents(query: string, page: number = 1, limit: number = 50): Promise<EventsResultDTO> {
         const cacheResult = await this.queryRepositoryService.findByKey(`${query}_p${page}_l${limit}`);
@@ -46,7 +45,7 @@ export class QueryService implements IQueryService {
         const filters = parseQueryString(query);
         const textQuery = filters["text"] || "";
         delete filters["text"];
-        
+
         let matchingIds: Set<number>;
         const allEvents = await this.queryRepositoryService.getAllEvents();
 
@@ -79,9 +78,11 @@ export class QueryService implements IQueryService {
             type: e.type,
             description: e.description,
             timestamp: e.timestamp,
-            ipAddress: e.ipAddress
+            ipAddress: e.ipAddress,
+            userId: e.userId,
+            userRole: e.userRole
         }));
-        
+
         const response: EventsResultDTO = {
             total: totalResults,
             data: data,
@@ -96,13 +97,13 @@ export class QueryService implements IQueryService {
         });
 
         return response;
-    } 
+    }
 
     public async generatePdfReport(dateFrom: string, dateTo: string, eventType: string): Promise<string> {
-        const eventsToReport = await this.queryRepositoryService.getFilteredEvents(dateFrom, dateTo, eventType); 
+        const eventsToReport = await this.queryRepositoryService.getFilteredEvents(dateFrom, dateTo, eventType);
 
         if (!eventsToReport || eventsToReport.length === 0) {
-            return ''; 
+            return '';
         }
 
         const data: EventDTO[] = eventsToReport.map(e => ({
@@ -111,39 +112,65 @@ export class QueryService implements IQueryService {
             type: e.type,
             description: e.description,
             timestamp: e.timestamp,
-            ipAddress: e.ipAddress
+            ipAddress: e.ipAddress,
+            userId: e.userId,
+            userRole: e.userRole
         }));
 
-        return await PdfGenerator.createReport(data); 
+        return await PdfGenerator.createReport(data);
     }
 
     public async generateAlertsPdfReport(
-    severity: string,
-    status?: string,
-    source?: string,
-    dateFrom?: string,
-    dateTo?: string
-): Promise<string> {
-    try {
-        const alerts = await this.queryAlertRepositoryService.getFilteredAlerts(
-            severity, status, source, dateFrom, dateTo
-        );
+        severity: string,
+        status?: string,
+        source?: string,
+        dateFrom?: string,
+        dateTo?: string
+    ): Promise<string> {
+        try {
+            const alerts = await this.queryAlertRepositoryService.getFilteredAlerts(
+                severity, status, source, dateFrom, dateTo
+            );
 
-        if (!alerts || alerts.length === 0) return "";
+            if (!alerts || alerts.length === 0) return "";
 
-        const reportData: AlertReportDTO[] = alerts.map(a => ({
-            source: a.source,
-            severity: a.severity,
-            status: a.status,
-            createdAt: a.createdAt.toLocaleString(),
-            description: a.source 
-        }));
+            const reportData: AlertReportDTO[] = alerts.map(a => ({
+                source: a.source,
+                severity: a.severity,
+                status: a.status,
+                createdAt: a.createdAt.toLocaleString(),
+                description: a.source
+            }));
 
-        return await PdfGenerator.createAlertReport(reportData);
-    } catch (error) {
-        console.error("Error in generateAlertsPdfReport:", error);
-        throw error;
+            return await PdfGenerator.createAlertReport(reportData);
+        } catch (error) {
+            console.error("Error in generateAlertsPdfReport:", error);
+            throw error;
+        }
     }
-}
+
+    async getEventDistribution(): Promise<DistributionDTO> {
+    const [infoCount, warningCount, errorCount] = await Promise.all([
+      this.queryRepositoryService.getInfoCount(),
+      this.queryRepositoryService.getWarningCount(),
+      this.queryRepositoryService.getErrorCount(),
+    ]);
+
+    console.log("Event counts - Info:", infoCount, "Warning:", warningCount, "Error:", errorCount);
+    const total = infoCount + warningCount + errorCount;
+
+    if (total === 0) {
+      return { notifications: 0, warnings: 0, errors: 0 };
+    }
+
+    const toPct = (x: number) =>
+    Math.round((x / total) * 100 * 100) / 100;
+
+    return {
+      notifications: toPct(infoCount),
+      warnings: toPct(warningCount),
+      errors: toPct(errorCount),
+    };
+  }
 
 }

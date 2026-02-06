@@ -1,119 +1,77 @@
-import express from "express";
+import express, { Application } from "express";
 import cors from "cors";
-import "reflect-metadata";
-import dotenv from "dotenv";
-import { initialize_database } from "./Database/InitializeConnection";
 import { Db } from "./Database/DbConnectionPool";
-import { Repository } from "typeorm";
+import { initialize_database } from "./Database/InitializeConnection";
 import { InsiderThreat } from "./Domain/models/InsiderThreat";
 import { UserRiskProfile } from "./Domain/models/UserRiskProfile";
-import { UserCache } from "./Domain/models/UserCache";
-import { InsiderThreatController } from "./WebAPI/controllers/InsiderThreatController";
-import { InternalController } from "./WebAPI/controllers/InternalController";
 import { InsiderThreatRepositoryService } from "./Services/InsiderThreatRepositoryService";
-import { InsiderThreatService } from "./Services/InsiderThreatService";
 import { UserRiskRepositoryService } from "./Services/UserRiskRepositoryService";
+import { InsiderThreatService } from "./Services/InsiderThreatService";
 import { UserRiskAnalysisService } from "./Services/UserRiskAnalysisService";
 import { ThreatDetectionService } from "./Services/ThreatDetectionService";
-import { UserCacheService } from "./Services/UserCacheService";
+import { EventFetcherService } from "./Services/EventFetcherService"; 
 import { LoggerService } from "./Services/LoggerService";
+import { InsiderThreatController } from "./WebAPI/controllers/InsiderThreatController";
 import { ThreatAnalysisJob } from "./Jobs/ThreatAnalysisJob";
 
-dotenv.config();
+const app: Application = express();
+const PORT = process.env.PORT || 5792;
+const EVENT_COLLECTOR_URL = process.env.EVENT_COLLECTOR_URL || "http://localhost:8259/api/v1";
 
-const app = express();
+app.use(cors({ origin: process.env.CORS_ORIGIN || "*" }));
 app.use(express.json());
 
-app.use(
-  cors({
-    origin: process.env.CORS_ORIGIN ?? "*",
-    methods: process.env.CORS_METHODS?.split(",") ?? ["GET", "POST", "PUT", "DELETE"],
-    credentials: true
-  })
-);
-
-initialize_database();
-
-// Health check endpoint
-app.get("/health", (req, res) => {
-  res.status(200).json({
-    status: "OK",
-    service: "InsiderThreatService",
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+app.get("/", (req, res) => {
+  res.json({ 
+    service: "Insider Threat Detection Service",
+    version: "1.0.0",
+    status: "running"
   });
 });
 
-// Repositories
-const typeormThreatRepo: Repository<InsiderThreat> = Db.getRepository(InsiderThreat);
-const typeormRiskRepo: Repository<UserRiskProfile> = Db.getRepository(UserRiskProfile);
-const typeormUserCacheRepo: Repository<UserCache> = Db.getRepository(UserCache);
+(async () => {
+  await initialize_database();
 
-// Services
-const logger = new LoggerService();
-const threatRepository = new InsiderThreatRepositoryService(typeormThreatRepo, logger);
-const threatService = new InsiderThreatService(threatRepository, logger);
-const riskRepository = new UserRiskRepositoryService(typeormRiskRepo, logger);
-const riskService = new UserRiskAnalysisService(riskRepository, threatRepository, logger);
-const detectionService = new ThreatDetectionService(logger);
-const userCacheService = new UserCacheService(typeormUserCacheRepo, logger);
+  const logger = new LoggerService();
+  const threatRepository = Db.getRepository(InsiderThreat);
+  const riskRepository = Db.getRepository(UserRiskProfile);
+  const threatRepoService = new InsiderThreatRepositoryService(threatRepository, logger);
+  const riskRepoService = new UserRiskRepositoryService(riskRepository, logger);
+  const threatService = new InsiderThreatService(threatRepoService, logger); 
+  const eventFetcherService = new EventFetcherService(EVENT_COLLECTOR_URL, logger);
+  const threatDetectionService = new ThreatDetectionService(
+    eventFetcherService,
+    logger
+  );
 
-// Controller
-const insiderThreatController = new InsiderThreatController(
-  threatService,
-  riskService,
-  logger
-);
+  const riskService = new UserRiskAnalysisService(
+    riskRepoService,
+    threatRepoService,
+    logger
+  );
 
-const internalController = new InternalController(
-  userCacheService,
-  logger
-);
+  const controller = new InsiderThreatController(
+    threatService,
+    riskService,
+    logger
+  );
 
-app.use("/api/v1", insiderThreatController.getRouter());
-app.use("/api/v1/internal", internalController.getRouter());
+  app.use("/api/v1", controller.getRouter());
 
-const EVENT_COLLECTOR_URL = process.env.EVENT_COLLECTOR_URL || "http://localhost:8259/api/v1";
-const JOB_INTERVAL_MINUTES = parseInt(process.env.THREAT_ANALYSIS_INTERVAL_MINUTES || "15", 10);
+  app.listen(PORT, () => {
+    logger.log(`[TCPListen@InsiderThreat] localhost:${PORT}`);
+  });
 
-logger.log(`Event Collector URL: ${EVENT_COLLECTOR_URL}`);
-logger.log(`Job interval: ${JOB_INTERVAL_MINUTES} minutes`);
+  const job = new ThreatAnalysisJob(
+    eventFetcherService,
+    threatService,
+    riskService,
+    threatDetectionService,
+    logger,
+    15
+  );
 
-const threatAnalysisJob = new ThreatAnalysisJob(
-  EVENT_COLLECTOR_URL,
-  threatService,
-  riskService,
-  detectionService,
-  userCacheService,
-  logger,
-  JOB_INTERVAL_MINUTES
-);
-
-setTimeout(() => {
-  logger.log("=".repeat(60));
-  logger.log("STARTING THREAT ANALYSIS JOB");
-  logger.log("=".repeat(60));
-  threatAnalysisJob.start();
-}, 30000);
-
-process.on("SIGINT", () => {
-  logger.log("\n" + "=".repeat(60));
-  logger.log("SHUTTING DOWN INSIDER THREAT SERVICE");
-  logger.log("=".repeat(60));
-  threatAnalysisJob.stop();
-  setTimeout(() => {
-    process.exit(0);
-  }, 1000);
-});
-
-process.on("SIGTERM", () => {
-  logger.log("\n" + "=".repeat(60));
-  logger.log("SHUTTING DOWN INSIDER THREAT SERVICE");
-  logger.log("=".repeat(60));
-  threatAnalysisJob.stop();
-  setTimeout(() => {
-    process.exit(0);
-  }, 1000);
-});
+  job.start();
+})();
 
 export default app;

@@ -49,4 +49,10 @@ export class Alert {
 
   @Column({ type: "varchar", length: 45, nullable: true })
   ipAddress?: string;
+
+  @Column({ type: "int", nullable: true })
+  userId?: number;
+
+  @Column({ type: "varchar", length: 50, nullable: true })
+  userRole?: string;
 }

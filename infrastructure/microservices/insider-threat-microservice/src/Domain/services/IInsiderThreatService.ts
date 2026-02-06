@@ -8,7 +8,7 @@ export interface IInsiderThreatService {
   createThreat(data: CreateInsiderThreatDTO): Promise<InsiderThreatDTO>;
   getAllThreats(): Promise<InsiderThreatDTO[]>;
   getThreatById(id: number): Promise<InsiderThreatDTO>;
-  getThreatsByUserId(userId: string): Promise<InsiderThreatDTO[]>;
+  getThreatsByUserId(userId: number): Promise<InsiderThreatDTO[]>;
   getThreatsByType(type: ThreatType): Promise<InsiderThreatDTO[]>;
   getThreatsByRiskLevel(level: RiskLevel): Promise<InsiderThreatDTO[]>;
   getUnresolvedThreats(): Promise<InsiderThreatDTO[]>;

@@ -1,72 +1,97 @@
 import { DetectionResult } from "../../Domain/types/DetectionResult";
 import { ThreatType } from "../../Domain/enums/ThreatType";
 import { RiskLevel } from "../../Domain/enums/RiskLevel";
-
-/**
- * Koreliše aktivnosti korisnika sa Auth događajima
- * Detektuje sumnjive pattern-e kao što su:
- * - Pristup nakon više neuspešnih pokušaja prijave
- * - Promena dozvola nakon uspešne prijave sa nepoznate IP adrese
- */
+import { Event } from "../../Domain/services/IEventFetcherService";
 export async function correlateAuthEvents(
-  userId: string,
-  eventIds: number[]
+  userId: number,
+  events: Event[]
 ): Promise<DetectionResult[]> {
+  
   const detections: DetectionResult[] = [];
 
-  // Ovde bi trebalo fetchovati auth događaje iz Auth mikroservisa
-  // i uporediti ih sa ostalim događajima
-  
-  // Simulacija: detektovanje pristupa nakon failed login-a
-  // U realnoj implementaciji bi se ovo radilo kroz API pozive
-  
-  // Pattern 1: Uspešna prijava nakon više neuspelih pokušaja
-  const suspiciousLoginPattern: DetectionResult = {
-    isDetected: true,
-    threatType: ThreatType.SUSPICIOUS_LOGIN,
-    riskLevel: RiskLevel.HIGH,
-    description: `User ${userId} successfully logged in after multiple failed attempts. Possible credential compromise.`,
-    metadata: {
-      pattern: "FAILED_THEN_SUCCESS",
-      failedAttempts: 5,
-      analysisTime: new Date().toISOString()
-    },
-    correlatedEventIds: eventIds
-  };
+  const sortedEvents = [...events].sort((a, b) => 
+    new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+  );
 
-  // Pattern 2: Brza promena dozvola nakon prijave
-  const rapidPermissionChangePattern: DetectionResult = {
-    isDetected: true,
-    threatType: ThreatType.PERMISSION_CHANGE,
-    riskLevel: RiskLevel.CRITICAL,
-    description: `User ${userId} changed permissions immediately after login. Possible account takeover.`,
-    metadata: {
-      pattern: "LOGIN_THEN_PERMISSION_CHANGE",
-      timeGap: "< 5 minutes",
-      analysisTime: new Date().toISOString()
-    },
-    correlatedEventIds: eventIds
-  };
+  const failedLogins = sortedEvents.filter(e => {
+    const desc = e.description.toLowerCase();
+    const type = e.type.toUpperCase();
+    return (
+      (desc.includes('failed login') || desc.includes('login failed') || desc.includes('authentication failed')) &&
+      (type === 'ERROR' || type === 'WARNING')
+    );
+  });
 
-  // Vraćamo detektovane pattern-e
-  // U realnoj implementaciji bi se ovo dinamički određivalo
-  if (eventIds.length > 5) {
-    detections.push(suspiciousLoginPattern);
+  const successfulLogins = sortedEvents.filter(e => {
+    const desc = e.description.toLowerCase();
+    const type = e.type.toUpperCase();
+    return (
+      (desc.includes('successful login') || desc.includes('login successful') || desc.includes('logged in')) &&
+      type === 'INFO'
+    );
+  });
+
+  if (failedLogins.length >= 3 && successfulLogins.length > 0) {
+    const lastFailed = failedLogins[failedLogins.length - 1];
+    const firstSuccess = successfulLogins[0];
+    
+    if (new Date(firstSuccess.timestamp) > new Date(lastFailed.timestamp)) {
+      const correlatedIds = [
+        ...failedLogins.map(e => e.id),
+        firstSuccess.id
+      ];
+
+      let riskLevel: RiskLevel;
+      if (failedLogins.length >= 10) {
+        riskLevel = RiskLevel.CRITICAL;
+      } else if (failedLogins.length >= 5) {
+        riskLevel = RiskLevel.HIGH;
+      } else {
+        riskLevel = RiskLevel.MEDIUM;
+      }
+
+      detections.push({
+        isDetected: true,
+        threatType: ThreatType.SUSPICIOUS_LOGIN,
+        riskLevel,
+        description: `User ${userId} successfully logged in after ${failedLogins.length} failed attempts. Possible credential compromise.`,
+        metadata: {
+          pattern: "FAILED_THEN_SUCCESS",
+          failedAttempts: failedLogins.length,
+          analysisTime: new Date().toISOString(),
+          timespan: {
+            firstFailed: failedLogins[0].timestamp.toISOString(),
+            lastFailed: lastFailed.timestamp.toISOString(),
+            successfulLogin: firstSuccess.timestamp.toISOString()
+          }
+        },
+        correlatedEventIds: correlatedIds
+      });
+    }
+  }
+
+  if (failedLogins.length >= 5 && successfulLogins.length === 0) {
+    detections.push({
+      isDetected: true,
+      threatType: ThreatType.SUSPICIOUS_LOGIN,
+      riskLevel: RiskLevel.MEDIUM,
+      description: `User ${userId} had ${failedLogins.length} failed login attempts without successful login. Possible brute force attack.`,
+      metadata: {
+        pattern: "MULTIPLE_FAILED",
+        failedAttempts: failedLogins.length,
+        analysisTime: new Date().toISOString()
+      },
+      correlatedEventIds: failedLogins.map(e => e.id)
+    });
   }
 
   return detections;
 }
 
-/**
- * Proverava da li je IP adresa sumnjiva
- */
 export function isSuspiciousIP(ipAddress: string, knownIPs: string[]): boolean {
   return !knownIPs.includes(ipAddress);
 }
 
-/**
- * Računa vremenski jaz između dva događaja
- */
 export function calculateTimeGap(timestamp1: Date, timestamp2: Date): number {
   return Math.abs(timestamp2.getTime() - timestamp1.getTime());
 }

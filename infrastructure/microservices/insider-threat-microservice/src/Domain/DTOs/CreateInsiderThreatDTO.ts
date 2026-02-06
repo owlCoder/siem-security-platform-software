@@ -1,11 +1,7 @@
-import { RiskLevel } from "../enums/RiskLevel";
 import { ThreatType } from "../enums/ThreatType";
-
-
-
-export interface CreateInsiderThreatDTO {
-  userId: string;
-  username: string;
+import { RiskLevel } from "../enums/RiskLevel";
+export type CreateInsiderThreatDTO = {
+  userId: number;
   threatType: ThreatType;
   riskLevel: RiskLevel;
   description: string;

@@ -49,67 +49,74 @@ app.use(cors({
 
 app.use(express.json());
 
-/* ========================
-   DATABASE
-======================== */
-initialize_database();
+const startServer = async () => {
+  try {
+    // 1. Čekamo da se baza poveže
+    await initialize_database();
+    console.log("✅ Database initialized successfully. Loading repositories...");
 
-/* ========================
-   ORM REPOSITORIES
-======================== */
-const thresholdRepository: Repository<ServiceThreshold> =
-  Db.getRepository(ServiceThreshold);
+    /* ========================
+       ORM REPOSITORIES
+    ======================== */
+    // Sada je bezbedno uzeti repozitorijume jer baza radi
+    const thresholdRepository: Repository<ServiceThreshold> =
+      Db.getRepository(ServiceThreshold);
 
-const checkRepository: Repository<ServiceCheck> =
-  Db.getRepository(ServiceCheck);
+    const checkRepository: Repository<ServiceCheck> =
+      Db.getRepository(ServiceCheck);
 
-const incidentRepository: Repository<ServiceIncident> =
-  Db.getRepository(ServiceIncident);
+    const incidentRepository: Repository<ServiceIncident> =
+      Db.getRepository(ServiceIncident);
 
-/* ========================
-   SERVICES
-======================== */
-const monitoringService: IMonitoringService = new MonitoringService(thresholdRepository, checkRepository);
+    /* ========================
+       SERVICES
+    ======================== */
+    const monitoringService: IMonitoringService = new MonitoringService(thresholdRepository, checkRepository);
+    const incidentService: IIncidentService = new IncidentService(checkRepository, incidentRepository, thresholdRepository);
+    const monitoringOrchestrator = new MonitoringOrchestrator(monitoringService, incidentService, thresholdRepository);
+    const analyticsService = new AnalyticsService(checkRepository, incidentRepository);
 
-const incidentService: IIncidentService = new IncidentService(checkRepository, incidentRepository, thresholdRepository);
+    /* ========================
+       CONTROLLERS
+    ======================== */
+    const statusMonitorController = new StatusMonitorController(
+      monitoringService,
+      incidentService,
+      analyticsService,
+      checkRepository,
+      incidentRepository,
+      thresholdRepository
+    );
 
-const monitoringOrchestrator = new MonitoringOrchestrator(monitoringService, incidentService, thresholdRepository);
+    /* ========================
+       ROUTES
+    ======================== */
+    app.get("/health", (_req, res) => {
+      res.status(200).json({ status: "OK", service: "StatusMonitor" });
+    });
 
-const analyticsService = new AnalyticsService(checkRepository);
+    app.use("/api/v1", statusMonitorController.getRouter());
 
-/* ========================
-   CONTROLLERS
-======================== */
-const statusMonitorController =
-  new StatusMonitorController(
-    monitoringService,
-    incidentService,
-    analyticsService,
-    checkRepository,
-    incidentRepository,
-    thresholdRepository
-  );
+    /* ========================
+       JOBS & SCHEDULER
+    ======================== */
+    const monitoringJob = new RecurringMonitoringJob(monitoringOrchestrator);
 
-/* ========================
-   ROUTES
-======================== */
-app.get("/health", (_req, res) => {
-  res.status(200).json({ status: "OK", service: "StatusMonitor" });
-});
+    const intervalSec = Number(process.env.DEFAULT_CHECK_INTERVAL_SEC ?? "30");
 
-app.use("/api/v1", statusMonitorController.getRouter());
+    const scheduler = new IntervalScheduler(monitoringJob, intervalSec * 1000);
+    
+    // Startujemo scheduler tek kad je sve spremno
+    scheduler.start();
+    console.log(`🕒 Scheduler started with interval: ${intervalSec}s`);
 
-/* ========================
-   JOBS
-======================== */
-const monitoringJob = new RecurringMonitoringJob(monitoringOrchestrator);
+  } catch (error) {
+    console.error("❌ Failed to start application:", error);
+    process.exit(1);
+  }
+};
 
-const intervalSec =
-  Number(process.env.DEFAULT_CHECK_INTERVAL_SEC ?? "30");
-
-const scheduler =
-  new IntervalScheduler(monitoringJob, intervalSec * 1000);
-
-scheduler.start();
+// Pokrećemo celu priču
+startServer();
 
 export default app;

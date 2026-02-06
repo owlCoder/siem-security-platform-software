@@ -13,13 +13,13 @@ export class ArchiveQueryService implements IArchiveQueryService {
     constructor(
         private readonly storageRepo: Repository<StorageLog>,
         private readonly logger: ILogerService
-    ) {}
+    ) { }
 
     public async getArchives(): Promise<StorageLog[]> {
         await this.logger.log("Fetching archive list...");
         return this.storageRepo.find();
     }
-    
+
     public async getArchiveFilePath(id: number): Promise<string | null> {
         try {
 
@@ -36,29 +36,28 @@ export class ArchiveQueryService implements IArchiveQueryService {
     }
 
     public async getTopArchives(type: "events" | "alerts", limit: number): Promise<TopArchiveDTO[]> {
-            try {
-                const archiveType = type === "events" ? ArchiveType.EVENT : ArchiveType.ALERT;
-    
-                const archives = await this.storageRepo.find({
-                    where: { archiveType },
-                    order: { recordCount: "DESC" },
-                    take: limit
-                });
-    
-                return archives.map(a => ({
-                    id: a.storageLogId,
-                    fileName: a.fileName,
-                    count: a.recordCount
-                }));
-            } catch (err) {
-                await this.logger.log("ERROR fetching top archives");
-                return []; //prazan niz, znaci nema podataka
-            }
+        try {
+            const archiveType = type === "events" ? ArchiveType.EVENT : ArchiveType.ALERT;
+
+            const archives = await this.storageRepo.find({
+                where: { archiveType },
+                order: { recordCount: "DESC" },
+                take: limit
+            });
+
+            return archives.map(a => ({
+                id: a.storageLogId,
+                fileName: a.fileName,
+                count: a.recordCount
+            }));
+        } catch (err) {
+            await this.logger.log("ERROR fetching top archives");
+            return []; //prazan niz, znaci nema podataka
         }
-    
+    }
+
     public async getArchiveVolume(period: "daily" | "monthly" | "yearly"): Promise<ArchiveVolumeDTO[]> {
         try {
-
             const archives = await this.storageRepo.find();
             const volumeMap: Record<string, number> = {};
 
@@ -78,7 +77,7 @@ export class ArchiveQueryService implements IArchiveQueryService {
                         break;
                 }
 
-                volumeMap[key] = (volumeMap[key] || 0) + a.recordCount;
+                volumeMap[key] = (volumeMap[key] || 0) + a.fileSize;
             });
 
             return Object.entries(volumeMap).map(([label, size]) => ({ label, size })).sort((a, b) => a.label.localeCompare(b.label));
@@ -88,11 +87,11 @@ export class ArchiveQueryService implements IArchiveQueryService {
         }
     }
 
-    public async getLargestArchive(): Promise<LargestArchiveDTO|null> {
+    public async getLargestArchive(): Promise<LargestArchiveDTO | null> {
         try {
             const archives = await this.storageRepo.find();
 
-            if(archives.length === 0)
+            if (archives.length === 0)
                 return null;
 
             const largest = archives.reduce((max, curr) => curr.fileSize > max.fileSize ? curr : max);
@@ -105,6 +104,6 @@ export class ArchiveQueryService implements IArchiveQueryService {
             await this.logger.log("ERROR fetching largest archive");
             return null;
         }
-    }  
+    }
 
 }

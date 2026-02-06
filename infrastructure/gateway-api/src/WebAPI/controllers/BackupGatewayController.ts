@@ -13,12 +13,12 @@ export class BackupGatewayController {
     }
 
     private initializeRoutes(): void {
-        this.router.post("/backup/validate", /*this.authenticate,*/ this.runValidation.bind(this));
-        this.router.get("/backup/logs", /*this.authenticate,*/ this.getAllLogs.bind(this));
-        this.router.get("/backup/last", /*this.authenticate,*/ this.getLastValidation.bind(this));
-        this.router.get("/backup/summary", /*this.authenticate,*/ this.getSummary.bind(this));
-        this.router.get("/backup/health", /*this.authenticate,*/ this.getHealth.bind(this));
-        this.router.get("/backup/stats", /*this.authenticate,*/ this.getStats.bind(this) );
+        this.router.post("/backup/validate", this.authenticate, this.runValidation.bind(this));
+        this.router.get("/backup/logs", this.authenticate, this.getAllLogs.bind(this));
+        this.router.get("/backup/last", this.authenticate, this.getLastValidation.bind(this));
+        this.router.get("/backup/summary", this.authenticate, this.getSummary.bind(this));
+        this.router.get("/backup/health", this.authenticate, this.getHealth.bind(this));
+        this.router.get("/backup/stats", this.authenticate, this.getStats.bind(this));
     }
 
     private async runValidation(req: Request, res: Response) {
@@ -55,5 +55,4 @@ export class BackupGatewayController {
     public getRouter(): Router {
         return this.router;
     }
-
 }

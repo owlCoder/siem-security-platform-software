@@ -1,11 +1,8 @@
+import { BackupLogsToolbarProps } from "../../types/props/backup/BackupLogsToolbarProps";
 import DropDownMenu from "../events/DropDownMenu";
 
-interface Props {
-    onSort: (sortType: number) => void;
-    onReset: () => void;
-}
 
-export default function BackupLogsToolbar({ onSort, onReset }: Props) {
+export default function BackupLogsToolbar({ onSort, onReset }: BackupLogsToolbarProps) {
 
     return(        
         <div className="grid grid-cols-3 lg:grid-cols-2 w-full px-2! py-2! mb-6">

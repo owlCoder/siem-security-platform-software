@@ -6,7 +6,6 @@ export function toUserRiskProfileDTO(profile: UserRiskProfile): UserRiskProfileD
   return {
     id: profile.id,
     userId: profile.userId,
-    username: profile.username,
     riskScore: profile.riskScore,
     currentRiskLevel: profile.currentRiskLevel,
     totalThreatsDetected: profile.totalThreatsDetected,
@@ -25,8 +24,7 @@ export function toUserRiskProfileDTO(profile: UserRiskProfile): UserRiskProfileD
 export function createEmptyUserRiskProfileDTO(): UserRiskProfileDTO {
   return {
     id: -1,
-    userId: "",
-    username: "",
+    userId: -1,
     riskScore: 0,
     currentRiskLevel: RiskLevel.LOW,
     totalThreatsDetected: 0,

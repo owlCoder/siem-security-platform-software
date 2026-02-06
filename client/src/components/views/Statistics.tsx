@@ -16,8 +16,7 @@ export default function Statistics({ queryApi, storageApi }: StatisticsProps) {
        STATE & EFFECTS
        ======================= */
 
-    //const { token } = useAuth();
-    const token = "sdasda";
+    const { token } = useAuth();
     const [archiveType, setArchiveType] = useState<"events" | "alerts">("events");
     const [volumePeriod, setVolumePeriod] = useState<
         "daily" | "monthly" | "yearly"
@@ -38,11 +37,11 @@ export default function Statistics({ queryApi, storageApi }: StatisticsProps) {
 
             try {
                 const results = await Promise.allSettled([
-                    queryApi.getEventStatistics(token),
-                    queryApi.getAlertStatistics(token),
-                    queryApi.getEventDistribution(token),
-                    storageApi.getTopArchives(token, archiveType, 5),
-                    storageApi.getArchiveVolume(token, volumePeriod),
+                    queryApi.getEventStatistics(token!),
+                    queryApi.getAlertStatistics(token!),
+                    queryApi.getEventDistribution(token!),
+                    storageApi.getTopArchives(token!, archiveType, 5),
+                    storageApi.getArchiveVolume(token!, volumePeriod),
                 ]);
 
                 const [
@@ -53,9 +52,9 @@ export default function Statistics({ queryApi, storageApi }: StatisticsProps) {
                     volumeRes,
                 ] = results;
 
-                console.log("Event stats ",eventStats );
-                console.log("VOLUME RES ",volumeRes );
-                console.log("Dist RES ",distRes );
+                console.log("Event stats ", eventStats);
+                console.log("VOLUME RES ", volumeRes);
+                console.log("Dist RES ", distRes);
                 if (eventsRes.status === "fulfilled") setEventStats(eventsRes.value);
                 else console.error("getEventStatistics failed:", eventsRes.reason);
 
@@ -65,7 +64,7 @@ export default function Statistics({ queryApi, storageApi }: StatisticsProps) {
                 if (distRes.status === "fulfilled") setDistribution(distRes.value);
                 else console.error("getEventDistribution failed:", distRes.reason);
 
-                
+
 
                 if (topRes.status === "fulfilled") setTopArchives(topRes.value);
                 else console.error("getTopArchives failed:", topRes.reason);

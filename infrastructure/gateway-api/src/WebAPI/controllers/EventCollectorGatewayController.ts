@@ -19,56 +19,56 @@ export class EventCollectorGatewayController {
     private initializeRoutes(): void {
         this.router.get(
             "/events",
-            /* this.authenticate,
-             requireSysAdmin,*/
+            this.authenticate,
+            requireSysAdmin,
             this.getAllEvents.bind(this)
         );
         this.router.get(
             "/events/topSource",
-            //  this.authenticate, TODO WHEN IMPLEMENT AUTHENTICATE WITH TOKEN
-            //  requireSysAdmin,
+            this.authenticate,
+            requireSysAdmin,
             this.getTopSourceEvent.bind(this)
         );
 
         this.router.get(
             "/events/sortedEventsByDate",
-            /*this.authenticate,
-            requireSysAdmin,*/
+            this.authenticate,
+            requireSysAdmin,
             this.getSortedEventsByDate.bind(this)
         );
 
         this.router.get(
             "/events/percentages",
-            /*this.authenticate,
-            requireSysAdmin,*/
+            this.authenticate,
+            requireSysAdmin,
             this.getEventPercentagesByEvent.bind(this)
         );
 
         this.router.get(
             "/events/:id",
-            /*this.authenticate,
-            requireSysAdmin,*/
+            this.authenticate,
+            requireSysAdmin,
             this.getEventById.bind(this)
         );
 
         this.router.get(
             "/events/from/:fromId/to/:toId",
-            /*this.authenticate,
-            requireSysAdmin,*/
+            this.authenticate,
+            requireSysAdmin,
             this.getEventsFromId1ToId2.bind(this)
         );
 
         this.router.get(
             "/events",
-            /*this.authenticate,
-            requireSysAdmin,*/
+            this.authenticate,
+            requireSysAdmin,
             this.createEvent.bind(this)
         );
 
         this.router.delete(
             "/events/:id",
-            /* this.authenticate,
-             requireSysAdmin,*/
+            this.authenticate,
+            requireSysAdmin,
             this.deleteEvent.bind(this)
         );
 

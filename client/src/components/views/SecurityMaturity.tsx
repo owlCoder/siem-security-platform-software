@@ -9,6 +9,7 @@ import { SecurityMaturityTrendDTO } from "../../models/security-maturity/Securit
 import SecurityMaturityTrend from "../security-maturity/SecurityMaturityTrend";
 import IncidentsByCategoryChart from "../security-maturity/IncidentsByCategoryChart";
 import { AlertCategory } from "../../enums/AlertCategory";
+import { useAuth } from "../../hooks/useAuthHook";
 
 const testSecurityMaturity: SecuirtyMaturityCurrentDTO = {
   scoreValue: 72,
@@ -38,49 +39,48 @@ const testSecurityMaturityTrend: SecurityMaturityTrendDTO[] = [
 
 
 export default function SecurityMaturity({
-    securityMaturityApi
-}: SecurityMaturityProps){
+  securityMaturityApi
+}: SecurityMaturityProps) {
+  const { token } = useAuth();
+  const [summary, setSummary] = useState<SecuirtyMaturityCurrentDTO | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [trend, setTrend] = useState<SecurityMaturityTrendDTO[]>([]);
 
-    const token = "sdasda";
-    const [summary, setSummary] = useState<SecuirtyMaturityCurrentDTO | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [trend, setTrend] = useState<SecurityMaturityTrendDTO[]>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            setIsLoading(true);
+      try {
+        const res = await securityMaturityApi.getCurrent(token!);
+        setSummary(res);
+      } catch (err) {
+        console.error("Security maturity fetch failed", err);
+        setSummary(testSecurityMaturity);
+        setTrend(testSecurityMaturityTrend);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-            try{
-                const res = await securityMaturityApi.getCurrent(token);
-                setSummary(res);
-            } catch(err){
-                console.error("Security maturity fetch failed", err);
-                setSummary(testSecurityMaturity);
-                setTrend(testSecurityMaturityTrend);
-            } finally{
-                setIsLoading(false);
-            }
-        };
+    fetchData();
+  }, [token, securityMaturityApi]);
 
-        fetchData();
-    }, [token, securityMaturityApi]);
+  if (isLoading) {
+    return <div className="p-6">Loading security maturity...</div>;
+  }
 
-    if(isLoading){
-        return <div className="p-6">Loading security maturity...</div>;
-    }
+  if (!summary) {
+    return <div className="p-6">No security maturity data</div>;
+  }
 
-    if(!summary){
-        return <div className="p-6">No security maturity data</div>;
-    }
+  const incidentsByCategory = Object.entries(summary.categoryCounts).map(
+    ([category, count]) => ({
+      category: category as AlertCategory,
+      count
+    })
+  );
 
-    const incidentsByCategory = Object.entries(summary.categoryCounts).map(
-      ([category, count]) => ({
-        category: category as AlertCategory,
-        count
-      })
-    );
-
-    return (
+  return (
     <div className="p-6">
       <div className="grid grid-cols-2 gap-5">
 
@@ -102,22 +102,21 @@ export default function SecurityMaturity({
 
 
       </div>
-        <div className="flex flex-col items-center rounded-lg border-2 border-[#282A28] bg-[#1f2123] p-6">
-          <h2 className="text-sm uppercase tracking-widest text-gray-400">
-            Security Maturity Trend
-          </h2>
-          
-          <SecurityMaturityTrend data={trend} />
-        </div>
+      <div className="flex flex-col items-center rounded-lg border-2 border-[#282A28] bg-[#1f2123] p-6">
+        <h2 className="text-sm uppercase tracking-widest text-gray-400">
+          Security Maturity Trend
+        </h2>
 
-        <div className="flex flex-col items-center rounded-lg border-2 border-[#282A28] bg-[#1f2123] p-6">
-          <h2 className="text-sm uppercase tracking-widest text-gray-400">
-            Incidents By Category
-          </h2>
-          
-          <IncidentsByCategoryChart data={incidentsByCategory} />
-        </div>
+        <SecurityMaturityTrend data={trend} />
+      </div>
+
+      <div className="flex flex-col items-center rounded-lg border-2 border-[#282A28] bg-[#1f2123] p-6">
+        <h2 className="text-sm uppercase tracking-widest text-gray-400">
+          Incidents By Category
+        </h2>
+
+        <IncidentsByCategoryChart data={incidentsByCategory} />
+      </div>
     </div>
   );
-
 }

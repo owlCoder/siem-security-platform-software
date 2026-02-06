@@ -1,23 +1,36 @@
 import { DetectionResult } from "../../Domain/types/DetectionResult";
 import { ThreatType } from "../../Domain/enums/ThreatType";
 import { RiskLevel } from "../../Domain/enums/RiskLevel";
+import { Event } from "../../Domain/services/IEventFetcherService";
 
-// Pragovi za detekciju masovnog čitanja
 const MASS_READ_THRESHOLD = {
-  CRITICAL: 1000,  // 1000+ read operacija u kratkom periodu
+  CRITICAL: 1000,
   HIGH: 500,
   MEDIUM: 200,
   LOW: 100
 };
 
 export async function detectMassDataRead(
-  userId: string, 
-  eventIds: number[]
+  userId: number,
+  events: Event[]
 ): Promise<DetectionResult | null> {
-  // Ovde bi trebalo fetchovati događaje i analizirati ih
-  // Za sada simuliramo detekciju
   
-  const readCount = eventIds.length;
+  const readEvents = events.filter(event => {
+    const desc = event.description.toLowerCase();
+    const isReadOperation = 
+      desc.includes('accessed file') ||
+      desc.includes('read') ||
+      desc.includes('download') ||
+      desc.includes('export') ||
+      desc.includes('viewed');
+    
+    const isNotPermission = !desc.includes('permission') && !desc.includes('privilege');
+    const isNotLogin = !desc.includes('login') && !desc.includes('logout');
+    
+    return isReadOperation && isNotPermission && isNotLogin;
+  });
+
+  const readCount = readEvents.length;
   
   if (readCount < MASS_READ_THRESHOLD.LOW) {
     return null;
@@ -48,8 +61,9 @@ export async function detectMassDataRead(
     metadata: {
       readCount,
       threshold: MASS_READ_THRESHOLD,
-      analysisTime: new Date().toISOString()
+      analysisTime: new Date().toISOString(),
+      sampleFiles: readEvents.slice(0, 5).map(e => e.description)
     },
-    correlatedEventIds: eventIds
+    correlatedEventIds: readEvents.map(e => e.id)
   };
 }

@@ -6,15 +6,13 @@ import { ThreatType } from "../enums/ThreatType";
 @Index(["userId"])
 @Index(["detectedAt"])
 @Index(["threatType"])
+@Index(["riskLevel"])
 export class InsiderThreat {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ type: "varchar", length: 100 })
-  userId!: string;
-
-  @Column({ type: "varchar", length: 100 })
-  username!: string;
+  @Column({ type: "int" })
+  userId!: number;
 
   @Column({ type: "enum", enum: ThreatType })
   threatType!: ThreatType;

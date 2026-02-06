@@ -47,7 +47,7 @@ export class InsiderThreatService implements IInsiderThreatService {
     return toInsiderThreatDTO(threat);
   }
 
-  async getThreatsByUserId(userId: string): Promise<InsiderThreatDTO[]> {
+  async getThreatsByUserId(userId: number): Promise<InsiderThreatDTO[]> {
     const threats = await this.repo.findByUserId(userId);
     return threats.map(t => toInsiderThreatDTO(t));
   }

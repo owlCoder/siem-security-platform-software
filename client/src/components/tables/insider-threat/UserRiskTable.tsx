@@ -15,7 +15,7 @@ export default function UserRiskTable({ profiles, onSelectUser }: UserRiskTableP
       <table className="w-full border-collapse text-center font-sans text-[14px]">
         <thead className="bg-[#2a2a2a]">
           <tr>
-            <th className="px-4 py-3 text-center text-[#d0d0d0] font-semibold text-[13px] border-b border-[#3a3a3a] uppercase tracking-[0.5px]">User</th>
+            <th className="px-4 py-3 text-center text-[#d0d0d0] font-semibold text-[13px] border-b border-[#3a3a3a] uppercase tracking-[0.5px]">User ID</th>
             <th className="px-4 py-3 text-center text-[#d0d0d0] font-semibold text-[13px] border-b border-[#3a3a3a] uppercase tracking-[0.5px]">Risk Score</th>
             <th className="px-4 py-3 text-center text-[#d0d0d0] font-semibold text-[13px] border-b border-[#3a3a3a] uppercase tracking-[0.5px]">Risk Level</th>
             <th className="px-4 py-3 text-center text-[#d0d0d0] font-semibold text-[13px] border-b border-[#3a3a3a] uppercase tracking-[0.5px]">Total Threats</th>
@@ -44,10 +44,7 @@ export default function UserRiskTable({ profiles, onSelectUser }: UserRiskTableP
                 <td className="px-4! py-3! border-b border-[#2d2d2d] text-[#dcdcdc]">
                   <div className="flex items-center gap-2 justify-center">
                     <PiUserFill size={16} />
-                    <div>
-                      <div className="font-semibold">{profile.username}</div>
-                      <div className="text-[10px] text-[#a6a6a6]">{profile.userId}</div>
-                    </div>
+                    <div className="font-semibold text-[16px]">{profile.userId}</div>
                   </div>
                 </td>
 

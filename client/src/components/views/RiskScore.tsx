@@ -9,32 +9,32 @@ import GlobalScoreGauge from "../risk-score/GlobalScoreGauge";
 import { FiDownload } from "react-icons/fi";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import { useAuth } from "../../hooks/useAuthHook";
 
 type RiskScoreProps = {
-  riskScoreApi: IRiskScoreAPI;
-  queryApi: IQueryAPI;
+    riskScoreApi: IRiskScoreAPI;
+    queryApi: IQueryAPI;
 };
 
 export default function RiskScore({ riskScoreApi, queryApi }: RiskScoreProps) {
-    //const { token } = useAuth();
-    const token = "sdasda";
+    const { token } = useAuth();
     const [entityType, setEntityType] = useState<RiskEntityType>(RiskEntityType.SERVICE);
     const [entityId, setEntityId] = useState<string>("");
-    const [entityOptions, setEntityOptions] = useState<string[]>([]); 
+    const [entityOptions, setEntityOptions] = useState<string[]>([]);
     const [period, setPeriod] = useState<number>(24);
 
     const [globalScore, setGlobalScore] = useState<number>(0);
     const [latestScore, setLatestScore] = useState<number>(0);
 
-    const [history, setHistory] = useState<{score: number, createdAt: Date}[]>([]);
+    const [history, setHistory] = useState<{ score: number, createdAt: Date }[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const fetchData = async() => {
+        const fetchData = async () => {
             setIsLoading(true);
 
             try {
-                const result = await riskScoreApi.getScoreHistory(token, entityType, entityId, period);
+                const result = await riskScoreApi.getScoreHistory(token!, entityType, entityId, period);
                 //console.log("history ", result);
                 if (result)
                     setHistory(
@@ -44,12 +44,12 @@ export default function RiskScore({ riskScoreApi, queryApi }: RiskScoreProps) {
                         }))
                     );
 
-                const score = await riskScoreApi.getGlobalScore(token);
+                const score = await riskScoreApi.getGlobalScore(token!);
                 //console.log("global score ", score);
                 if (score)
                     setGlobalScore(score);
 
-                const latestScore = await riskScoreApi.getLatestScore(token, entityType, entityId);
+                const latestScore = await riskScoreApi.getLatestScore(token!, entityType, entityId);
                 if (latestScore)
                     setLatestScore(latestScore);
             } catch (error) {
@@ -63,16 +63,16 @@ export default function RiskScore({ riskScoreApi, queryApi }: RiskScoreProps) {
             try {
                 let options: string[] = [];
                 if (entityType === RiskEntityType.SERVICE) {
-                    options = await queryApi.getUniqueServices(token) || [];
+                    options = await queryApi.getUniqueServices(token!) || [];
                     //console.log(options);
                 } else if (entityType === RiskEntityType.IP_ADDRESS) {
-                    options = await queryApi.getUniqueIps(token) || [];
+                    options = await queryApi.getUniqueIps(token!) || [];
                     //console.log(options);
                 }
-                
+
                 if (Array.isArray(options)) {
                     setEntityOptions(options);
-                    if (options.length > 0 && !entityId) { 
+                    if (options.length > 0 && !entityId) {
                         setEntityId(options[0]);
                     }
                 } else {
@@ -97,68 +97,68 @@ export default function RiskScore({ riskScoreApi, queryApi }: RiskScoreProps) {
 
     const printRef = useRef<HTMLDivElement | null>(null);
     const handleDownload = async () => {
-    if (!printRef.current) return;
+        if (!printRef.current) return;
 
-    try {
-        const canvas = await html2canvas(printRef.current, {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: "#1f2123",
-            onclone: (clonedDoc) => {
-                const container = clonedDoc.querySelector('.grid-cols-10') as HTMLElement;
-                if (container) {
-                    container.style.padding = "10px"; 
-                    container.style.height = "auto";
-                }
-
-                const elements = clonedDoc.querySelectorAll('*');
-                elements.forEach((el) => {
-                    if (el instanceof HTMLElement) {
-                        const style = window.getComputedStyle(el);
-                        
-                        if (style.backgroundColor.includes('oklch')) {
-                            el.style.backgroundColor = '#1f2123'; 
-                        }
-                        if (style.color.includes('oklch')) {
-                            el.style.color = '#ffffff'; 
-                        }
-                        if (style.borderColor.includes('oklch')) {
-                            el.style.borderColor = '#282A28'; 
-                        }
-
-                        if (["GOOD", "WARNING", "CRITICAL"].includes(el.innerText.trim())) {
-                            el.style.transform = "translateY(5px)"; 
-                            el.style.display = "block";
-                            el.style.textAlign = "center";
-                        }
+        try {
+            const canvas = await html2canvas(printRef.current, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: "#1f2123",
+                onclone: (clonedDoc) => {
+                    const container = clonedDoc.querySelector('.grid-cols-10') as HTMLElement;
+                    if (container) {
+                        container.style.padding = "10px";
+                        container.style.height = "auto";
                     }
-                });
-            }
-        });
 
-        const imgData = canvas.toDataURL("image/png");
-        const doc = new jsPDF({
-            orientation: "landscape",
-            unit: "mm",
-            format: "a4",
-        });
+                    const elements = clonedDoc.querySelectorAll('*');
+                    elements.forEach((el) => {
+                        if (el instanceof HTMLElement) {
+                            const style = window.getComputedStyle(el);
 
-        const pdfWidth = doc.internal.pageSize.getWidth();
-        const imgWidth = pdfWidth - 20;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                            if (style.backgroundColor.includes('oklch')) {
+                                el.style.backgroundColor = '#1f2123';
+                            }
+                            if (style.color.includes('oklch')) {
+                                el.style.color = '#ffffff';
+                            }
+                            if (style.borderColor.includes('oklch')) {
+                                el.style.borderColor = '#282A28';
+                            }
 
-        const margin = 10;
-        let cursorY = margin;
-        doc.setFontSize(14);
-        doc.text("Risk score report", margin, cursorY + 6);
+                            if (["GOOD", "WARNING", "CRITICAL"].includes(el.innerText.trim())) {
+                                el.style.transform = "translateY(5px)";
+                                el.style.display = "block";
+                                el.style.textAlign = "center";
+                            }
+                        }
+                    });
+                }
+            });
 
-        cursorY += 15;
-        doc.addImage(imgData, "PNG", margin, cursorY, imgWidth, imgHeight);
-        doc.save(`risk-score-report.pdf`);
-    } catch (err) {
-        console.error("PDF Export Error:", err);
-    }
-};
+            const imgData = canvas.toDataURL("image/png");
+            const doc = new jsPDF({
+                orientation: "landscape",
+                unit: "mm",
+                format: "a4",
+            });
+
+            const pdfWidth = doc.internal.pageSize.getWidth();
+            const imgWidth = pdfWidth - 20;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+            const margin = 10;
+            let cursorY = margin;
+            doc.setFontSize(14);
+            doc.text("Risk score report", margin, cursorY + 6);
+
+            cursorY += 15;
+            doc.addImage(imgData, "PNG", margin, cursorY, imgWidth, imgHeight);
+            doc.save(`risk-score-report.pdf`);
+        } catch (err) {
+            console.error("PDF Export Error:", err);
+        }
+    };
 
     return (
         <div className="bg-transparent border-2 border-solid rounded-[14px] border-[#282A28]">
@@ -181,7 +181,7 @@ export default function RiskScore({ riskScoreApi, queryApi }: RiskScoreProps) {
                     <label className="px-1! block text-[11px] text-gray-400 mb-1 uppercase tracking-wider font-semibold">Entity Type</label>
                     <GraphParametersSelect
                         value={entityType}
-                        onChange={(v) => {setEntityType(v as RiskEntityType); setEntityId(""); setLatestScore(0);}}
+                        onChange={(v) => { setEntityType(v as RiskEntityType); setEntityId(""); setLatestScore(0); }}
                         options={[
                             { label: "Service", value: RiskEntityType.SERVICE },
                             { label: "IP Address", value: RiskEntityType.IP_ADDRESS },
@@ -208,7 +208,7 @@ export default function RiskScore({ riskScoreApi, queryApi }: RiskScoreProps) {
                         onChange={(v) => setPeriod(Number(v))}
                         options={[
                             { label: "24 hours", value: 24 },
-                            { label: "7 days", value: 24*7 },
+                            { label: "7 days", value: 24 * 7 },
                         ]}
                     />
                 </div>
@@ -233,7 +233,7 @@ export default function RiskScore({ riskScoreApi, queryApi }: RiskScoreProps) {
                         </div>
 
                         <div className="flex items-end justify-end">
-                            <RiskScoreCard score={latestScore}/>
+                            <RiskScoreCard score={latestScore} />
                         </div>
                     </div>
                     {/* RISK TREND */}

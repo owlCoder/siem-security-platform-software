@@ -6,6 +6,8 @@ import { BackupHealthDTO } from "../DTOs/BackupHealthDTO";
 import { BackupStatsDTO } from "../DTOs/BackupStatsDTO";
 import { BackupValidationLogDTO } from "../DTOs/BackupValidationLogDTO";
 import { BackupValidationResultDTO } from "../DTOs/BackupValidationResultDTO";
+import { BusinessLLMInputDto } from "../DTOs/businessInsights/BusinessLLMInputDto";
+import { BusinessResponseDto } from "../DTOs/businessInsights/BusinessResponseDto";
 import { DistributionDTO } from "../DTOs/DistributionDTO";
 import { EventDTO } from "../DTOs/EventDTO";
 import { EventsResultDTO } from "../DTOs/EventsResultDTO";
@@ -105,6 +107,7 @@ export interface IGatewayService {
   //Analysis Engine
   analysisEngineNormalize(rawMessage: string): Promise<NormalizedEventDTO>;
   analysisEngineDeleteCorrelationsByEventIds(eventIds: number[]): Promise<number>;
+  analysisEngineGenerateBusinessInsights(businessLLMInput: BusinessLLMInputDto): Promise<BusinessResponseDto>;
 
   //EventCollector
   createEvent(event: EventDTO): Promise<EventDTO>;
@@ -129,7 +132,7 @@ export interface IGatewayService {
   //insider threat detection
   getAllInsiderThreats(): Promise<InsiderThreatDTO[]>;
   getInsiderThreatById(id: number): Promise<InsiderThreatDTO>;
-  getInsiderThreatsByUserId(userId: string): Promise<InsiderThreatDTO[]>;
+  getInsiderThreatsByUserId(userId: number): Promise<InsiderThreatDTO[]>;
   getUnresolvedInsiderThreats(): Promise<InsiderThreatDTO[]>;
   searchInsiderThreats(query: ThreatQueryDTO): Promise<PaginatedThreatsDTO>;
   resolveInsiderThreat(id: number, resolvedBy: string, resolutionNotes?: string): Promise<InsiderThreatDTO>;
@@ -137,9 +140,9 @@ export interface IGatewayService {
   //user risk analysis
   getAllUserRiskProfiles(): Promise<UserRiskProfileDTO[]>;
   getHighRiskUsers(): Promise<UserRiskProfileDTO[]>;
-  getUserRiskProfile(userId: string): Promise<UserRiskProfileDTO>;
-  getUserRiskAnalysis(userId: string): Promise<UserRiskAnalysisDTO>;
-  recalculateUserRisk(userId: string): Promise<UserRiskProfileDTO>;
+  getUserRiskProfile(userId: number): Promise<UserRiskProfileDTO>;
+  getUserRiskAnalysis(userId: number): Promise<UserRiskAnalysisDTO>;
+  recalculateUserRisk(userId: number): Promise<UserRiskProfileDTO>;
 
   // Integrity service
   initializeHashChain(): Promise<{ message: string }>;

@@ -13,175 +13,175 @@ export class QueryGatewayController {
   private initializeRoutes(): void {
     this.router.get(
       "/query/search",
-      // this.authenticate,     // TODO: DELETE COMMENTS AFTER TESTING!
-      // requireSysAdmin,
+      this.authenticate,
+      requireSysAdmin,
       this.searchEvents.bind(this)
     );
     this.router.get(
       "/query/oldEvents/:hours",
-      // this.authenticate,
-      // requireSysAdmin,
+      this.authenticate,
+      requireSysAdmin,
       this.getOldEvents.bind(this)
     );
     this.router.get(
       "/query/lastThreeEvents",
-      // this.authenticate,
-      // requireSysAdmin,
+      this.authenticate,
+      requireSysAdmin,
       this.getLastThreeEvents.bind(this)
     );
     this.router.get(
       "/query/events",
-      // this.authenticate,
-      // requireSysAdmin,
+      this.authenticate,
+      requireSysAdmin,
       this.getAllEvents.bind(this)
     );
     this.router.get(
       "/query/eventsCount",
-      // this.authenticate,
-      // requireSysAdmin,
+      this.authenticate,
+      requireSysAdmin,
       this.getEventsCount.bind(this)
     );
     this.router.get(
       "/query/infoCount",
-      // this.authenticate,
-      // requireSysAdmin,
+      this.authenticate,
+      requireSysAdmin,
       this.getInfoCount.bind(this)
     );
     this.router.get(
       "/query/warningCount",
-      // this.authenticate,
-      // requireSysAdmin,
+      this.authenticate,
+      requireSysAdmin,
       this.getWarningCount.bind(this)
     );
     this.router.get(
       "/query/errorCount",
-      // this.authenticate,
-      // requireSysAdmin,
+      this.authenticate,
+      requireSysAdmin,
       this.getErrorCount.bind(this)
     );
     this.router.get(
       "/query/distribution",
-      // this.authenticate,
-      // requireSysAdmin,
+      this.authenticate,
+      requireSysAdmin,
       this.getEventDistribution.bind(this)
     );
 
     this.router.get(
       "/query/statistics/events",
-      // this.authenticate,
-      // requireSysAdmin,
+      this.authenticate,
+      requireSysAdmin,
       this.getEventStatistics.bind(this)
     );
 
     this.router.get(
       "/query/statistics/alerts",
-      // this.authenticate,
-      // requireSysAdmin,
+      this.authenticate,
+      requireSysAdmin,
       this.getAlertStatistics.bind(this)
     );
 
     this.router.get(
       "/query/totalEventCount",
-      // this.authenticate,
-      // requireSysAdmin,
+      this.authenticate,
+      requireSysAdmin,
       this.getTotalEventCount.bind(this)
     );
 
     this.router.get(
       "/query/errorEventCount",
-      // this.authenticate,
-      // requireSysAdmin,
+      this.authenticate,
+      requireSysAdmin,
       this.getErrorEventCount.bind(this)
     );
 
     this.router.get(
       "/query/eventRate",
-      // this.authenticate,
-      // requireSysAdmin,
+      this.authenticate,
+      requireSysAdmin,
       this.getEventRate.bind(this)
     );
 
     this.router.get(
       "/query/alertsCountBySeverity",
-      // this.authenticate,
-      // requireSysAdmin,
+      this.authenticate,
+      requireSysAdmin,
       this.getAlertsCountBySeverity.bind(this)
     );
 
     this.router.get(
       "/query/criticalAlertsCount",
-      // this.authenticate,
-      // requireSysAdmin,
+      this.authenticate,
+      requireSysAdmin,
       this.getCriticalAlertsCount.bind(this)
     );
 
     this.router.get(
       "/query/anomalyRate",
-      // this.authenticate,
-      // requireSysAdmin,
+      this.authenticate,
+      requireSysAdmin,
       this.getAnomalyRate.bind(this)
     );
 
     this.router.get(
       "/query/burstAnomaly",
-      // this.authenticate,
-      // requireSysAdmin,
+      this.authenticate,
+      requireSysAdmin,
       this.getBurstAnomaly.bind(this)
     );
 
     this.router.get(
       "/query/uniqueServicesCount",
-      // this.authenticate,
-      // requireSysAdmin,
+      this.authenticate,
+      requireSysAdmin,
       this.getUniqueServicesCount.bind(this)
     );
 
     this.router.get(
       "/query/uniqueIpsCount",
-      // this.authenticate,
-      // requireSysAdmin,
+      this.authenticate,
+      requireSysAdmin,
       this.getUniqueIpsCount.bind(this)
     );
 
     this.router.get(
       "/query/uniqueServices",
-      // this.authenticate,
-      // requireSysAdmin,
+      this.authenticate,
+      requireSysAdmin,
       this.getUniqueServices.bind(this)
     );
 
     this.router.get(
       "/query/uniqueIps",
-      // this.authenticate,
-      // requireSysAdmin,
+      this.authenticate,
+      requireSysAdmin,
       this.getUniqueIps.bind(this)
     );
 
     this.router.get(
       "/query/oldAlerts/:hours",
-      // this.authenticate,
-      // requireSysAdmin,
+      this.authenticate,
+      requireSysAdmin,
       this.getOldAlerts.bind(this)
     );
 
     this.router.get(
       "/query/alerts",
-      // this.authenticate,
-      // requireSysAdmin,
+      this.authenticate,
+      requireSysAdmin,
       this.getAllAlerts.bind(this)
     );
 
     this.router.post(
       "/query/searchAlerts",
-      // this.authenticate,
-      // requireSysAdmin,
+      this.authenticate,
+      requireSysAdmin,
       this.searchAlerts.bind(this)
     );
 
     this.router.get(
       "/query/alertsCount",
-      // this.authenticate,
-      // requireSysAdmin,
+      this.authenticate,
+      requireSysAdmin,
       this.getAlertsCount.bind(this)
     );
   }

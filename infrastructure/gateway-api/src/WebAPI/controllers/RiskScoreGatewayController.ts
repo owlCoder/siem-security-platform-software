@@ -1,6 +1,7 @@
 import { Router, Response, Request } from "express";
 import { IGatewayService } from "../../Domain/services/IGatewayService";
 import { RiskEntityType } from "../../Domain/enums/RiskEntityType";
+import { requireSysAdmin } from "../../Middlewares/authorization/AuthorizeMiddleware";
 
 export class RiskScoreGatwayController {
     private readonly router: Router;
@@ -14,26 +15,26 @@ export class RiskScoreGatwayController {
     private initializeRoutes(): void {
         this.router.post(
             "/riskScore/calculateScore",
-            // this.authenticate,     // TODO: DELETE COMMENTS AFTER TESTING!
-            // requireSysAdmin,
+            this.authenticate,
+            requireSysAdmin,
             this.calculateScore.bind(this)
         );
         this.router.get(
             "/riskScore/getLatestScore",
-            // this.authenticate,
-            // requireSysAdmin,
+            this.authenticate,
+            requireSysAdmin,
             this.getLatestScore.bind(this)
         );
         this.router.get(
             "/riskScore/getScoreHistory",
-            // this.authenticate,
-            // requireSysAdmin,
+            this.authenticate,
+            requireSysAdmin,
             this.getScoreHistory.bind(this)
         );
         this.router.get(
             "/riskScore/getGlobalScore",
-            // this.authenticate,
-            // requireSysAdmin,
+            this.authenticate,
+            requireSysAdmin,
             this.getGlobalScore.bind(this)
         );
     }

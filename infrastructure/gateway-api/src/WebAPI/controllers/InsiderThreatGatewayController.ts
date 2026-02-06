@@ -26,7 +26,7 @@ export class InsiderThreatGatewayController {
     );
     this.router.get(
       "/insider-threats/unresolved",
-      this.authenticate, 
+      this.authenticate,
       this.getUnresolvedThreats.bind(this)
     );
     this.router.get(
@@ -41,39 +41,41 @@ export class InsiderThreatGatewayController {
     );
     this.router.get(
       "/insider-threats/user/:userId",
-      this.authenticate, 
+      this.authenticate,
       this.getThreatsByUserId.bind(this)
     );
     this.router.put(
       "/insider-threats/:id/resolve",
-      this.authenticate, requireSysAdmin, 
+      this.authenticate,
+      requireSysAdmin,
       this.resolveThreat.bind(this)
     );
 
     // User risk endpoints
     this.router.get(
       "/siem/user-risk/profiles",
-      this.authenticate, 
+      this.authenticate,
       this.getAllUserRiskProfiles.bind(this)
     );
     this.router.get(
       "/siem/user-risk/high-risk",
-      this.authenticate, 
+      this.authenticate,
       this.getHighRiskUsers.bind(this)
     );
     this.router.get(
       "/siem/user-risk/:userId",
-      this.authenticate, 
+      this.authenticate,
       this.getUserRiskProfile.bind(this)
     );
     this.router.get(
       "/siem/user-risk/:userId/analysis",
-      this.authenticate, 
+      this.authenticate,
       this.getUserRiskAnalysis.bind(this)
     );
     this.router.post(
       "/siem/user-risk/:userId/recalculate",
-      this.authenticate, requireSysAdmin, 
+      this.authenticate,
+      requireSysAdmin,
       this.recalculateUserRisk.bind(this)
     );
   }
@@ -103,7 +105,7 @@ export class InsiderThreatGatewayController {
 
   private async getThreatsByUserId(req: Request<ReqParams<"userId">>, res: Response): Promise<void> {
     try {
-      const userId = req.params.userId;
+      const userId = parseInt(req.params.userId, 10);
       const threats = await this.gatewayService.getInsiderThreatsByUserId(userId);
       res.status(200).json(threats);
     } catch (err) {
@@ -127,14 +129,14 @@ export class InsiderThreatGatewayController {
       const query: ThreatQueryDTO = {
         page: req.query.page ? Number(req.query.page) : undefined,
         limit: req.query.limit ? Number(req.query.limit) : undefined,
-        userId: req.query.userId as string,
-        threatType: req.query.threatType as any,
-        riskLevel: req.query.riskLevel as any,
+        userId: req.query.userId ? Number(req.query.userId) : undefined,
+        threatType: req.query.threatType as ThreatQueryDTO["threatType"],
+        riskLevel: req.query.riskLevel as ThreatQueryDTO["riskLevel"],
         startDate: req.query.startDate ? new Date(req.query.startDate as string) : undefined,
         endDate: req.query.endDate ? new Date(req.query.endDate as string) : undefined,
         isResolved: req.query.isResolved === "true" ? true : req.query.isResolved === "false" ? false : undefined,
-        sortBy: req.query.sortBy as any,
-        sortOrder: req.query.sortOrder as any,
+        sortBy: req.query.sortBy as ThreatQueryDTO["sortBy"],
+        sortOrder: req.query.sortOrder as ThreatQueryDTO["sortOrder"],
       };
 
       const result = await this.gatewayService.searchInsiderThreats(query);
@@ -148,8 +150,12 @@ export class InsiderThreatGatewayController {
   private async resolveThreat(req: Request<ReqParams<"id">>, res: Response): Promise<void> {
     try {
       const id = parseInt(req.params.id, 10);
-      const resolvedBy = req.user?.username || "Unknown";
-      const { resolutionNotes } = req.body;
+      const { resolvedBy, resolutionNotes } = req.body;
+
+      if (!resolvedBy) {
+        res.status(400).json({ message: "resolvedBy is required" });
+        return;
+      }
 
       const result = await this.gatewayService.resolveInsiderThreat(id, resolvedBy, resolutionNotes);
       res.status(200).json(result);
@@ -183,7 +189,7 @@ export class InsiderThreatGatewayController {
 
   private async getUserRiskProfile(req: Request<ReqParams<"userId">>, res: Response): Promise<void> {
     try {
-      const userId = req.params.userId;
+      const userId = parseInt(req.params.userId, 10);
       const profile = await this.gatewayService.getUserRiskProfile(userId);
       res.status(200).json(profile);
     } catch (err) {
@@ -194,7 +200,7 @@ export class InsiderThreatGatewayController {
 
   private async getUserRiskAnalysis(req: Request<ReqParams<"userId">>, res: Response): Promise<void> {
     try {
-      const userId = req.params.userId;
+      const userId = parseInt(req.params.userId, 10);
       const analysis = await this.gatewayService.getUserRiskAnalysis(userId);
       res.status(200).json(analysis);
     } catch (err) {
@@ -205,7 +211,7 @@ export class InsiderThreatGatewayController {
 
   private async recalculateUserRisk(req: Request<ReqParams<"userId">>, res: Response): Promise<void> {
     try {
-      const userId = req.params.userId;
+      const userId = parseInt(req.params.userId, 10);
       const profile = await this.gatewayService.recalculateUserRisk(userId);
       res.status(200).json(profile);
     } catch (err) {

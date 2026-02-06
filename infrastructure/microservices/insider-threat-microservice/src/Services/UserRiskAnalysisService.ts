@@ -1,69 +1,114 @@
-import { UserRiskProfileDTO } from "../Domain/DTOs/UserRiskProfileDTO";
-import { UserRiskAnalysisDTO } from "../Domain/DTOs/UserRiskAnalysisDTO";
 import { IUserRiskAnalysisService } from "../Domain/services/IUserRiskAnalysisService";
 import { IUserRiskRepositoryService } from "../Domain/services/IUserRiskRepositoryService";
 import { IInsiderThreatRepositoryService } from "../Domain/services/IInsiderThreatRepositoryService";
-import { ILoggerService } from "../Domain/services/ILoggerService";
+import { UserRiskProfile } from "../Domain/models/UserRiskProfile";
+import { UserRiskAnalysisDTO } from "../Domain/DTOs/UserRiskAnalysisDTO";
+import { UserRiskProfileDTO } from "../Domain/DTOs/UserRiskProfileDTO";
 import { RiskLevel } from "../Domain/enums/RiskLevel";
-import { ThreatType } from "../Domain/enums/ThreatType";
-import { toUserRiskProfileDTO, createEmptyUserRiskProfileDTO } from "../Utils/Converters/UserRiskProfileConverter";
-import { calculateRiskScore, determineRiskLevel } from "../Utils/Analyzers/RiskScoreCalculator";
-
+import { ILoggerService } from "../Domain/services/ILoggerService";
+import { toUserRiskProfileDTO } from "../Utils/Converters/UserRiskProfileConverter";
 export class UserRiskAnalysisService implements IUserRiskAnalysisService {
   constructor(
-    private userRiskRepo: IUserRiskRepositoryService,
-    private threatRepo: IInsiderThreatRepositoryService,
+    private readonly riskRepository: IUserRiskRepositoryService,
+    private readonly threatRepository: IInsiderThreatRepositoryService,
     private readonly logger: ILoggerService
   ) {}
 
-  async getUserRiskProfile(userId: string): Promise<UserRiskProfileDTO> {
-    const profile = await this.userRiskRepo.findByUserId(userId);
+  async updateUserRiskAfterThreat(userId: number, threatId: number): Promise<UserRiskProfile> {
+    let profile = await this.riskRepository.findByUserId(userId);
     
     if (!profile) {
-      await this.logger.log(`User risk profile for ${userId} not found`);
-      return createEmptyUserRiskProfileDTO();
+      profile = await this.riskRepository.create({
+        userId,
+        riskScore: 0,
+        currentRiskLevel: RiskLevel.LOW,
+        totalThreatsDetected: 0,
+        criticalThreatsCount: 0,
+        highThreatsCount: 0,
+        mediumThreatsCount: 0,
+        lowThreatsCount: 0,
+        failedLoginAttempts: 0,
+        lastThreatDetectedAt: null,
+        lastLoginAt: null,
+        recentActivities: []
+      });
     }
+
+    const threat = await this.threatRepository.findById(threatId);
+    if (!threat) {
+      throw new Error(`Threat ${threatId} not found`);
+    }
+
+    profile.totalThreatsDetected++;
     
-    return toUserRiskProfileDTO(profile);
+    switch (threat.riskLevel) {
+      case RiskLevel.CRITICAL:
+        profile.criticalThreatsCount++;
+        profile.riskScore += 50;
+        break;
+      case RiskLevel.HIGH:
+        profile.highThreatsCount++;
+        profile.riskScore += 30;
+        break;
+      case RiskLevel.MEDIUM:
+        profile.mediumThreatsCount++;
+        profile.riskScore += 15;
+        break;
+      case RiskLevel.LOW:
+        profile.lowThreatsCount++;
+        profile.riskScore += 5;
+        break;
+    }
+
+    profile.currentRiskLevel = this.calculateRiskLevel(profile.riskScore);
+    profile.lastThreatDetectedAt = threat.detectedAt;
+
+    if (!profile.recentActivities) {
+      profile.recentActivities = [];
+    }
+    profile.recentActivities.unshift({
+      threatType: threat.threatType,
+      detectedAt: threat.detectedAt,
+      riskLevel: threat.riskLevel
+    });
+    
+    if (profile.recentActivities.length > 10) {
+      profile.recentActivities = profile.recentActivities.slice(0, 10);
+    }
+
+    return await this.riskRepository.update(profile.id, profile);
   }
 
-  async getAllUserRiskProfiles(): Promise<UserRiskProfileDTO[]> {
-    const profiles = await this.userRiskRepo.findAll();
-    return profiles.map(p => toUserRiskProfileDTO(p));
-  }
-
-  async getHighRiskUsers(): Promise<UserRiskProfileDTO[]> {
-    const profiles = await this.userRiskRepo.findHighRiskUsers(70);
-    return profiles.map(p => toUserRiskProfileDTO(p));
-  }
-
-  async getUserRiskAnalysis(userId: string): Promise<UserRiskAnalysisDTO> {
-    const profile = await this.userRiskRepo.findByUserId(userId);
+  async getUserRiskAnalysis(userId: number): Promise<UserRiskAnalysisDTO> {
+    const profile = await this.riskRepository.findByUserId(userId);
     
     if (!profile) {
-      throw new Error(`User risk profile for ${userId} not found`);
+      throw new Error(`User risk profile not found for userId: ${userId}`);
     }
 
-    const allThreats = await this.threatRepo.findByUserId(userId);
-    const recentThreats = allThreats.slice(0, 10);
+    const allThreats = await this.threatRepository.findByUserId(userId);
+    const recentThreats = allThreats
+      .sort((a, b) => b.detectedAt.getTime() - a.detectedAt.getTime())
+      .slice(0, 5)
+      .map(t => ({
+        id: t.id,
+        threatType: t.threatType,
+        riskLevel: t.riskLevel,
+        detectedAt: t.detectedAt,
+        description: t.description
+      }));
 
-    const offHoursCount = await this.threatRepo.countByUserIdAndType(userId, ThreatType.OFF_HOURS_ACCESS);
-    const massDataCount = await this.threatRepo.countByUserIdAndType(userId, ThreatType.MASS_DATA_READ);
-    const permissionCount = await this.threatRepo.countByUserIdAndType(userId, ThreatType.PERMISSION_CHANGE);
+    const behaviorPatterns = {
+      offHoursAccesses: allThreats.filter(t => t.threatType === "OFF_HOURS_ACCESS").length,
+      massDataReads: allThreats.filter(t => t.threatType === "MASS_DATA_READ").length,
+      permissionChanges: allThreats.filter(t => t.threatType === "PERMISSION_CHANGE").length,
+      failedLogins: profile.failedLoginAttempts
+    };
 
-    let recommendation = "User behavior is within acceptable parameters.";
-    
-    if (profile.currentRiskLevel === RiskLevel.CRITICAL) {
-      recommendation = "CRITICAL: Immediate security review required. Consider temporary access suspension.";
-    } else if (profile.currentRiskLevel === RiskLevel.HIGH) {
-      recommendation = "HIGH RISK: Schedule security interview and review access privileges.";
-    } else if (profile.currentRiskLevel === RiskLevel.MEDIUM) {
-      recommendation = "MEDIUM RISK: Monitor user activity closely and conduct periodic reviews.";
-    }
+    const recommendation = this.generateRecommendation(profile, behaviorPatterns);
 
     return {
       userId: profile.userId,
-      username: profile.username,
       currentRiskLevel: profile.currentRiskLevel,
       riskScore: profile.riskScore,
       threatsSummary: {
@@ -73,129 +118,133 @@ export class UserRiskAnalysisService implements IUserRiskAnalysisService {
         medium: profile.mediumThreatsCount,
         low: profile.lowThreatsCount
       },
-      recentThreats: recentThreats.map(t => ({
-        id: t.id,
-        threatType: t.threatType,
-        riskLevel: t.riskLevel,
-        detectedAt: t.detectedAt,
-        description: t.description
-      })),
-      behaviorPatterns: {
-        offHoursAccesses: offHoursCount,
-        massDataReads: massDataCount,
-        permissionChanges: permissionCount,
-        failedLogins: profile.failedLoginAttempts
-      },
+      recentThreats,
+      behaviorPatterns,
       recommendation
     };
   }
 
-  async updateUserRiskAfterThreat(userId: string, username: string, threatId: number): Promise<void> {
-    let profile = await this.userRiskRepo.findByUserId(userId);
-
-    if (!profile) {
-      profile = await this.userRiskRepo.create({
-        userId,
-        username,
-        riskScore: 0,
-        currentRiskLevel: RiskLevel.LOW,
-        totalThreatsDetected: 0,
-        criticalThreatsCount: 0,
-        highThreatsCount: 0,
-        mediumThreatsCount: 0,
-        lowThreatsCount: 0,
-        lastThreatDetectedAt: null,
-        lastLoginAt: null,
-        failedLoginAttempts: 0,
-        recentActivities: []
-      });
-      await this.logger.log(`Created new risk profile for user ${userId}`);
-    }
-
-    const threat = await this.threatRepo.findById(threatId);
-    if (!threat) return;
-
-    profile.totalThreatsDetected++;
-    profile.lastThreatDetectedAt = threat.detectedAt;
-
-    switch (threat.riskLevel) {
-      case RiskLevel.CRITICAL:
-        profile.criticalThreatsCount++;
-        break;
-      case RiskLevel.HIGH:
-        profile.highThreatsCount++;
-        break;
-      case RiskLevel.MEDIUM:
-        profile.mediumThreatsCount++;
-        break;
-      case RiskLevel.LOW:
-        profile.lowThreatsCount++;
-        break;
-    }
-
-    const recentActivities = profile.recentActivities || [];
-    recentActivities.unshift({
-      threatType: threat.threatType,
-      detectedAt: threat.detectedAt,
-      riskLevel: threat.riskLevel
-    });
-    profile.recentActivities = recentActivities.slice(0, 20);
-
-    profile.riskScore = calculateRiskScore(profile);
-    profile.currentRiskLevel = determineRiskLevel(profile.riskScore);
-
-    await this.userRiskRepo.save(profile);
-    await this.logger.log(`Updated risk profile for user ${userId} - New score: ${profile.riskScore}, Level: ${profile.currentRiskLevel}`);
-  }
-
-  async updateUserLoginInfo(userId: string, username: string, isSuccessful: boolean): Promise<void> {
-    let profile = await this.userRiskRepo.findByUserId(userId);
-
-    if (!profile) {
-      profile = await this.userRiskRepo.create({
-        userId,
-        username,
-        riskScore: 0,
-        currentRiskLevel: RiskLevel.LOW,
-        totalThreatsDetected: 0,
-        criticalThreatsCount: 0,
-        highThreatsCount: 0,
-        mediumThreatsCount: 0,
-        lowThreatsCount: 0,
-        lastThreatDetectedAt: null,
-        lastLoginAt: null,
-        failedLoginAttempts: 0,
-        recentActivities: []
-      });
-    }
-
-    if (isSuccessful) {
-      profile.lastLoginAt = new Date();
-      profile.failedLoginAttempts = 0;
-    } else {
-      profile.failedLoginAttempts++;
-    }
-
-    profile.riskScore = calculateRiskScore(profile);
-    profile.currentRiskLevel = determineRiskLevel(profile.riskScore);
-
-    await this.userRiskRepo.save(profile);
-    await this.logger.log(`Updated login info for user ${userId} - Successful: ${isSuccessful}`);
-  }
-
-  async recalculateUserRisk(userId: string): Promise<UserRiskProfileDTO> {
-    const profile = await this.userRiskRepo.findByUserId(userId);
+  async recalculateUserRisk(userId: number): Promise<UserRiskProfile> {
+    const threats = await this.threatRepository.findByUserId(userId);
+    
+    let profile = await this.riskRepository.findByUserId(userId);
     
     if (!profile) {
-      throw new Error(`User risk profile for ${userId} not found`);
+      profile = await this.riskRepository.create({
+        userId,
+        riskScore: 0,
+        currentRiskLevel: RiskLevel.LOW,
+        totalThreatsDetected: 0,
+        criticalThreatsCount: 0,
+        highThreatsCount: 0,
+        mediumThreatsCount: 0,
+        lowThreatsCount: 0,
+        failedLoginAttempts: 0,
+        lastThreatDetectedAt: null,
+        lastLoginAt: null,
+        recentActivities: []
+      });
     }
 
-    profile.riskScore = calculateRiskScore(profile);
-    profile.currentRiskLevel = determineRiskLevel(profile.riskScore);
+    profile.riskScore = 0;
+    profile.totalThreatsDetected = threats.length;
+    profile.criticalThreatsCount = 0;
+    profile.highThreatsCount = 0;
+    profile.mediumThreatsCount = 0;
+    profile.lowThreatsCount = 0;
 
-    const updated = await this.userRiskRepo.save(profile);
-    await this.logger.log(`Recalculated risk for user ${userId} - Score: ${profile.riskScore}`);
+    threats.forEach(threat => {
+      switch (threat.riskLevel) {
+        case RiskLevel.CRITICAL:
+          profile!.criticalThreatsCount++;
+          profile!.riskScore += 50;
+          break;
+        case RiskLevel.HIGH:
+          profile!.highThreatsCount++;
+          profile!.riskScore += 30;
+          break;
+        case RiskLevel.MEDIUM:
+          profile!.mediumThreatsCount++;
+          profile!.riskScore += 15;
+          break;
+        case RiskLevel.LOW:
+          profile!.lowThreatsCount++;
+          profile!.riskScore += 5;
+          break;
+      }
+    });
 
-    return toUserRiskProfileDTO(updated);
+    profile.currentRiskLevel = this.calculateRiskLevel(profile.riskScore);
+    
+    if (threats.length > 0) {
+      const latest = threats.sort((a, b) => b.detectedAt.getTime() - a.detectedAt.getTime())[0];
+      profile.lastThreatDetectedAt = latest.detectedAt;
+    }
+
+    return await this.riskRepository.update(profile.id, profile);
+  }
+
+  async getHighRiskUsers(): Promise<UserRiskProfile[]> {
+    return await this.riskRepository.findHighRiskUsers();
+  }
+
+  async getAllUserRiskProfiles(): Promise<UserRiskProfileDTO[]> {
+    const profiles = await this.riskRepository.findAll();
+    return profiles.map(profile => toUserRiskProfileDTO(profile));
+  }
+
+  async getUserRiskProfile(userId: number): Promise<UserRiskProfileDTO | null> {
+    const profile = await this.riskRepository.findByUserId(userId);
+    
+    if (!profile) {
+      return null;
+    }
+    
+    return toUserRiskProfileDTO(profile);
+  }
+
+  private calculateRiskLevel(score: number): RiskLevel {
+    if (score >= 100) return RiskLevel.CRITICAL;
+    if (score >= 60) return RiskLevel.HIGH;
+    if (score >= 30) return RiskLevel.MEDIUM;
+    return RiskLevel.LOW;
+  }
+
+  private generateRecommendation(
+    profile: UserRiskProfile,
+    patterns: { 
+      offHoursAccesses: number; 
+      massDataReads: number; 
+      permissionChanges: number; 
+      failedLogins: number 
+    }
+  ): string {
+    const recommendations: string[] = [];
+
+    if (profile.currentRiskLevel === RiskLevel.CRITICAL) {
+      recommendations.push("CRITICAL: Immediate investigation required!");
+    }
+
+    if (patterns.offHoursAccesses > 3) {
+      recommendations.push("Multiple off-hours accesses detected - review access patterns");
+    }
+
+    if (patterns.massDataReads > 2) {
+      recommendations.push("Unusual data access volume - potential data exfiltration risk");
+    }
+
+    if (patterns.permissionChanges > 2) {
+      recommendations.push("Multiple permission changes - audit recent role modifications");
+    }
+
+    if (patterns.failedLogins > 5) {
+      recommendations.push("Multiple failed login attempts - possible credential compromise");
+    }
+
+    if (recommendations.length === 0) {
+      recommendations.push("Continue monitoring user activity");
+    }
+
+    return recommendations.join("; ");
   }
 }

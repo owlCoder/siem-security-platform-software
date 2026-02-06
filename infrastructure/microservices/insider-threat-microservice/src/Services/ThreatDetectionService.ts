@@ -1,8 +1,7 @@
 import { DetectionResult } from "../Domain/types/DetectionResult";
 import { IThreatDetectionService } from "../Domain/services/IThreatDetectionService";
+import { IEventFetcherService } from "../Domain/services/IEventFetcherService";
 import { ILoggerService } from "../Domain/services/ILoggerService";
-import { ThreatType } from "../Domain/enums/ThreatType";
-import { RiskLevel } from "../Domain/enums/RiskLevel";
 import { detectMassDataRead } from "../Utils/Detectors/MassDataReadDetector";
 import { detectPermissionChange } from "../Utils/Detectors/PermissionChangeDetector";
 import { detectOffHoursAccess } from "../Utils/Detectors/OffHoursAccessDetector";
@@ -10,28 +9,34 @@ import { correlateAuthEvents } from "../Utils/Analyzers/AuthEventCorrelator";
 
 
 export class ThreatDetectionService implements IThreatDetectionService {
-  constructor(private readonly logger: ILoggerService) {}
+  constructor(
+    private readonly eventFetcher: IEventFetcherService,
+    private readonly logger: ILoggerService
+  ) {}
 
+  async analyzeEvents(userId: number, eventIds: number[]): Promise<DetectionResult[]> {
+    const events = await this.eventFetcher.fetchEventsByIds(eventIds);
 
-  async analyzeEvents(userId: string, eventIds: number[]): Promise<DetectionResult[]> {
-    await this.logger.log(`Analyzing ${eventIds.length} events for user ${userId}`);
+    if (events.length === 0) {
+      return [];
+    }
 
     const results: DetectionResult[] = [];
 
-    const authResults = await this.correlateWithAuthEvents(userId, eventIds);
+    const authResults = await correlateAuthEvents(userId, events);
     results.push(...authResults);
 
-    const offHours = await detectOffHoursAccess(userId, eventIds);
+    const offHours = await detectOffHoursAccess(userId, events);
     if (offHours) {
       results.push(offHours);
     }
 
-    const massRead = await detectMassDataRead(userId, eventIds);
+    const massRead = await detectMassDataRead(userId, events);
     if (massRead) {
       results.push(massRead);
     }
 
-    const permissionChange = await detectPermissionChange(userId, eventIds);
+    const permissionChange = await detectPermissionChange(userId, events);
     if (permissionChange) {
       results.push(permissionChange);
     }
@@ -39,44 +44,23 @@ export class ThreatDetectionService implements IThreatDetectionService {
     return results;
   }
 
-  async detectMassDataRead(userId: string, eventIds: number[]): Promise<DetectionResult | null> {
-    await this.logger.log(`Checking for mass data read by user ${userId}`);
-    
-    const result = await detectMassDataRead(userId, eventIds);
-    
-    if (result) {
-      await this.logger.log(`Mass data read detected for user ${userId}`);
-    }
-    
-    return result;
+  async detectMassDataRead(userId: number, eventIds: number[]): Promise<DetectionResult | null> {
+    const events = await this.eventFetcher.fetchEventsByIds(eventIds);
+    return await detectMassDataRead(userId, events);
   }
 
-  async detectPermissionChange(userId: string, eventIds: number[]): Promise<DetectionResult | null> {
-    await this.logger.log(`Checking for permission changes by user ${userId}`);
-    
-    const result = await detectPermissionChange(userId, eventIds);
-    
-    if (result) {
-      await this.logger.log(`Suspicious permission change detected for user ${userId}`);
-    }
-    
-    return result;
+  async detectPermissionChange(userId: number, eventIds: number[]): Promise<DetectionResult | null> {
+    const events = await this.eventFetcher.fetchEventsByIds(eventIds);
+    return await detectPermissionChange(userId, events);
   }
 
-  async detectOffHoursAccess(userId: string, eventIds: number[]): Promise<DetectionResult | null> {
-    await this.logger.log(`Checking for off-hours access by user ${userId}`);
-    
-    const result = await detectOffHoursAccess(userId, eventIds);
-    
-    if (result) {
-      await this.logger.log(`Off-hours access detected for user ${userId}`);
-    }
-    
-    return result;
+  async detectOffHoursAccess(userId: number, eventIds: number[]): Promise<DetectionResult | null> {
+    const events = await this.eventFetcher.fetchEventsByIds(eventIds);
+    return await detectOffHoursAccess(userId, events);
   }
 
-  async correlateWithAuthEvents(userId: string, eventIds: number[]): Promise<DetectionResult[]> {
-    await this.logger.log(`Correlating events with auth data for user ${userId}`);
-    return correlateAuthEvents(userId, eventIds);
+  async correlateWithAuthEvents(userId: number, eventIds: number[]): Promise<DetectionResult[]> {
+    const events = await this.eventFetcher.fetchEventsByIds(eventIds);
+    return correlateAuthEvents(userId, events);
   }
 }

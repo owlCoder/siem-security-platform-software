@@ -14,7 +14,7 @@ export default function StorageTableRow({ archive, storageApi }: StorageTableRow
             </td>
             <td className={tdClass}>{archive.fileName}</td>
             <td className={tdClass}>{new Date(archive.createdAt).toLocaleDateString()}</td>
-            <td className={tdClass}>{(archive.fileSize / 1024 / 1024).toFixed(2)} MB</td>
+            <td className={tdClass}>{archive.fileSize} bytes </td>
             <td className={tdClass}>
                 <DownloadArchiveButton archiveId={archive.id} fileName={archive.fileName} storageApi={storageApi} />
             </td>

@@ -9,7 +9,7 @@ export default function DownloadArchiveButton({ archiveId, fileName, storageApi 
     const [isDownloading, setIsDownloading] = useState(false);
 
     const handleDownload = async () => {
-        if (/*!token ||*/ isDownloading) return;
+        if (!token || isDownloading) return;
 
         try {
             setIsDownloading(true);

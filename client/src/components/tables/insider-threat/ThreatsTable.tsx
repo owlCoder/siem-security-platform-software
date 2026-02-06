@@ -30,7 +30,7 @@ export default function ThreatsTable({ threats, onSelectThreat }: ThreatsTablePr
         <thead className="bg-[#2a2a2a]">
           <tr>
             <th className="px-4 py-3 text-center text-[#d0d0d0] font-semibold text-[13px] border-b border-[#3a3a3a] uppercase tracking-[0.5px]"></th>
-            <th className="px-4! py-3! text-center text-[#d0d0d0] font-semibold text-[13px] border-b border-[#3a3a3a] uppercase tracking-[0.5px]">User</th>
+            <th className="px-4! py-3! text-center text-[#d0d0d0] font-semibold text-[13px] border-b border-[#3a3a3a] uppercase tracking-[0.5px]">User ID</th>
             <th className="px-4! py-3! text-center text-[#d0d0d0] font-semibold text-[13px] border-b border-[#3a3a3a] uppercase tracking-[0.5px]">Threat Type</th>
             <th className="px-4! py-3! text-center text-[#d0d0d0] font-semibold text-[13px] border-b border-[#3a3a3a] uppercase tracking-[0.5px]">Risk Level</th>
             <th className="px-4! py-3! text-center text-[#d0d0d0] font-semibold text-[13px] border-b border-[#3a3a3a] uppercase tracking-[0.5px]">Description</th>
@@ -60,8 +60,7 @@ export default function ThreatsTable({ threats, onSelectThreat }: ThreatsTablePr
                 </td>
 
                 <td className="px-4! py-3! border-b border-[#2d2d2d] text-[#dcdcdc]">
-                  <div className="font-semibold">{threat.username}</div>
-                  <div className="text-[11px] text-[#a6a6a6]">{threat.userId}</div>
+                  <div className="font-semibold text-[16px]">{threat.userId}</div>
                 </td>
 
                 <td className="px-4 py-3 border-b border-[#2d2d2d]">

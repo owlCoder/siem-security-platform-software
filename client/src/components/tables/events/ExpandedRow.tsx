@@ -1,27 +1,27 @@
 import { useEffect, useState } from "react";
 import { ExpandedProps } from "../../../types/props/events/ExpandedProps";
+import { useAuth } from "../../../hooks/useAuthHook";
 
 
 export function ExpandedRow({ expanded, e, parserApi }: ExpandedProps) {
-    //const { token } = useAuth();
-    const token = "token";      // TODO: DELETE AFTER TESTING!
+    const { token } = useAuth();
     const [rawMsg, setRawMsg] = useState<string>();
-    
-  /*  useEffect(() => {
+
+    useEffect(() => {
         // if (!e?.id) return; // čekaj dok e.id postoji
         const loadEventRawMessage = async () => {
-            console.log("Event ",e);
+            console.log("Event ", e);
             try {
-            const data = await parserApi.getParserEventById(e.id, token);
-            setRawMsg(data.text_before_parsing);
-        } catch (err) {
-            console.error(err);
-            setRawMsg("Currently not available.");
-        }
-    };
+                const data = await parserApi.getParserEventById(e.id, token!);
+                setRawMsg(data.text_before_parsing);
+            } catch (err) {
+                console.error(err);
+                setRawMsg("Currently not available.");
+            }
+        };
 
-    void loadEventRawMessage();
-}, [ token]); */
+        void loadEventRawMessage();
+    }, [token]);
 
     return (
         <>

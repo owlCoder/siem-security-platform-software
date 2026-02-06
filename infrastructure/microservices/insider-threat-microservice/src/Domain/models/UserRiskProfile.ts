@@ -1,16 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn, Index } from "typeorm";
 import { RiskLevel } from "../enums/RiskLevel";
 
 @Entity("user_risk_profiles")
+@Index(["currentRiskLevel"])
 export class UserRiskProfile {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ type: "varchar", length: 100, unique: true })
-  userId!: string;
-
-  @Column({ type: "varchar", length: 100 })
-  username!: string;
+  @Column({ type: "int", unique: true })
+  userId!: number;
 
   @Column({ type: "int", default: 0 })
   riskScore!: number;

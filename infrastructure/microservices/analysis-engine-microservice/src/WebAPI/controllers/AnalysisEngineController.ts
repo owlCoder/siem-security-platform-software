@@ -3,6 +3,8 @@ import { ICorrelationService } from "../../Domain/services/ICorrelationService";
 import { ILLMChatAPIService } from "../../Domain/services/ILLMChatAPIService";
 import { validateRecommendationContextDto } from "../validators/validateRecommendationContext";
 import { ILoggerService } from "../../Domain/services/ILoggerService";
+import { BusinessLLMInputDto } from "../../Domain/types/businessInsights/BusinessDto";
+import { ScanIncidentDto } from "../../Domain/types/ScanIncidentDto";
 
 export class AnalysisEngineController {
 
@@ -20,8 +22,9 @@ export class AnalysisEngineController {
     private initializeRoutes(): void {
         this.router.post("/AnalysisEngine/processEvent", this.processEvent.bind(this));
         this.router.post("/AnalysisEngine/recommendations", this.getRecommendations.bind(this));
+        this.router.post("/AnalysisEngine/generateBusinessInsights", this.generateBusinessInsights.bind(this));
+        this.router.post("/AnalysisEngine/scanIncident", this.scanIncident.bind(this));
     }
-
 
     private async getRecommendations(req: Request, res: Response): Promise<void> {
         try {
@@ -60,4 +63,27 @@ export class AnalysisEngineController {
             res.status(500).json({ error: (err as Error).message });
         }
     }
+
+    private async generateBusinessInsights(req: Request, res: Response): Promise<void> {
+        try{
+            const businessDto = req.body as BusinessLLMInputDto;
+            const businessInsights = await this.llmChatAPIService.sendBusinessInsightsPrompt(businessDto);
+            res.status(200).json(businessInsights);
+        }catch(err){
+            this.loggerService.error("[Controller] generateBusinessInsights: " + (err as Error).message);
+            res.status(500).json({ error: (err as Error).message });
+        }
+    }
+
+    private async scanIncident(req: Request, res: Response): Promise<void> {
+        try{
+            const indicentDto = req.body as ScanIncidentDto;
+            const incident = await this.llmChatAPIService.sendScanIncidentPrompt(indicentDto);
+            res.status(200).json(incident)
+        }catch(err){
+            this.loggerService.error("[Controller] scanIncident: " + (err as Error).message);
+            res.status(500).json({ error: (err as Error).message });
+        }
+    }
+
 }

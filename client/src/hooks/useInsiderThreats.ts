@@ -127,7 +127,7 @@ export const useInsiderThreats = (insiderThreatAPI: IInsiderThreatAPI) => {
     }
   }, [getToken, insiderThreatAPI]);
 
-  const getUserRiskAnalysis = useCallback(async (userId: string) => {
+  const getUserRiskAnalysis = useCallback(async (userId: number) => {
     const token = getToken();
     if (!token) {
       throw new Error("Not authenticated");

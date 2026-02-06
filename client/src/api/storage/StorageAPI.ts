@@ -17,26 +17,29 @@ export class StorageAPI implements IStorageAPI {
         });
     }
 
-    async getAllArchives(): Promise<StorageLogResponseDTO[]> {
+    async getAllArchives(token: string): Promise<StorageLogResponseDTO[]> {
         const response: AxiosResponse = await this.axiosInstance.post("", {
             url: "storageLog",
             method: "GET",
+            headers: { Authorization: `Bearer ${token}` }
         });
         return response.data.response;
     }
 
-    async getStats(): Promise<ArchiveStatsDTO> {
+    async getStats(token: string): Promise<ArchiveStatsDTO> {
         const response: AxiosResponse = await this.axiosInstance.post("", {
             url: "storageLog/stats",
             method: "GET",
+            headers: { Authorization: `Bearer ${token}` }
         });
         return response.data.response;
     }
 
-    async downloadArchive(id: number): Promise<ArrayBuffer> {
+    async downloadArchive(token: string, id: number): Promise<ArrayBuffer> {
         const response: AxiosResponse = await this.axiosInstance.post("", {
             url: `storageLog/file/${id}`,
             method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
             responseType: "arraybuffer",
         });
         return response.data.response;
@@ -51,6 +54,7 @@ export class StorageAPI implements IStorageAPI {
         });
         return response.data.response;
     }
+
 
     async getArchiveVolume(token: string, period: "daily" | "monthly" | "yearly"): Promise<ArchiveVolumeDTO[]> {
         const response: AxiosResponse = await this.axiosInstance.post("", {

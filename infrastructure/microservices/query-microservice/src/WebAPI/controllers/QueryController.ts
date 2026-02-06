@@ -135,15 +135,7 @@ export class QueryController {
 
     private async getEventDistribution(req: Request, res: Response): Promise<void> {
         try {
-            const warningCount = this.queryRepositoryService.getWarningCount();
-            const infoCount = this.queryRepositoryService.getInfoCount();
-            const errorCount = this.queryRepositoryService.getErrorCount();
-
-            const distribution: DistributionDTO = {
-                notifications: infoCount,
-                warnings: warningCount,
-                errors: errorCount
-            };
+            const distribution = await this.queryService.getEventDistribution();
             res.status(200).json({
                 distribution
             });

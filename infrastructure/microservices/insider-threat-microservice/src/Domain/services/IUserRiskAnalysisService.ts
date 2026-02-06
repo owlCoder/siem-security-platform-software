@@ -1,12 +1,12 @@
-import { UserRiskProfileDTO } from "../DTOs/UserRiskProfileDTO";
+import { UserRiskProfile } from "../models/UserRiskProfile";
 import { UserRiskAnalysisDTO } from "../DTOs/UserRiskAnalysisDTO";
+import { UserRiskProfileDTO } from "../DTOs/UserRiskProfileDTO";
 
 export interface IUserRiskAnalysisService {
-  getUserRiskProfile(userId: string): Promise<UserRiskProfileDTO>;
+  updateUserRiskAfterThreat(userId: number, threatId: number): Promise<UserRiskProfile>;
+  getUserRiskAnalysis(userId: number): Promise<UserRiskAnalysisDTO>;
+  recalculateUserRisk(userId: number): Promise<UserRiskProfile>;
+  getHighRiskUsers(): Promise<UserRiskProfile[]>;
   getAllUserRiskProfiles(): Promise<UserRiskProfileDTO[]>;
-  getHighRiskUsers(): Promise<UserRiskProfileDTO[]>;
-  getUserRiskAnalysis(userId: string): Promise<UserRiskAnalysisDTO>;
-  updateUserRiskAfterThreat(userId: string, username: string, threatId: number): Promise<void>;
-  updateUserLoginInfo(userId: string, username: string, isSuccessful: boolean): Promise<void>;
-  recalculateUserRisk(userId: string): Promise<UserRiskProfileDTO>;
+  getUserRiskProfile(userId: number): Promise<UserRiskProfileDTO | null>;
 }

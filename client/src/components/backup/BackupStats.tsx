@@ -1,12 +1,8 @@
 import { MdCheckCircle, MdError, MdHistory } from "react-icons/md";
-import { BackupValidationResultDTO } from "../../models/backup/BackupValidationResultDTO";
 import StatCard from "../stat_card/StatCard";
+import { BackupStatsProps } from "../../types/props/backup/BackupStatsProps";
 
-interface Props {
-    stats: BackupValidationResultDTO;
-}
-
-export default function BackupStats({ stats }: Props) {
+export default function BackupStats({ stats }: BackupStatsProps) {
     return(
         <div className="grid grid-cols-12 gap-5 p-[10px]!">
             <div className="col-span-3">

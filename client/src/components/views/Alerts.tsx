@@ -9,9 +9,10 @@ import { AlertStatus } from "../../enums/AlertStatus";
 import { AlertSeverity } from "../../enums/AlertSeverity";
 import { AlertDTO } from "../../models/alerts/AlertDTO";
 import { AlertsProps } from "../../types/props/alerts/AlertsProps";
+import { useAuth } from "../../hooks/useAuthHook";
 
 export default function Alerts({ alertsApi }: AlertsProps) {
-  const token = "token"; // TODO: DELETE AFTER TESTING!
+  const { token } = useAuth();
 
   const [selectedAlertId, setSelectedAlertId] = useState<number | null>(null);
   const [severity, setSeverity] = useState<AlertSeverity | "all">("all");
@@ -19,7 +20,7 @@ export default function Alerts({ alertsApi }: AlertsProps) {
   const [source, setSource] = useState<string>("");
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
-  
+
   const [alerts, setAlerts] = useState<AlertDTO[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,7 +51,7 @@ export default function Alerts({ alertsApi }: AlertsProps) {
   });
 
   const loadAlertsWithQuery = async (
-    targetPage: number = 1, 
+    targetPage: number = 1,
     currentLimit: number = pageSize,
     queryOverride?: AlertQueryDTO
   ) => {
@@ -74,7 +75,7 @@ export default function Alerts({ alertsApi }: AlertsProps) {
         page: targetPage,
         limit: currentLimit,
       };
-      
+
       // Dodaj opcione parametre ako postoje
       if (querySeverity && querySeverity !== "all") {
         query.severity = querySeverity;
@@ -91,10 +92,9 @@ export default function Alerts({ alertsApi }: AlertsProps) {
       if (queryEndDate) {
         query.endDate = queryEndDate;
       }
-      
-      console.log("📤 Sending alert query:", query);
+
       const response: PaginatedAlertsDTO = await alertsApi.searchAlerts(query, token);
-      
+
       setAlerts(response.data);
       setTotalItems(response.pagination.total);
       setPage(response.pagination.page);
@@ -141,15 +141,15 @@ export default function Alerts({ alertsApi }: AlertsProps) {
 
   const handleResolve = async (id: number, resolvedBy: string, markedFalse: boolean) => {
     try {
-      await alertsApi.resolveAlert(id, resolvedBy, markedFalse ? "true" : "false", token);
-      
+      await alertsApi.resolveAlert(id, resolvedBy, markedFalse ? "true" : "false", token!);
+
       // Update local state
-      setAlerts(prev => prev.map(a => 
-        a.id === id 
+      setAlerts(prev => prev.map(a =>
+        a.id === id
           ? { ...a, status: markedFalse ? AlertStatus.MARKED_FALSE : AlertStatus.RESOLVED }
           : a
       ));
-      
+
       setSelectedAlertId(null);
     } catch (err) {
       console.error("Failed to resolve alert:", err);
@@ -158,10 +158,10 @@ export default function Alerts({ alertsApi }: AlertsProps) {
 
   const handleUpdateStatus = async (id: number, newStatus: AlertStatus) => {
     try {
-      await alertsApi.updateAlertStatus(id, newStatus, token);
-      
+      await alertsApi.updateAlertStatus(id, newStatus, token!);
+
       // Update local state
-      setAlerts(prev => prev.map(a => 
+      setAlerts(prev => prev.map(a =>
         a.id === id ? { ...a, status: newStatus } : a
       ));
     } catch (err) {
@@ -184,16 +184,14 @@ export default function Alerts({ alertsApi }: AlertsProps) {
         <h2 className="m-0">Alert Dashboard</h2>
         <div className="flex items-center gap-3">
           <div
-            className={`flex w-[150px]! items-center gap-2 px-3! py-1.5! rounded-[8px] text-[12px] font-semibold ${
-              !isLoading
-                ? "bg-[rgba(74,222,128,0.15)] text-[#4ade80] border border-[rgba(74,222,128,0.3)]"
-                : "bg-[rgba(239,68,68,0.15)] text-[#f87171] border border-[rgba(239,68,68,0.3)]"
-            }`}
+            className={`flex w-[150px]! items-center gap-2 px-3! py-1.5! rounded-[8px] text-[12px] font-semibold ${!isLoading
+              ? "bg-[rgba(74,222,128,0.15)] text-[#4ade80] border border-[rgba(74,222,128,0.3)]"
+              : "bg-[rgba(239,68,68,0.15)] text-[#f87171] border border-[rgba(239,68,68,0.3)]"
+              }`}
           >
             <div
-              className={`w-2 h-2 rounded-full ${
-                !isLoading ? "bg-[#4ade80] animate-pulse" : "bg-[#f87171] animate-none"
-              }`}
+              className={`w-2 h-2 rounded-full ${!isLoading ? "bg-[#4ade80] animate-pulse" : "bg-[#f87171] animate-none"
+                }`}
             ></div>
             {!isLoading ? "Live Updates Active" : "Connecting..."}
           </div>
@@ -224,7 +222,7 @@ export default function Alerts({ alertsApi }: AlertsProps) {
       {!isLoading && alerts.length === 0 && (
         <div className="text-center p-10 text-gray-400">No alerts found</div>
       )}
-      
+
       {!isLoading && alerts.length > 0 && (
         <RecentAlertsTable
           alerts={sortedAlerts}
@@ -259,4 +257,3 @@ export default function Alerts({ alertsApi }: AlertsProps) {
     </div>
   );
 }
-   

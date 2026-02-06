@@ -21,7 +21,15 @@ import { FirewallAPI } from "./api/firewall/FirewallAPI";
 import { IBackupValidationAPI } from "./api/backup/IBackupValdationAPI";
 import { BackupValidationAPI } from "./api/backup/BackupValidationAPI";
 import { IIntegrityAPI } from "./api/integrity/IIntegrityAPI";
+<<<<<<< HEAD
 import { IntegrityAPI } from "./api/integrity/IntegrityAPI";
+=======
+import { IInsiderThreatAPI } from "./api/insider-threat/IInsiderThreatAPI";
+import { InsiderThreatAPI } from "./api/insider-threat/InsiderThreatAPI";
+import { ISecurityMaturityAPI } from "./api/security-maturity/ISecurityMaturityAPI";
+import { SecurityMaturityAPI } from "./api/security-maturity/SecurityMaturityAPI";
+import { StatusMonitorAPI } from "./api/status-monitor/StatusMonitorAPI";
+>>>>>>> f51f5f8e12bc7d5fbaf8bd0fb9c11011a3a01abe
 
 const auth_api: IAuthAPI = new AuthAPI();
 const alerts_api: IAlertAPI = new AlertAPI();
@@ -34,6 +42,12 @@ const risk_score_api: IRiskScoreAPI = new RiskScoreAPI();
 const firewall_api: IFirewallAPI = new FirewallAPI();
 const backup_api: IBackupValidationAPI = new BackupValidationAPI();
 const integrity_api: IIntegrityAPI = new IntegrityAPI();
+<<<<<<< HEAD
+=======
+const insider_threat_api: IInsiderThreatAPI = new InsiderThreatAPI(); 
+const securityMaturityApi: ISecurityMaturityAPI = new SecurityMaturityAPI();
+const statusMonitorApi = new StatusMonitorAPI("http://localhost:5793/api/v1");
+>>>>>>> f51f5f8e12bc7d5fbaf8bd0fb9c11011a3a01abe
 
 function App() {
   return (
@@ -53,8 +67,15 @@ function App() {
         <Route path="/mainLayout" element={<MainLayout alertsAPI={alerts_api}
           parserAPI={parser_api} queryAPI={query_api} storageAPI={storage_api}
           simulatorAPI={simulator_api} desktopNotification={desktopNotification}
+<<<<<<< HEAD
           riskScoreApi={risk_score_api} firewallApi={firewall_api} backupApi={backup_api}
           integrityApi={integrity_api}/>} />
+=======
+          riskScoreApi={risk_score_api} firewallApi={firewall_api} backupApi={backup_api} 
+          insiderThreatApi={insider_threat_api} securityMaturityApi={securityMaturityApi}
+          integrityApi={integrity_api}
+          statusMonitorApi={statusMonitorApi}/>}/>
+>>>>>>> f51f5f8e12bc7d5fbaf8bd0fb9c11011a3a01abe
       </Routes>
     </>
   );

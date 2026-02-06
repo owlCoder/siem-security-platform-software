@@ -11,42 +11,45 @@ export class MonitoringService implements IMonitoringService {
     private checkRepo: Repository<ServiceCheck>
   ) {}
 
-async runChecks(): Promise<void> {
-  const services = await this.thresholdRepo.find();
-
-  for (const s of services) {
+  // NOVA METODA: Radi posao za jedan servis
+  async checkService(threshold: ServiceThreshold): Promise<ServiceCheck> {
     const start = Date.now();
-    try {
-      // Koristimo timeoutMs specifičan za taj servis iz baze
-      await axios.get(s.pingUrl, { timeout: s.timeoutMs });
-      const responseTimeMs = Date.now() - start;
+    let status = ServiceStatus.UP;
+    let responseTimeMs: number | null = 0;
+    let errorType: string | null = null;
 
-      await this.checkRepo.save({
-        serviceName: s.serviceName,
-        checkedAt: new Date(),
-        status: ServiceStatus.UP,
-        responseTimeMs,
-        errorType: null, // Sve je u redu
-      });
+    try {
+      // Koristimo timeout definisan u bazi za taj servis
+      await axios.get(threshold.pingUrl, { timeout: threshold.timeoutMs || 1500 });
+      responseTimeMs = Date.now() - start;
 
     } catch (err: any) {
-      // Detektujemo da li je pao zbog timeout-a ili nečeg drugog (npr. 500 Error)
-      let errorType = "request_failed";
+      status = ServiceStatus.DOWN;
+      responseTimeMs = null;
       
       if (err?.code === "ECONNABORTED" || err?.message?.includes("timeout")) {
         errorType = "timeout";
       } else if (err?.response) {
-        errorType = `http_${err.response.status}`; // npr. http_500
+        errorType = `http_${err.response.status}`;
+      } else {
+        errorType = "connection_error";
       }
-
-      await this.checkRepo.save({
-        serviceName: s.serviceName,
-        checkedAt: new Date(),
-        status: ServiceStatus.DOWN,
-        responseTimeMs: null,
-        errorType,
-      });
     }
+
+    // Snimamo u bazu
+    const check = await this.checkRepo.save({
+      serviceName: threshold.serviceName,
+      checkedAt: new Date(),
+      status: status,
+      responseTimeMs: responseTimeMs,
+      errorType: errorType,
+    });
+
+    return check;
   }
-}
+
+  async runChecks(): Promise<void> {
+    // Ova metoda više ništa ne radi jer Orchestrator preuzima kontrolu
+    return;
+  }
 }

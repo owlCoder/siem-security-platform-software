@@ -36,7 +36,7 @@ export class InsiderThreatRepositoryService implements IInsiderThreatRepositoryS
     return threat;
   }
 
-  async findByUserId(userId: string): Promise<InsiderThreat[]> {
+  async findByUserId(userId: number): Promise<InsiderThreat[]> {
     return this.repo.find({ 
       where: { userId },
       order: { detectedAt: 'DESC' }
@@ -80,7 +80,7 @@ export class InsiderThreatRepositoryService implements IInsiderThreatRepositoryS
 
     const queryBuilder = this.repo.createQueryBuilder('threat');
 
-    if (userId) {
+    if (userId !== undefined) {
       queryBuilder.andWhere('threat.userId = :userId', { userId });
     }
 
@@ -114,11 +114,11 @@ export class InsiderThreatRepositoryService implements IInsiderThreatRepositoryS
     return { threats, total };
   }
 
-  async countByUserId(userId: string): Promise<number> {
+  async countByUserId(userId: number): Promise<number> {
     return this.repo.count({ where: { userId } });
   }
 
-  async countByUserIdAndType(userId: string, type: ThreatType): Promise<number> {
+  async countByUserIdAndType(userId: number, type: ThreatType): Promise<number> {
     return this.repo.count({ where: { userId, threatType: type } });
   }
 }

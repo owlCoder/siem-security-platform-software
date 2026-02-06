@@ -5,9 +5,9 @@ import { BackupValidationResultDTO } from "../../models/backup/BackupValidationR
 
 export interface IBackupValidationAPI {
     runValidation(): Promise<boolean>;
-    getAllLogs(/*token: string*/): Promise<BackupValidationLogDTO[]>;
-    getLastValidation(/*token: string*/): Promise<BackupValidationLogDTO | null>;
-    getSummary(/*token: string*/): Promise<BackupValidationResultDTO>;
-    getHealth(): Promise<BackupHealthDTO>;
-    getStats(rangeDays: number): Promise<BackupStatsDTO[]>;
+    getAllLogs(token: string): Promise<BackupValidationLogDTO[]>;
+    getLastValidation(token: string): Promise<BackupValidationLogDTO | null>;
+    getSummary(token: string): Promise<BackupValidationResultDTO>;
+    getHealth(token: string): Promise<BackupHealthDTO>;
+    getStats(token: string, rangeDays: number): Promise<BackupStatsDTO[]>;
 }

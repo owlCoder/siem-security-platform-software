@@ -8,11 +8,11 @@ export interface IInsiderThreatRepositoryService {
   save(threat: InsiderThreat): Promise<InsiderThreat>;
   findAll(): Promise<InsiderThreat[]>;
   findById(id: number): Promise<InsiderThreat | null>;
-  findByUserId(userId: string): Promise<InsiderThreat[]>;
+  findByUserId(userId: number): Promise<InsiderThreat[]>;
   findByType(type: ThreatType): Promise<InsiderThreat[]>;
   findByRiskLevel(level: RiskLevel): Promise<InsiderThreat[]>;
   findUnresolved(): Promise<InsiderThreat[]>;
   findWithFilters(query: ThreatQueryDTO): Promise<{ threats: InsiderThreat[], total: number }>;
-  countByUserId(userId: string): Promise<number>;
-  countByUserIdAndType(userId: string, type: ThreatType): Promise<number>;
+  countByUserId(userId: number): Promise<number>;
+  countByUserIdAndType(userId: number, type: ThreatType): Promise<number>;
 }

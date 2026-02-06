@@ -21,50 +21,55 @@ export class BackupValidationAPI implements IBackupValidationAPI {
             url: "backup/validate",
             method: "POST",
         });
-        
+
         return response.data.response;
     }
 
-    async getAllLogs(/*token: string*/): Promise<BackupValidationLogDTO[]> {
+    async getAllLogs(token: string): Promise<BackupValidationLogDTO[]> {
         const response: AxiosResponse = await this.axiosInstance.post("", {
             url: "backup/logs",
             method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
         });
 
         return response.data.response;
     }
 
-    async getLastValidation(/*token: string*/): Promise<BackupValidationLogDTO | null> {
+    async getLastValidation(token: string): Promise<BackupValidationLogDTO | null> {
         const response: AxiosResponse = await this.axiosInstance.post("", {
             url: "backup/last",
             method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
         });
 
         return response.data.response;
     }
-    
-    async getSummary(/*token: string*/): Promise<BackupValidationResultDTO> {
+
+    async getSummary(token: string): Promise<BackupValidationResultDTO> {
         const response: AxiosResponse = await this.axiosInstance.post("", {
             url: "backup/summary",
             method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
         });
 
         return response.data.response;
     }
 
-    async getHealth(/*token: string*/): Promise<BackupHealthDTO> {
+    async getHealth(token: string): Promise<BackupHealthDTO> {
         const response: AxiosResponse = await this.axiosInstance.post("", {
             url: "backup/health",
             method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
         });
 
         return response.data.response;
     }
 
-    async getStats(rangeDays: number): Promise<BackupStatsDTO[]> {
+    async getStats(token: string, rangeDays: number): Promise<BackupStatsDTO[]> {
         const response: AxiosResponse = await this.axiosInstance.post("", {
             url: "backup/stats",
             method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
             params: { range: rangeDays },
         });
 

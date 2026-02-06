@@ -8,6 +8,7 @@ import axios from "axios";
 
 export class EventsController {
     private readonly router: Router;
+    getEventsForCorrelation: any;
 
     constructor(
         private readonly eventsService: IEventsService,
@@ -28,6 +29,8 @@ export class EventsController {
         this.router.post("/events", this.createEvent.bind(this));
         this.router.delete("/events/old", this.deleteOldEvents.bind(this));
         this.router.delete("/events/:id", this.deleteEvent.bind(this));
+        this.router.get("/events/correlation", this.getFilteredEventsForCorrelation.bind(this));
+
     }
 
     private async healthCheck(req: Request, res: Response): Promise<void> {
@@ -216,6 +219,36 @@ export class EventsController {
             res.status(500).json({ message });
         }
     }
+
+    private async getFilteredEventsForCorrelation(req: Request, res: Response): Promise<void> {
+    try {
+        const serviceName = req.query.serviceName as string;
+        const startTime = new Date(req.query.startTime as string);
+        const limit = Number(req.query.limit) || 50;
+        
+        const severities = Array.isArray(req.query.severity) 
+            ? (req.query.severity as string[]) 
+            : [req.query.severity as string];
+
+        if (!serviceName || isNaN(startTime.getTime())) {
+            res.status(400).json({ message: "Invalid parameters" });
+            return;
+        }
+
+        const events = await this.eventsService.getFilteredEventsForCorrelation(
+            serviceName, 
+            startTime, 
+            severities, 
+            limit
+        );
+
+        res.status(200).json(events);
+    } catch (err) {
+        const message = (err as Error).message;
+        await this.logger.log(`Error in correlation logs fetch: ${message}`);
+        res.status(500).json({ message });
+    }
+}
     public getRouter(): Router {
         return this.router;
     }

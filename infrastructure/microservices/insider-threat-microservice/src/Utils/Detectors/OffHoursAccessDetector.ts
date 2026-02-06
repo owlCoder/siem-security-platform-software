@@ -1,22 +1,32 @@
 import { DetectionResult } from "../../Domain/types/DetectionResult";
 import { ThreatType } from "../../Domain/enums/ThreatType";
 import { RiskLevel } from "../../Domain/enums/RiskLevel";
+import { Event } from "../../Domain/services/IEventFetcherService";
 import { WorkingHoursConfig } from "../../Domain/types/WorkingHoursConfig";
 
-// Podrazumevano radno vreme: 8:00 - 18:00, ponedeljak-petak
 const DEFAULT_WORKING_HOURS: WorkingHoursConfig = {
   startHour: 8,
   endHour: 18,
-  workingDays: [1, 2, 3, 4, 5] // Monday to Friday
+  workingDays: [1, 2, 3, 4, 5]  
 };
 
 export async function detectOffHoursAccess(
-  userId: string,
-  eventIds: number[]
+  userId: number,
+  events: Event[]
 ): Promise<DetectionResult | null> {
   
-  
-  const offHoursAccessCount = eventIds.length;
+  const offHoursEvents = events.filter(event => {
+    const timestamp = new Date(event.timestamp);
+    const hour = timestamp.getHours();
+    const day = timestamp.getDay();  
+
+    const isWeekend = (day === 0 || day === 6);
+    const isNightTime = (hour < DEFAULT_WORKING_HOURS.startHour || hour >= DEFAULT_WORKING_HOURS.endHour);
+
+    return isWeekend || isNightTime;
+  });
+
+  const offHoursAccessCount = offHoursEvents.length;
   
   if (offHoursAccessCount === 0) {
     return null;
@@ -47,9 +57,14 @@ export async function detectOffHoursAccess(
     metadata: {
       accessCount: offHoursAccessCount,
       workingHours: DEFAULT_WORKING_HOURS,
-      analysisTime: new Date().toISOString()
+      analysisTime: new Date().toISOString(),
+      sampleTimestamps: offHoursEvents.slice(0, 5).map(e => ({
+        time: e.timestamp.toISOString(),
+        hour: e.timestamp.getHours(),
+        day: e.timestamp.getDay()
+      }))
     },
-    correlatedEventIds: eventIds
+    correlatedEventIds: offHoursEvents.map(e => e.id)
   };
 }
 

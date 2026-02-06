@@ -3,7 +3,7 @@ import { TbLayoutDashboardFilled } from "react-icons/tb";
 import { BsCalendarFill } from "react-icons/bs";
 import { VscGraph } from "react-icons/vsc";
 import { LuDatabaseBackup, LuLayers3 } from "react-icons/lu";
-import { MdKeyboardArrowRight, MdOutlineScience } from "react-icons/md";
+import { MdKeyboardArrowRight, MdOutlineScience, MdMonitorHeart } from "react-icons/md";
 import { BiError } from "react-icons/bi";
 import { PiShieldCheck, PiShieldWarningFill, PiSpeedometerFill, PiFingerprintFill } from "react-icons/pi"; // Nova ikonica
 import { useState } from "react";
@@ -214,6 +214,23 @@ export default function Sidebar({ setSideMenuPage }: SidebarProps) {
                         <div className="flex items-center gap-2">
                             <PiFingerprintFill size={24} color={selectedButton === 11 ? "#00ffaa" : "white"} /> 
                             <span style={{ fontWeight: selectedButton === 11 ? "bold" : "normal" }}>Integrity</span>
+                        </div>
+                        <MdKeyboardArrowRight size={20} />
+                    </button>
+
+                    <button
+                        className={itemClass(12)}
+                        style={{ marginLeft: '20px', borderRadius: '0.75rem' }}
+                        onClick={() => {
+                            setSideMenuPage(12);
+                            setSelectedButton(12);
+                        }}
+                        onMouseEnter={() => setHover(12)}
+                        onMouseLeave={() => setHover(null)}
+                    >
+                        <div className="flex items-center gap-2">
+                            <MdMonitorHeart size={22} />
+                            <span>System Status</span>
                         </div>
                         <MdKeyboardArrowRight size={20} />
                     </button>

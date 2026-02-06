@@ -17,6 +17,7 @@ import Integrity from '../components/views/Integrity';
   //insiderThreatAPI: InsiderThreatAPI;
 //}
 import SecurityMaturity from '../components/views/SecurityMaturity';
+import StatusDashboard from '../components/views/StatusDashboard';
 
 export default function MainLayout({
   alertsAPI,
@@ -30,7 +31,8 @@ export default function MainLayout({
   firewallApi,
   backupApi,
   securityMaturityApi,
-  integrityApi
+  integrityApi,
+  statusMonitorApi
 }: MainLayoutProps) {  
 
   const [sideMenuPage, setSideMenuPage] = useState<number>(0);
@@ -76,6 +78,9 @@ export default function MainLayout({
         )}
         {sideMenuPage === 11 && (
           <Integrity integrityApi={integrityApi}/>
+        )}
+        {sideMenuPage === 12 && (
+             <StatusDashboard statusApi={statusMonitorApi} />
         )}
       </div>
     </div>

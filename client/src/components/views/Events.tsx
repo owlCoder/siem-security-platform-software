@@ -10,14 +10,13 @@ import { EventsProps } from "../../types/props/events/EventsProps";
 import Pagination from "../common/Pagination";
 
 export default function Events({ queryApi, parserApi }: EventsProps) {
-    //const { token } = useAuth();
-    const token = "token";      // TODO: DELETE AFTER TESTING!
+    const { token } = useAuth();
 
     const [searchText, setSearchText] = useState("");
     const [dateFrom, setDateFrom] = useState<string>("");
     const [dateTo, setDateTo] = useState<string>("");
     const [eventType, setEventType] = useState<string>("all");
-    const [reset,setReset]=useState(false);
+    const [reset, setReset] = useState(false);
 
     const [sortType, setSortType] = useState(0);
     const [events, setEvents] = useState<EventRow[]>([]);
@@ -84,16 +83,16 @@ export default function Events({ queryApi, parserApi }: EventsProps) {
     };
 
     useEffect(() => {
-        //if (!token) return;       // TODO: DELETE COMMENT AFTER TESTING!
+        if (!token) return;
 
         void loadEventsWithQuery(1);
-    }, [token,reset]);
+    }, [token, reset]);
     const handleReset = () => {
         setSearchText("");
         setDateFrom("");
         setDateTo("");
         setEventType("all");
-       setReset(p=>!p);
+        setReset(p => !p);
     };
 
     return (

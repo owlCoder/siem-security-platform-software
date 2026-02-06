@@ -7,7 +7,6 @@ export function toInsiderThreatDTO(threat: InsiderThreat): InsiderThreatDTO {
   return {
     id: threat.id,
     userId: threat.userId,
-    username: threat.username,
     threatType: threat.threatType,
     riskLevel: threat.riskLevel,
     description: threat.description,
@@ -26,8 +25,7 @@ export function toInsiderThreatDTO(threat: InsiderThreat): InsiderThreatDTO {
 export function createEmptyInsiderThreatDTO(): InsiderThreatDTO {
   return {
     id: -1,
-    userId: "",
-    username: "",
+    userId: -1,
     threatType: ThreatType.MASS_DATA_READ,
     riskLevel: RiskLevel.LOW,
     description: "",

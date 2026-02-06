@@ -1,7 +1,6 @@
 export interface UserRiskProfileDTO {
   id: number;
-  userId: string;
-  username: string;
+  userId: number;
   riskScore: number;
   currentRiskLevel: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
   totalThreatsDetected: number;

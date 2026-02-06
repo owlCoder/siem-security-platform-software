@@ -1,22 +1,38 @@
 import { DetectionResult } from "../../Domain/types/DetectionResult";
 import { ThreatType } from "../../Domain/enums/ThreatType";
 import { RiskLevel } from "../../Domain/enums/RiskLevel";
+import { Event } from "../../Domain/services/IEventFetcherService";
 
-// Pragovi za detekciju neuobičajenih promena dozvola
 const PERMISSION_CHANGE_THRESHOLD = {
-  CRITICAL: 10,  // 10+ promena dozvola
+  CRITICAL: 10,
   HIGH: 5,
   MEDIUM: 3,
   LOW: 2
 };
 
 export async function detectPermissionChange(
-  userId: string,
-  eventIds: number[]
+  userId: number,
+  events: Event[]
 ): Promise<DetectionResult | null> {
   
-  
-  const permissionChangeCount = eventIds.length;
+  const permissionEvents = events.filter(event => {
+    const desc = event.description.toLowerCase();
+    const type = event.type.toUpperCase();
+    
+    const isPermissionChange = 
+      desc.includes('permission') ||
+      desc.includes('privilege') ||
+      desc.includes('access') && desc.includes('granted') ||
+      desc.includes('elevated') ||
+      desc.includes('role') && desc.includes('changed') ||
+      desc.includes('admin access');
+    
+    const isAdminOperation = type === 'WARNING' || type === 'INFO';
+    
+    return isPermissionChange && isAdminOperation;
+  });
+
+  const permissionChangeCount = permissionEvents.length;
   
   if (permissionChangeCount < PERMISSION_CHANGE_THRESHOLD.LOW) {
     return null;
@@ -47,8 +63,12 @@ export async function detectPermissionChange(
     metadata: {
       changeCount: permissionChangeCount,
       threshold: PERMISSION_CHANGE_THRESHOLD,
-      analysisTime: new Date().toISOString()
+      analysisTime: new Date().toISOString(),
+      sampleChanges: permissionEvents.slice(0, 5).map(e => ({
+        description: e.description,
+        timestamp: e.timestamp.toISOString()
+      }))
     },
-    correlatedEventIds: eventIds
+    correlatedEventIds: permissionEvents.map(e => e.id)
   };
 }

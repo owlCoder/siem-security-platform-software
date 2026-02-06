@@ -10,9 +10,8 @@ import { mapToArchiveDTO } from "../../helpers/mapToArchiveDTO";
 import { emptyStats } from "../../constants/emptyStats";
 
 export default function Storage({ storageApi }: StorageProps) {
-
     const { token } = useAuth();
-    const [allArchives, setAllArchives] = useState<ArchiveDTO[]>([]); //originalno svi podaci
+    const [allArchives, setAllArchives] = useState<ArchiveDTO[]>([]);
     const [archives, setArchives] = useState<ArchiveDTO[]>([]);
     const [stats, setStats] = useState<ArchiveStatsDTO | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -20,16 +19,16 @@ export default function Storage({ storageApi }: StorageProps) {
     const [sortType, setSortType] = useState(0);
 
     useEffect(() => {
-        // if(!token)
-        //     return;
+        if (!token)
+            return;
 
         const fetchStorageData = async () => {
             try {
                 setIsLoading(true);
 
-                const archivesResponse = await storageApi.getAllArchives(/*token*/);
+                const archivesResponse = await storageApi.getAllArchives(token);
                 console.log("ARCHIVES RESPONSE: ", archivesResponse);
-                const statsResponse = await storageApi.getStats(/*token*/);
+                const statsResponse = await storageApi.getStats(token);
                 const mapped = mapToArchiveDTO(archivesResponse);
 
                 setAllArchives(mapped);
@@ -43,23 +42,23 @@ export default function Storage({ storageApi }: StorageProps) {
             }
         };
         fetchStorageData();
-    }, [/*token*/]);
+    }, [token]);
 
     const handleSearchArchives = async (query: string) => {
-        //if (!token) return;
+        if (!token) return;
 
-       if(!query){
-        setArchives(allArchives);
-        return;
-       }
+        if (!query) {
+            setArchives(allArchives);
+            return;
+        }
 
-       const filtered = allArchives.filter(a => a.fileName.toLowerCase().includes(query.toLocaleLowerCase()));
+        const filtered = allArchives.filter(a => a.fileName.toLowerCase().includes(query.toLocaleLowerCase()));
 
-       setArchives(filtered);
+        setArchives(filtered);
     }
 
     const handleResetArchives = async () => {
-       setArchives(allArchives);
+        setArchives(allArchives);
     }
 
     return (

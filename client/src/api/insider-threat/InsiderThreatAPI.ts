@@ -8,7 +8,7 @@ import { UserRiskAnalysisDTO } from "../../models/insider-threat/UserRiskAnalysi
 export class InsiderThreatAPI implements IInsiderThreatAPI {
   private readonly axiosInstance: AxiosInstance;
   private readonly basePath = "insider-threats";
-  private readonly riskPath = "siem/user-risk"; 
+  private readonly riskPath = "siem/user-risk";
 
   constructor() {
     this.axiosInstance = axios.create({
@@ -21,49 +21,49 @@ export class InsiderThreatAPI implements IInsiderThreatAPI {
   // =============== THREAT METHODS ===============
 
   async getAllThreats(token: string): Promise<InsiderThreatDTO[]> {
-      const response: AxiosResponse = await this.axiosInstance.post("", {
-        url: this.basePath,
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return response.data.response;
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: this.basePath,
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data.response;
   }
 
   async getThreatById(id: number, token: string): Promise<InsiderThreatDTO> {
-      const response: AxiosResponse = await this.axiosInstance.post("", {
-        url: `${this.basePath}/${id}`,
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return response.data.response;
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: `${this.basePath}/${id}`,
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data.response;
   }
 
-  async getThreatsByUserId(userId: string, token: string): Promise<InsiderThreatDTO[]> {
-      const response: AxiosResponse = await this.axiosInstance.post("", {
-        url: `${this.basePath}/user/${userId}`,
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return response.data.response;
+  async getThreatsByUserId(userId: number, token: string): Promise<InsiderThreatDTO[]> {
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: `${this.basePath}/user/${userId}`,
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data.response;
   }
 
   async getUnresolvedThreats(token: string): Promise<InsiderThreatDTO[]> {
-      const response: AxiosResponse = await this.axiosInstance.post("", {
-        url: `${this.basePath}/unresolved`,
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return response.data.response;
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: `${this.basePath}/unresolved`,
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data.response;
   }
 
   async searchThreats(query: ThreatQueryDTO, token: string): Promise<PaginatedThreatsDTO> {
-      const response: AxiosResponse = await this.axiosInstance.post("", {
-        url: `${this.basePath}/search`,
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-        params: this.sanitizeQuery(query),
-      });
-      return response.data.response;
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: `${this.basePath}/search`,
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+      params: this.sanitizeQuery(query),
+    });
+    return response.data.response;
   }
 
   async resolveThreat(
@@ -72,61 +72,61 @@ export class InsiderThreatAPI implements IInsiderThreatAPI {
     resolutionNotes: string | undefined,
     token: string
   ): Promise<InsiderThreatDTO> {
-      const response: AxiosResponse = await this.axiosInstance.post("", {
-        url: `${this.basePath}/${id}/resolve`,
-        method: "PUT",
-        headers: { Authorization: `Bearer ${token}` },
-        data: { resolvedBy, resolutionNotes },
-      });
-      return response.data.response;
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: `${this.basePath}/${id}/resolve`,
+      method: "PUT",
+      headers: { Authorization: `Bearer ${token}` },
+      data: { resolvedBy, resolutionNotes },
+    });
+    return response.data.response;
   }
 
   // =============== USER RISK METHODS ===============
 
   async getAllUserRiskProfiles(token: string): Promise<UserRiskProfileDTO[]> {
-      const response: AxiosResponse = await this.axiosInstance.post("", {
-        url: `${this.riskPath}/profiles`,
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return response.data.response;
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: `${this.riskPath}/profiles`,
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data.response;
   }
 
   async getHighRiskUsers(token: string): Promise<UserRiskProfileDTO[]> {
-      const response: AxiosResponse = await this.axiosInstance.post("", {
-        url: `${this.riskPath}/high-risk`,
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return response.data.response;
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: `${this.riskPath}/high-risk`,
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data.response;
   }
 
-  async getUserRiskProfile(userId: string, token: string): Promise<UserRiskProfileDTO> {
-      const response: AxiosResponse = await this.axiosInstance.post("", {
-        url: `${this.riskPath}/${userId}`,
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return response.data.response;
+  async getUserRiskProfile(userId: number, token: string): Promise<UserRiskProfileDTO> {
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: `${this.riskPath}/${userId}`,
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data.response;
   }
 
-  async getUserRiskAnalysis(userId: string, token: string): Promise<UserRiskAnalysisDTO> {
-      const response: AxiosResponse = await this.axiosInstance.post("", {
-        url: `${this.riskPath}/${userId}/analysis`,
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return response.data.response;
+  async getUserRiskAnalysis(userId: number, token: string): Promise<UserRiskAnalysisDTO> {
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: `${this.riskPath}/${userId}/analysis`,
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data.response;
   }
 
-  async recalculateUserRisk(userId: string, token: string): Promise<UserRiskProfileDTO> {
-      const response: AxiosResponse = await this.axiosInstance.post("", {
-        url: `${this.riskPath}/${userId}/recalculate`,
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        data: {},
-      });
-      return response.data.response;
+  async recalculateUserRisk(userId: number, token: string): Promise<UserRiskProfileDTO> {
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: `${this.riskPath}/${userId}/recalculate`,
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      data: {},
+    });
+    return response.data.response;
   }
 
   // =============== HELPER ===============

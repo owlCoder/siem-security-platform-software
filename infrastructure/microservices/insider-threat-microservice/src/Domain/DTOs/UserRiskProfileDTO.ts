@@ -1,11 +1,8 @@
 import { RiskLevel } from "../enums/RiskLevel";
 
-
-
-export interface UserRiskProfileDTO {
+export type UserRiskProfileDTO = {
   id: number;
-  userId: string;
-  username: string;
+  userId: number;  
   riskScore: number;
   currentRiskLevel: RiskLevel;
   totalThreatsDetected: number;

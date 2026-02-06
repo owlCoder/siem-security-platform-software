@@ -1,12 +1,8 @@
 import { useState } from "react";
-import { IBackupValidationAPI } from "../../api/backup/IBackupValdationAPI";
+import { BackupValidationButtonProps } from "../../types/props/backup/BackupValidationButtonProps";
 
-interface Props {
-    backupApi: IBackupValidationAPI;
-    onSuccess?: () => void;
-}
 
-export default function BackupValidationButton({ backupApi, onSuccess}: Props){
+export default function BackupValidationButton({ backupApi, onSuccess}: BackupValidationButtonProps){
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 

@@ -1,50 +1,58 @@
-import { Repository, MoreThanOrEqual } from "typeorm";
-import { UserRiskProfile } from "../Domain/models/UserRiskProfile";
+import { Repository } from "typeorm";
 import { IUserRiskRepositoryService } from "../Domain/services/IUserRiskRepositoryService";
-import { ILoggerService } from "../Domain/services/ILoggerService";
+import { UserRiskProfile } from "../Domain/models/UserRiskProfile";
 import { RiskLevel } from "../Domain/enums/RiskLevel";
+import { ILoggerService } from "../Domain/services/ILoggerService";
+
 
 export class UserRiskRepositoryService implements IUserRiskRepositoryService {
   constructor(
-    private repo: Repository<UserRiskProfile>,
+    private readonly repository: Repository<UserRiskProfile>,
     private readonly logger: ILoggerService
   ) {}
 
   async create(data: Partial<UserRiskProfile>): Promise<UserRiskProfile> {
-    const entity = this.repo.create(data);
-    const saved = await this.repo.save(entity);
-    return saved;
+    const profile = this.repository.create(data);
+    return await this.repository.save(profile);
   }
 
-  async save(profile: UserRiskProfile): Promise<UserRiskProfile> {
-    return this.repo.save(profile);
-  }
-
-  async findAll(): Promise<UserRiskProfile[]> {
-    return this.repo.find({ order: { riskScore: 'DESC' } });
-  }
-
-  async findByUserId(userId: string): Promise<UserRiskProfile | null> {
-    const profile = await this.repo.findOne({ where: { userId } });
-    
-    if (!profile) {
-      await this.logger.log(`User risk profile for userId ${userId} not found`);
-    }
-    
-    return profile;
-  }
-
-  async findByRiskLevel(level: RiskLevel): Promise<UserRiskProfile[]> {
-    return this.repo.find({ 
-      where: { currentRiskLevel: level },
-      order: { riskScore: 'DESC' }
+  async findByUserId(userId: number): Promise<UserRiskProfile | null> {
+    return await this.repository.findOne({
+      where: { userId }
     });
   }
 
-  async findHighRiskUsers(threshold: number): Promise<UserRiskProfile[]> {
-    return this.repo.find({ 
-      where: { riskScore: MoreThanOrEqual(threshold) },
-      order: { riskScore: 'DESC' }
+  async update(id: number, data: Partial<UserRiskProfile>): Promise<UserRiskProfile> {
+    await this.repository.update(id, data);
+    
+    const updated = await this.repository.findOne({
+      where: { id }
+    });
+    
+    if (!updated) {
+      throw new Error(`UserRiskProfile with id ${id} not found after update`);
+    }
+    
+    return updated;
+  }
+
+  async findHighRiskUsers(): Promise<UserRiskProfile[]> {
+    return await this.repository.find({
+      where: [
+        { currentRiskLevel: RiskLevel.HIGH },
+        { currentRiskLevel: RiskLevel.CRITICAL }
+      ],
+      order: {
+        riskScore: "DESC"
+      }
+    });
+  }
+
+  async findAll(): Promise<UserRiskProfile[]> {
+    return await this.repository.find({
+      order: {
+        riskScore: "DESC"
+      }
     });
   }
 }

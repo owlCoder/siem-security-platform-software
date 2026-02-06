@@ -29,7 +29,7 @@ export class InsiderThreatGatewayService implements IInsiderThreatGatewayService
     return response.data;
   }
 
-  async getThreatsByUserId(userId: string): Promise<InsiderThreatDTO[]> {
+  async getThreatsByUserId(userId: number): Promise<InsiderThreatDTO[]> {
     const response = await this.client.get<InsiderThreatDTO[]>(`/threats/user/${userId}`);
     return response.data;
   }
@@ -66,18 +66,22 @@ export class InsiderThreatGatewayService implements IInsiderThreatGatewayService
     return response.data;
   }
 
-  async getUserRiskProfile(userId: string): Promise<UserRiskProfileDTO> {
+  async getUserRiskProfile(userId: number): Promise<UserRiskProfileDTO> {
     const response = await this.client.get<UserRiskProfileDTO>(`/user-risk-profiles/${userId}`);
     return response.data;
   }
 
-  async getUserRiskAnalysis(userId: string): Promise<UserRiskAnalysisDTO> {
-    const response = await this.client.get<UserRiskAnalysisDTO>(`/user-risk-profiles/${userId}/analysis`);
+  async getUserRiskAnalysis(userId: number): Promise<UserRiskAnalysisDTO> {
+    const response = await this.client.get<UserRiskAnalysisDTO>(
+      `/user-risk-profiles/${userId}/analysis`
+    );
     return response.data;
   }
 
-  async recalculateUserRisk(userId: string): Promise<UserRiskProfileDTO> {
-    const response = await this.client.post<UserRiskProfileDTO>(`/user-risk-profiles/${userId}/recalculate`);
+  async recalculateUserRisk(userId: number): Promise<UserRiskProfileDTO> {
+    const response = await this.client.post<UserRiskProfileDTO>(
+      `/user-risk-profiles/${userId}/recalculate`
+    );
     return response.data;
   }
 }
