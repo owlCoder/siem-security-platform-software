@@ -36,6 +36,26 @@ app.use(
 );
 
 app.use(express.json());
+/* ===================== HEALTH CHECK ===================== */
+
+app.get("/health", async (req, res) => {
+  try {
+    res.status(200).json({
+      status: "OK",
+      service: "AnalysisEngineService", 
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime()
+    });
+  } catch (err) {
+    res.status(503).json({
+      status: "DOWN",
+      service: "AnalysisEngineService",
+      timestamp: new Date().toISOString(),
+      error: err instanceof Error ? err.message : "Database error"
+    });
+  }
+});
+
 
 /* ===================== Composition ===================== */
 

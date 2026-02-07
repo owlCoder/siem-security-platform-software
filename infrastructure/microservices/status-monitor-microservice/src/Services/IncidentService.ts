@@ -79,7 +79,7 @@ export class IncidentService implements IIncidentService {
       return "Correlation: The service has never been successfully initialized (no history of an UP status). Check network reachability.";
     }
 
-    // Provera: Da li su svi padovi bili timeout (npr. responseTime je -1 ili null)
+    //Provera: Da li su svi padovi bili timeout (npr. responseTime je -1 ili null)
     const allTimeouts = downs.every(c => !c.responseTimeMs || c.responseTimeMs === -1);
     if (allTimeouts) {
       return "Correlation (Heuristic): A complete timeout has been detected. Possible network outage or a DDoS attack saturating the service.";

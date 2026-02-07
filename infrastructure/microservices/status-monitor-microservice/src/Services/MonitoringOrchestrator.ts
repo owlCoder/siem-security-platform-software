@@ -29,14 +29,12 @@ export class MonitoringOrchestrator implements IMonitoringOrchestrator {
                     continue; 
                 }
 
-                console.log(`⏱️ Vreme je za proveru: ${threshold.serviceName} (Interval: ${threshold.checkIntervalSec || 30}s)`);
+                console.log(`Checking service: ${threshold.serviceName} (Interval: ${threshold.checkIntervalSec || 30}s)`);
 
                 // 3. Izvršavamo proveru samo za taj servis
-                // OVO JE DEO KOJI JE FALIO: Dobijamo 'checkResult'
                 const checkResult = await this.monitoringService.checkService(threshold);
 
                 // 4. Proveravamo da li treba otvoriti incident
-                // SADA IMAMO SVA 3 ARGUMENTA KOJA TVOJ INTERFEJS TRAŽI
                 await this.incidentService.evaluate(threshold.serviceName, checkResult, threshold);
             }
             

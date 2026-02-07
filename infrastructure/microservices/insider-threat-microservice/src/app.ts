@@ -32,6 +32,26 @@ app.get("/", (req, res) => {
 (async () => {
   await initialize_database();
 
+  app.get("/health", async (req, res) => {
+    try {
+      await Db.query("SELECT 1");
+
+      res.status(200).json({
+        status: "OK",
+        service: "InsiderThreatService",
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime()
+      });
+    } catch (err) {
+      res.status(503).json({
+        status: "DOWN",
+        service: "InsiderThreatService",
+        timestamp: new Date().toISOString(),
+        error: "Database connection failed"
+      });
+    }
+  });
+
   const logger = new LoggerService();
   const threatRepository = Db.getRepository(InsiderThreat);
   const riskRepository = Db.getRepository(UserRiskProfile);
