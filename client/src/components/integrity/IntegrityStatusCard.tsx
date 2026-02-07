@@ -33,17 +33,17 @@ export default function IntegrityStatusCard({ status, onVerify, loading }: Integ
                         <label className="block text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">
                             Total Logs Checked
                         </label>
-                        <span className="text-white font-mono font-semibold text-lg">
+                        <span className="text-[#dcdcdc] font-mono text-sm font-medium">
                             {status?.totalLogsChecked || 0}
                         </span>
                     </div>
 
-                    <div className="text-center md:text-right md:border-l border-[#3a3a3a] md:pl-6">
+                    <div className="text-center md:text-center md:border-l border-[#3a3a3a] md:pl-6">
                         <label className="block text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">
                             Last Check
                         </label>
-                        <span className="text-white text-sm font-medium">
-                            {status?.lastChecked ? new Date(status.lastChecked).toLocaleString("sr-RS") : "Never Checked"}
+                        <span className="ml-3! text-[#dcdcdc] font-mono text-sm font-medium">
+                            {status?.lastChecked ? new Date(status.lastChecked).toLocaleString("en-GB") : "Never Checked"}
                         </span>
                     </div>
 

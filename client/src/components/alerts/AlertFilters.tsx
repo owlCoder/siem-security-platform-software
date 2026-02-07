@@ -6,7 +6,7 @@ import SelectFilters from "./SelectFilters";
 import SearchBar from "./SearchBar";
 import { AlertFiltersProps } from "../../types/props/alerts/AlertFilterProps";
 
-export default function AlertFilters({ onSearch }:AlertFiltersProps)  {
+export default function AlertFilters({ onSearch , alertsApi}:AlertFiltersProps)  {
   const [searchText, setSearchText] = useState("");
   const [severity, setSeverity] = useState<AlertSeverity | undefined>();
   const [status, setStatus] = useState<AlertStatus | undefined>();
@@ -58,6 +58,9 @@ export default function AlertFilters({ onSearch }:AlertFiltersProps)  {
           onSearch={handleSearch}
           onReset={handleReset}
           onKeyPress={handleKeyPress}
+          severity={severity}
+          status={status}
+          alertsApi={alertsApi}
         />
       </div>
       <div className="h-4"></div>

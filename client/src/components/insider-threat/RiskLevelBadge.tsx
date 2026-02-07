@@ -14,9 +14,9 @@ export default function RiskLevelBadge({ level, size = "md" }: RiskLevelBadgePro
   const color = getRiskColor(level);
   
   const sizeClasses = {
-    sm: "px-2 py-1 text-[10px]",
-    md: "px-2.5 py-1.5 text-[12px]",
-    lg: "px-3 py-2 text-[14px]"
+    sm: "px-2! py-1! text-[10px]",
+    md: "px-2.5! py-1.5! text-[12px]",
+    lg: "px-3! py-2! text-[14px]"
   };
 
   return (

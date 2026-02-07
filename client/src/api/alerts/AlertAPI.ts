@@ -42,7 +42,7 @@ export class AlertAPI implements IAlertAPI {
       headers: { Authorization: `Bearer ${token}` },
       data: this.sanitizeQuery(query),
     });
-    
+
     return response.data.response;
   }
 
@@ -79,4 +79,7 @@ export class AlertAPI implements IAlertAPI {
     });
     return sanitized;
   }
+  
+
+
 }
