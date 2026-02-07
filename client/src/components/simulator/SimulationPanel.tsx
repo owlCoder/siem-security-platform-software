@@ -92,21 +92,27 @@ export function SimulationPanel({ simulatorApi }: SimulationPanelProps) {
   };
 
   return (
-    <div className="bg-[#151515] border border-[#2f2f2f] rounded-[12px] px-8 py-5 mb-4">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-[16px] font-semibold">Security Incident Simulator</h3>
+    <div className="flex flex-col w-full bg-[#1f2123] border-2 border-[#282A28] rounded-[12px] px-8 py-7 mb-4">
+
+      {/* HEADER */}
+      <div className="flex items-center justify-between pb-4 border-b border-[#2c2c2c]">
+        <h3 className="text-white text-lg font-semibold">
+          Security Incident Simulator
+        </h3>
+
         {activeSimulation && (
-          <span className="text-[12px] text-[#a3a3a3]">
+          <span className="text-xs text-[#a6a6a6] bg-[#1f1f1f] px-3 py-1 rounded-lg border border-[#333]">
             ID: {activeSimulation.id}
           </span>
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4 pl-4">
-        <label className="text-[12px] text-[#a3a3a3]">
-          Type
+      {/* INPUT SECTION */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-5 pt-6 pb-6 border-b border-[#2c2c2c]">
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-[#a6a6a6]">Type</label>
           <select
-            className="mt-2 w-full rounded bg-[#232323] p-2 text-[13px]"
+            className="w-full px-4 py-2 rounded-[10px] border-2 border-[#333] bg-[#1f1f1f] text-white text-sm focus:outline-none focus:border-[#007a55] transition-colors duration-200"
             value={type}
             onChange={(e) => setType(e.target.value as SimulationType)}
           >
@@ -116,88 +122,124 @@ export function SimulationPanel({ simulatorApi }: SimulationPanelProps) {
               </option>
             ))}
           </select>
-        </label>
+        </div>
 
-        <label className="text-[12px] text-[#a3a3a3]">
-          Intensity (events/sec)
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-[#a6a6a6]">Intensity (events/sec)</label>
           <input
-            className="mt-2 w-full rounded bg-[#232323] p-2 text-[13px]"
             type="number"
             min={1}
             value={intensity}
             onChange={(e) => setIntensity(Number(e.target.value))}
+            className="w-full px-4 py-2 rounded-[10px] border-2 border-[#333] bg-[#1f1f1f] text-white text-sm focus:outline-none focus:border-[#007a55]"
           />
-        </label>
+        </div>
 
-        <label className="text-[12px] text-[#a3a3a3]">
-          Duration (sec)
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-[#a6a6a6]">Duration (sec)</label>
           <input
-            className="mt-2 w-full rounded bg-[#232323] p-2 text-[13px]"
             type="number"
             min={1}
             value={durationSeconds}
             onChange={(e) => setDurationSeconds(Number(e.target.value))}
+            className="w-full px-4 py-2 rounded-[10px] border-2 border-[#333] bg-[#1f1f1f] text-white text-sm focus:outline-none focus:border-[#007a55]"
           />
-        </label>
+        </div>
 
-        <label className="text-[12px] text-[#a3a3a3]">
-          Target
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-[#a6a6a6]">Target</label>
           <input
-            className="mt-2 w-full rounded bg-[#232323] p-2 text-[13px]"
             value={target}
             onChange={(e) => setTarget(e.target.value)}
             placeholder="auth-service"
+            className="w-full px-4 py-2 rounded-[10px] border-2 border-[#333] bg-[#1f1f1f] text-white placeholder:text-[#a6a6a6] text-sm focus:outline-none focus:border-[#007a55]"
           />
-        </label>
+        </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 mb-4 pl-4">
+      {/* BUTTONS + STATUS */}
+      <div className="flex flex-wrap items-center gap-3 pt-5 pb-5 border-b border-[#2c2c2c]">
         <button
-          className="px-3 py-2 rounded bg-[#4ade80] text-[#0f0f0f] text-[12px] font-semibold"
           onClick={startSimulation}
           disabled={isLoading}
+          className={`px-5 py-2 rounded-[10px] text-white text-sm font-semibold transition-all duration-200 ${isLoading
+              ? "bg-[#313338] cursor-not-allowed"
+              : "bg-[#007a55] hover:bg-[#008b65]"
+            }`}
         >
           Start
         </button>
+
         <button
-          className="px-3 py-2 rounded bg-[#f87171] text-[#0f0f0f] text-[12px] font-semibold"
           onClick={stopSimulation}
           disabled={!activeSimulation || isLoading}
+          className={`px-5 py-2 rounded-[10px] text-white text-sm font-semibold transition-all duration-200 ${!activeSimulation || isLoading
+              ? "bg-[#313338] cursor-not-allowed"
+              : "bg-red-600 hover:bg-red-700"
+            }`}
         >
           Stop
         </button>
+
         <button
-          className="px-3 py-2 rounded bg-[#3b82f6] text-white text-[12px] font-semibold"
           onClick={refreshSimulation}
           disabled={!activeSimulation || isLoading}
+          className={`px-5 py-2 rounded-[10px] text-white text-sm font-semibold transition-all duration-200 ${!activeSimulation || isLoading
+              ? "bg-[#313338] cursor-not-allowed"
+              : "bg-[#1f6feb] hover:bg-[#2a7fff]"
+            }`}
         >
           Refresh
         </button>
+
         {activeSimulation && (
-          <span className="text-[12px] text-[#a3a3a3]">
-            Status: {activeSimulation.status} | Events: {activeSimulation.eventsGenerated}
-          </span>
+          <div className="ml-3 text-xs text-[#a6a6a6]">
+            Status:{" "}
+            <span className="text-white font-semibold">
+              {activeSimulation.status}
+            </span>
+            <span className="mx-2 text-[#555]">|</span>
+            Events:{" "}
+            <span className="text-[#00ff88] font-semibold">
+              {activeSimulation.eventsGenerated}
+            </span>
+          </div>
         )}
       </div>
 
-      {error && <div className="text-[12px] text-red-400 mb-2">{error}</div>}
+      {/* ERROR */}
+      {error && (
+        <div className="pt-4 text-sm font-semibold text-red-500">
+          {error}
+        </div>
+      )}
 
-      <div className="h-[180px] bg-[#111111] rounded-[8px] p-3">
-        {timelineData.length === 0 ? (
-          <div className="text-[12px] text-[#666] flex items-center justify-center h-full">
-            No simulation data yet.
-          </div>
-        ) : (
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={timelineData}>
-              <XAxis dataKey="time" tick={{ fill: "#9ca3af", fontSize: 10 }} />
-              <YAxis tick={{ fill: "#9ca3af", fontSize: 10 }} />
-              <Tooltip />
-              <Line type="monotone" dataKey="count" stroke="#4ade80" strokeWidth={2} dot={false} />
-            </LineChart>
-          </ResponsiveContainer>
-        )}
+      {/* CHART */}
+      <div className="pt-6">
+        <div className="h-[200px] bg-[#1f2123] rounded-[10px] border border-[#333] p-4">
+          {timelineData.length === 0 ? (
+            <div className="text-xs text-[#666] flex items-center justify-center h-full">
+              No simulation data yet.
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={timelineData}>
+                <XAxis dataKey="time" tick={{ fill: "#9ca3af", fontSize: 10 }} />
+                <YAxis tick={{ fill: "#9ca3af", fontSize: 10 }} />
+                <Tooltip />
+                <Line
+                  type="monotone"
+                  dataKey="count"
+                  stroke="#00ff88"
+                  strokeWidth={2}
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
+        </div>
       </div>
     </div>
   );
+
 }
