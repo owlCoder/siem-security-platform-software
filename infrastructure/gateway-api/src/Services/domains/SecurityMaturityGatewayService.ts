@@ -5,6 +5,7 @@ import { defaultAxiosClient } from "../../Domain/constants/AxiosClient";
 import { SecuirtyMaturityCurrentDTO } from "../../Domain/DTOs/SecurityMaturityCurrentDTO";
 import { SecurityMaturityTrendDTO } from "../../Domain/DTOs/SecurityMaturityTrendDTO";
 import { SecuirtyMaturityIncidentsByCategoryDTO } from "../../Domain/DTOs/SecurityMaturityIncidentsByCategoryDTO";
+import { SecurityMaturityRecommendationDTO } from "../../Domain/DTOs/SecurityMaturityRecommendationDTO";
 
 export class SecurityMaturityGatewayService implements ISecurityMaturityGatewayService {
   private readonly client: AxiosInstance;
@@ -45,6 +46,15 @@ export class SecurityMaturityGatewayService implements ISecurityMaturityGatewayS
     >("/incidents-by-category", {
       params: { period },
     });
+
+    return response.data;
+  }
+
+  async getRecommendations(): Promise<SecurityMaturityRecommendationDTO[]> {
+    const response =
+      await this.client.get<SecurityMaturityRecommendationDTO[]>(
+        "/recommendations",
+      );
 
     return response.data;
   }

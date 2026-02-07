@@ -1,5 +1,6 @@
 import { AlertDTO } from "../Domain/DTOs/AlertDTO";
 import { CreateAlertDTO } from "../Domain/DTOs/CreateAlertDTO";
+import { CreateSystemAlertDTO } from "../Domain/DTOs/CreateSystemAlertDTO";
 import { ResolveAlertDTO } from "../Domain/DTOs/ResolveAlertDTO";
 import { AlertSeverity } from "../Domain/enums/AlertSeverity";
 import { AlertStatus } from "../Domain/enums/AlertStatus";
@@ -34,6 +35,33 @@ export class AlertService implements IAlertService {
       return toAlertDTO(saved);
     } catch (err) {
       await this.logger.log(`Failed to create alert: ${err}`);
+      return createEmptyAlertDTO();
+    }
+  }
+
+  async createSystemAlert(data: CreateSystemAlertDTO): Promise<AlertDTO> {
+    try {
+      const alertData = {
+        title: `System Alert: ${data.category}`,
+        description: data.description,
+        severity: data.severity,
+        correlatedEvents: [], 
+        source: data.source,
+        detectionRule: null,
+        category: data.category,
+        oldestEventTimestamp: new Date(), 
+        status: AlertStatus.ACTIVE,
+        resolvedAt: null,
+        resolvedBy: null,
+        resolutionNotes: null
+      };
+
+      const saved = await this.repo.create(alertData);
+      await this.logger.log(`System alert created successfully with ID: ${saved.id} from source: ${data.source}`);
+
+      return toAlertDTO(saved);
+    } catch (err) {
+      await this.logger.log(`Failed to create system alert: ${err}`);
       return createEmptyAlertDTO();
     }
   }

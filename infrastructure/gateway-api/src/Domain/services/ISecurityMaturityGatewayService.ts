@@ -1,5 +1,6 @@
 import { SecuirtyMaturityCurrentDTO } from "../DTOs/SecurityMaturityCurrentDTO";
 import { SecuirtyMaturityIncidentsByCategoryDTO } from "../DTOs/SecurityMaturityIncidentsByCategoryDTO";
+import { SecurityMaturityRecommendationDTO } from "../DTOs/SecurityMaturityRecommendationDTO";
 import { SecurityMaturityTrendDTO } from "../DTOs/SecurityMaturityTrendDTO";
 
 export interface ISecurityMaturityGatewayService {
@@ -8,4 +9,5 @@ export interface ISecurityMaturityGatewayService {
   getIncidentsByCategory(
     period: string,
   ): Promise<SecuirtyMaturityIncidentsByCategoryDTO[]>;
+  getRecommendations(): Promise<SecurityMaturityRecommendationDTO[]>;
 }

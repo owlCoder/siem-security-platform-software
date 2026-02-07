@@ -2,6 +2,7 @@ import { ValidationResult } from "../../Domain/types/ValidationResult";
 import { CreateAlertDTO } from "../../Domain/DTOs/CreateAlertDTO";
 import { ResolveAlertDTO } from "../../Domain/DTOs/ResolveAlertDTO";
 import { CreateAlertFromCorrelationDTO } from "../../Domain/DTOs/CreateAlertFromCorrelationDTO";
+import { CreateSystemAlertDTO } from "../../Domain/DTOs/CreateSystemAlertDTO";
 import { AlertSeverity } from "../../Domain/enums/AlertSeverity";
 import { AlertStatus } from "../../Domain/enums/AlertStatus";
 import { AlertCategory } from "../../Domain/enums/AlertCategory";
@@ -49,6 +50,26 @@ export function validateCreateAlertDTO(data: CreateAlertDTO): ValidationResult {
 
   if (!(data.oldestEventTimestamp instanceof Date) || Number.isNaN(data.oldestEventTimestamp.getTime())) {
     return { success: false, message: "Invalid oldestEventTimestamp" };
+  }
+
+  return { success: true };
+}
+
+export function validateCreateSystemAlertDTO(data: CreateSystemAlertDTO): ValidationResult {
+  if (!data.description || typeof data.description !== "string" || data.description.trim().length === 0) {
+    return { success: false, message: "Invalid input: 'description' must be a non-empty string!" };
+  }
+
+  if (!data.severity || !Object.values(AlertSeverity).includes(data.severity)) {
+    return { success: false, message: "Invalid severity value!" };
+  }
+
+  if (!Object.values(AlertCategory).includes(data.category)) {
+    return { success: false, message: "Invalid category value!" };
+  }
+
+  if (!data.source || typeof data.source !== "string" || data.source.trim().length === 0) {
+    return { success: false, message: "Invalid input: 'source' must be a non-empty string!" };
   }
 
   return { success: true };

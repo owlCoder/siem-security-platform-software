@@ -31,7 +31,10 @@ import { BackupValidationLogDTO } from "../../Domain/DTOs/BackupValidationLogDTO
 import { BackupValidationResultDTO } from "../../Domain/DTOs/BackupValidationResultDTO";
 import { IInsiderThreatGatewayService } from "../../Domain/services/IInsiderThreatGatewayService";
 import { InsiderThreatDTO } from "../../Domain/DTOs/InsiderThreatDTO";
-import { PaginatedThreatsDTO, ThreatQueryDTO } from "../../Domain/DTOs/ThreatQueryDTO";
+import {
+  PaginatedThreatsDTO,
+  ThreatQueryDTO,
+} from "../../Domain/DTOs/ThreatQueryDTO";
 import { UserRiskProfileDTO } from "../../Domain/DTOs/UserRiskProfileDTO";
 import { UserRiskAnalysisDTO } from "../../Domain/DTOs/UserRiskAnalysisDTO";
 import { RiskEntityType } from "../../Domain/enums/RiskEntityType";
@@ -41,6 +44,11 @@ import { BackupStatsDTO } from "../../Domain/DTOs/BackupStatsDTO";
 import { IIntegrityGatewayService } from "../../Domain/services/IIntegrityGatewayService";
 import { BusinessLLMInputDto } from "../../Domain/DTOs/businessInsights/BusinessLLMInputDto";
 import { BusinessResponseDto } from "../../Domain/DTOs/businessInsights/BusinessResponseDto";
+import { ISecurityMaturityGatewayService } from "../../Domain/services/ISecurityMaturityGatewayService";
+import { SecuirtyMaturityCurrentDTO } from "../../Domain/DTOs/SecurityMaturityCurrentDTO";
+import { SecurityMaturityTrendDTO } from "../../Domain/DTOs/SecurityMaturityTrendDTO";
+import { SecuirtyMaturityIncidentsByCategoryDTO } from "../../Domain/DTOs/SecurityMaturityIncidentsByCategoryDTO";
+import { SecurityMaturityRecommendationDTO } from "../../Domain/DTOs/SecurityMaturityRecommendationDTO";
 
 /**
  * Facade that delegates to domain-specific gateway services.
@@ -58,8 +66,9 @@ export class GatewayService implements IGatewayService {
     private readonly backupService: IBackupGatewayService,
     private readonly insiderThreatService: IInsiderThreatGatewayService,
     private readonly riskScoreService: IRiskScoreGatewayService,
-    private readonly integrityService: IIntegrityGatewayService
-  ) { }
+    private readonly integrityService: IIntegrityGatewayService,
+    private readonly securityMaturityService: ISecurityMaturityGatewayService,
+  ) {}
 
   // Event Collector
   async createEvent(event: EventDTO): Promise<EventDTO> {
@@ -77,7 +86,10 @@ export class GatewayService implements IGatewayService {
   async deleteOldEvents(expiredIds: number[]): Promise<boolean> {
     return await this.eventService.deleteOldEvents(expiredIds);
   }
-  async getEventsFromId1ToId2(fromId: number, toId: number): Promise<EventDTO[]> {
+  async getEventsFromId1ToId2(
+    fromId: number,
+    toId: number,
+  ): Promise<EventDTO[]> {
     return await this.eventService.getEventsFromId1ToId2(fromId, toId);
   }
 
@@ -94,8 +106,20 @@ export class GatewayService implements IGatewayService {
   }
 
   // Parser
-  async log(eventMessage: string, eventSource: string, ipAddress?: string, userId?: number, userRole?: string): Promise<EventDTO> {
-    return this.parserService.log(eventMessage, eventSource, ipAddress, userId, userRole);
+  async log(
+    eventMessage: string,
+    eventSource: string,
+    ipAddress?: string,
+    userId?: number,
+    userRole?: string,
+  ): Promise<EventDTO> {
+    return this.parserService.log(
+      eventMessage,
+      eventSource,
+      ipAddress,
+      userId,
+      userRole,
+    );
   }
 
   async getAllParserEvents(): Promise<ParserEventDto[]> {
@@ -145,7 +169,11 @@ export class GatewayService implements IGatewayService {
     return this.alertService.searchAlerts(query);
   }
 
-  async resolveAlert(id: number, resolvedBy: string, status: string): Promise<AlertDTO> {
+  async resolveAlert(
+    id: number,
+    resolvedBy: string,
+    status: string,
+  ): Promise<AlertDTO> {
     return this.alertService.resolveAlert(id, resolvedBy, status);
   }
 
@@ -154,7 +182,11 @@ export class GatewayService implements IGatewayService {
   }
 
   // Query Service
-  async searchEvents(query: string, targetPage: number, limit: number): Promise<EventsResultDTO> {
+  async searchEvents(
+    query: string,
+    targetPage: number,
+    limit: number,
+  ): Promise<EventsResultDTO> {
     return this.queryService.searchEvents(query, targetPage, limit);
   }
 
@@ -206,7 +238,9 @@ export class GatewayService implements IGatewayService {
     return this.queryService.getAllAlerts();
   }
 
-  async searchAlertsFromQuery(alertQueryDTO: AlertQueryDTO): Promise<PaginatedAlertsDTO> {
+  async searchAlertsFromQuery(
+    alertQueryDTO: AlertQueryDTO,
+  ): Promise<PaginatedAlertsDTO> {
     return this.queryService.searchAlerts(alertQueryDTO);
   }
 
@@ -214,31 +248,56 @@ export class GatewayService implements IGatewayService {
     return this.queryService.getAlertsCount();
   }
 
-  async getTotalEventCount(entityType: RiskEntityType, entityId: string): Promise<number> {
+  async getTotalEventCount(
+    entityType: RiskEntityType,
+    entityId: string,
+  ): Promise<number> {
     return this.queryService.getTotalEventCount(entityType, entityId);
   }
 
-  async getErrorEventCount(entityType: RiskEntityType, entityId: string, hours: number): Promise<number> {
+  async getErrorEventCount(
+    entityType: RiskEntityType,
+    entityId: string,
+    hours: number,
+  ): Promise<number> {
     return this.queryService.getErrorEventCount(entityType, entityId, hours);
   }
 
-  async getEventRate(entityType: RiskEntityType, entityId: string, hours: number): Promise<number> {
+  async getEventRate(
+    entityType: RiskEntityType,
+    entityId: string,
+    hours: number,
+  ): Promise<number> {
     return this.queryService.getEventRate(entityType, entityId, hours);
   }
 
-  async getAlertsCountBySeverity(entityType: RiskEntityType, entityId: string): Promise<Map<string, number>> {
+  async getAlertsCountBySeverity(
+    entityType: RiskEntityType,
+    entityId: string,
+  ): Promise<Map<string, number>> {
     return this.queryService.getAlertsCountBySeverity(entityType, entityId);
   }
 
-  async getCriticalAlertsCount(entityType: RiskEntityType, entityId: string): Promise<number> {
+  async getCriticalAlertsCount(
+    entityType: RiskEntityType,
+    entityId: string,
+  ): Promise<number> {
     return this.queryService.getCriticalAlertsCount(entityType, entityId);
   }
 
-  async getAnomalyRate(entityType: RiskEntityType, entityId: string, hours: number): Promise<number> {
+  async getAnomalyRate(
+    entityType: RiskEntityType,
+    entityId: string,
+    hours: number,
+  ): Promise<number> {
     return this.queryService.getAnomalyRate(entityType, entityId, hours);
   }
 
-  async getBurstAnomaly(entityType: RiskEntityType, entityId: string, hours: number): Promise<boolean> {
+  async getBurstAnomaly(
+    entityType: RiskEntityType,
+    entityId: string,
+    hours: number,
+  ): Promise<boolean> {
     return this.queryService.getBurstAnomaly(entityType, entityId, hours);
   }
 
@@ -275,11 +334,16 @@ export class GatewayService implements IGatewayService {
     return this.storageService.downloadArchive(id);
   }
 
-  async getTopArchives(type: "events" | "alerts", limit: number): Promise<TopArchiveDTO[]> {
+  async getTopArchives(
+    type: "events" | "alerts",
+    limit: number,
+  ): Promise<TopArchiveDTO[]> {
     return this.storageService.getTopArchives(type, limit);
   }
 
-  async getArchiveVolume(period: "daily" | "monthly" | "yearly"): Promise<ArchiveVolumeDTO[]> {
+  async getArchiveVolume(
+    period: "daily" | "monthly" | "yearly",
+  ): Promise<ArchiveVolumeDTO[]> {
     return this.storageService.getArchiveVolume(period);
   }
 
@@ -288,16 +352,24 @@ export class GatewayService implements IGatewayService {
   }
 
   // Analysis Engine
-  async analysisEngineNormalize(rawMessage: string): Promise<NormalizedEventDTO> {
+  async analysisEngineNormalize(
+    rawMessage: string,
+  ): Promise<NormalizedEventDTO> {
     return this.analysisService.normalize(rawMessage);
   }
 
-  async analysisEngineDeleteCorrelationsByEventIds(eventIds: number[]): Promise<number> {
+  async analysisEngineDeleteCorrelationsByEventIds(
+    eventIds: number[],
+  ): Promise<number> {
     return this.analysisService.deleteCorrelationsByEventIds(eventIds);
   }
 
-  async analysisEngineGenerateBusinessInsights(businessLLMInput: BusinessLLMInputDto): Promise<BusinessResponseDto> {
-    return this.analysisService.analysisEngineGenerateBusinessInsights(businessLLMInput);
+  async analysisEngineGenerateBusinessInsights(
+    businessLLMInput: BusinessLLMInputDto,
+  ): Promise<BusinessResponseDto> {
+    return this.analysisService.analysisEngineGenerateBusinessInsights(
+      businessLLMInput,
+    );
   }
 
   // Backup
@@ -342,14 +414,23 @@ export class GatewayService implements IGatewayService {
     return await this.insiderThreatService.getUnresolvedThreats();
   }
 
-  async searchInsiderThreats(query: ThreatQueryDTO): Promise<PaginatedThreatsDTO> {
+  async searchInsiderThreats(
+    query: ThreatQueryDTO,
+  ): Promise<PaginatedThreatsDTO> {
     return await this.insiderThreatService.searchThreats(query);
   }
 
-  async resolveInsiderThreat(id: number, resolvedBy: string, resolutionNotes?: string): Promise<InsiderThreatDTO> {
-    return await this.insiderThreatService.resolveThreat(id, resolvedBy, resolutionNotes);
+  async resolveInsiderThreat(
+    id: number,
+    resolvedBy: string,
+    resolutionNotes?: string,
+  ): Promise<InsiderThreatDTO> {
+    return await this.insiderThreatService.resolveThreat(
+      id,
+      resolvedBy,
+      resolutionNotes,
+    );
   }
-
 
   async getAllUserRiskProfiles(): Promise<UserRiskProfileDTO[]> {
     return await this.insiderThreatService.getAllUserRiskProfiles();
@@ -372,33 +453,75 @@ export class GatewayService implements IGatewayService {
   }
 
   // Risk Score
-  async calculateScore(entityType: RiskEntityType, entityId: string, hours: number): Promise<number> {
-    return await this.riskScoreService.calculateScore(entityType, entityId, hours);
+  async calculateScore(
+    entityType: RiskEntityType,
+    entityId: string,
+    hours: number,
+  ): Promise<number> {
+    return await this.riskScoreService.calculateScore(
+      entityType,
+      entityId,
+      hours,
+    );
   }
 
-  async getLatestScore(entityType: RiskEntityType, entityId: string): Promise<number | null> {
+  async getLatestScore(
+    entityType: RiskEntityType,
+    entityId: string,
+  ): Promise<number | null> {
     return await this.riskScoreService.getLatestScore(entityType, entityId);
   }
 
-  async getScoreHistory(entityType: RiskEntityType, entityId: string, hours: number): Promise<{ score: number; createdAt: Date; }[]> {
-    return await this.riskScoreService.getScoreHistory(entityType, entityId, hours);
+  async getScoreHistory(
+    entityType: RiskEntityType,
+    entityId: string,
+    hours: number,
+  ): Promise<{ score: number; createdAt: Date }[]> {
+    return await this.riskScoreService.getScoreHistory(
+      entityType,
+      entityId,
+      hours,
+    );
   }
 
   async getGlobalScore(): Promise<number> {
     return await this.riskScoreService.getGlobalScore();
   }
-  
-//Integrity
+
+  //Integrity
   async initializeHashChain(): Promise<{ message: string }> {
-  return await this.integrityService.initializeHashChain();
-}
+    return await this.integrityService.initializeHashChain();
+  }
 
-async verifyLogs(): Promise<any> {
-  return await this.integrityService.verifyLogs();
-}
+  async verifyLogs(): Promise<any> {
+    return await this.integrityService.verifyLogs();
+  }
 
-async getCompromisedLogs(): Promise<any[]> {
-  return await this.integrityService.getCompromisedLogs();
-}
+  async getCompromisedLogs(): Promise<any[]> {
+    return await this.integrityService.getCompromisedLogs();
+  }
 
+  // Security maturity
+  async getSecurityMaturityCurrent(): Promise<SecuirtyMaturityCurrentDTO> {
+    return await this.securityMaturityService.getCurrent();
+  }
+
+  async getSecurityMaturityTrend(
+    metric: string,
+    period: string,
+  ): Promise<SecurityMaturityTrendDTO[]> {
+    return await this.securityMaturityService.getTrend(metric, period);
+  }
+
+  async getSecurityMaturityIncidentsByCategory(
+    period: string,
+  ): Promise<SecuirtyMaturityIncidentsByCategoryDTO[]> {
+    return await this.securityMaturityService.getIncidentsByCategory(period);
+  }
+
+  async getSecurityMaturityRecommendations(): Promise<
+    SecurityMaturityRecommendationDTO[]
+  > {
+    return this.securityMaturityService.getRecommendations();
+  }
 }

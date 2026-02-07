@@ -8,9 +8,10 @@ import { ParserGatewayService } from "../domains/ParserGatewayService";
 import { AnalysisGatewayService } from "../domains/AnalysisGatewayService";
 import { EventCollectorGatewayService } from "../domains/EventCollectorGatewayService";
 import { BackupGatewayService } from "../domains/BackupGatewayService";
-import { InsiderThreatGatewayService } from "../domains/InsiderThreatGatewayService"; 
+import { InsiderThreatGatewayService } from "../domains/InsiderThreatGatewayService";
 import { RiskScoreGatewayService } from "../domains/RiskScoreGatewayService";
 import { IntegrityGatewayService } from "../domains/IntegrityGatewayService";
+import { SecurityMaturityGatewayService } from "../domains/SecurityMaturityGatewayService";
 /**
  * Factory for creating GatewayService instances with all dependencies.
  * Centralizes object creation and dependency wiring.
@@ -28,7 +29,8 @@ export class GatewayServiceFactory {
       new BackupGatewayService(),
       new InsiderThreatGatewayService(),
       new RiskScoreGatewayService(),
-      new IntegrityGatewayService()
+      new IntegrityGatewayService(),
+      new SecurityMaturityGatewayService(),
     );
   }
 }

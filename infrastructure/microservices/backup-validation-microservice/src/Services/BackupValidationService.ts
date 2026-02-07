@@ -9,7 +9,7 @@ import { IBackupValidationService } from "../Domain/services/IBackupValidationSe
 import { ensureMysqlToolsExist } from "../Utils/Service/EnsureMysqlToolsExist";
 import { ensureDirectoryExists } from "../Utils/Service/EnsureDirectoryExists";
 import { runShellCommand } from "../Utils/Service/RunShellCommand";
-import { CreateAlertFromCorrelationDTO } from "../Domain/DTOs/CreateAlertFromCorrelationDTO";
+import { CreateAlertDTO } from "../Domain/DTOs/CreateAlertDTO";
 import { AlertSeverity } from "../Domain/enums/AlertSeverity";
 import { AxiosInstance } from "axios";
 import { createAxiosClient } from "../Utils/Client/AxiosClient";
@@ -150,16 +150,14 @@ export class BackupValidationService implements IBackupValidationService {
 
     private async sendAlert(message: string): Promise<void> {
         try {
-            const alertData: CreateAlertFromCorrelationDTO = {
-                correlationId: 0,
+            const alertData: CreateAlertDTO = {
                 description: message,
                 severity: AlertSeverity.HIGH,
-                correlatedEventIds: [],
                 category: AlertCategory.OTHER,
-                oldestEventTimestamp: new Date().toISOString(),
+                source: "backup validation fail"
             };
 
-            await this.alertClient.post("/alerts/correlation", alertData);
+            await this.alertClient.post("/alerts/system", alertData);
             await this.logger.log("Alert sent successfully to AlertService");
         } catch (err: any) {
             await this.logger.log("Failed to send alert to AlertService: " + err.message);

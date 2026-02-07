@@ -5,6 +5,7 @@ import { AlertNotificationService } from "../../Services/AlertNotificationServic
 import { AlertSeverity } from "../../Domain/enums/AlertSeverity";
 import { AlertStatus } from "../../Domain/enums/AlertStatus";
 import { CreateAlertDTO } from "../../Domain/DTOs/CreateAlertDTO";
+import { CreateSystemAlertDTO } from "../../Domain/DTOs/CreateSystemAlertDTO";
 import { ResolveAlertDTO } from "../../Domain/DTOs/ResolveAlertDTO";
 import { CreateAlertFromCorrelationDTO } from "../../Domain/DTOs/CreateAlertFromCorrelationDTO";
 import { AlertQueryDTO } from "../../Domain/DTOs/AlertQueryDTO";
@@ -13,6 +14,7 @@ import { toHourlyWindowStartUtc, formatWindowStartIsoUtc, formatWindowStartHuman
 import {
   validateAlertId,
   validateCreateAlertDTO,
+  validateCreateSystemAlertDTO,
   validateAlertStatus,
   validateAlertSeverity,
   validateResolveAlertDTO,
@@ -36,6 +38,7 @@ export class AlertController {
     this.router.get("/alerts/notifications/stream", this.streamNotifications.bind(this));
     this.router.get("/alerts/search", this.searchAlerts.bind(this));
     this.router.post("/alerts/correlation", this.createAlertFromCorrelation.bind(this));
+    this.router.post("/alerts/system", this.createSystemAlert.bind(this));
     this.router.get("/alerts", this.getAllAlerts.bind(this));
     this.router.get("/alerts/for-kpi", this.getAlertsForKpi.bind(this));
     this.router.get("/alerts/:id", this.getAlertById.bind(this));
@@ -68,6 +71,35 @@ export class AlertController {
       clearInterval(heartbeatInterval);
       this.logger.log(`SSE client disconnected: ${clientId}`);
     });
+  }
+
+  private async createSystemAlert(req: Request, res: Response): Promise<void> {
+    try {
+      const data: CreateSystemAlertDTO = req.body;
+
+      const validation = validateCreateSystemAlertDTO(data);
+      if (!validation.success) {
+        res.status(400).json({ success: false, message: validation.message });
+        return;
+      }
+
+      await this.logger.log(`Creating system alert from source: ${data.source}, category: ${data.category}`);
+
+      const alert = await this.alertService.createSystemAlert(data);
+
+      if (alert.id === -1) {
+        await this.logger.log("System alert creation failed (repo error). Not broadcasting.");
+        res.status(500).json({ message: "Service error: Failed to create system alert." });
+        return;
+      }
+
+      await this.notificationService.broadcastNewAlert(alert);
+
+      res.status(201).json({ success: true, alert });
+    } catch (err: any) {
+      await this.logger.log(`Error creating system alert: ${err.message}`);
+      res.status(500).json({ message: "Service error: Failed to create system alert." });
+    }
   }
 
   private async createAlertFromCorrelation(req: Request, res: Response): Promise<void> {
