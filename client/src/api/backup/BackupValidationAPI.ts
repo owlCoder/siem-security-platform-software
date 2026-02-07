@@ -16,10 +16,11 @@ export class BackupValidationAPI implements IBackupValidationAPI {
         });
     }
 
-    async runValidation(): Promise<boolean> {
+    async runValidation(token: string): Promise<boolean> {
         const response: AxiosResponse = await this.axiosInstance.post("", {
             url: "backup/validate",
             method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
         });
 
         return response.data.response;

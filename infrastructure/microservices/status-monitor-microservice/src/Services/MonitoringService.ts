@@ -9,7 +9,7 @@ export class MonitoringService implements IMonitoringService {
   constructor(
     private thresholdRepo: Repository<ServiceThreshold>,
     private checkRepo: Repository<ServiceCheck>
-  ) {}
+  ) { }
 
   // NOVA METODA: Radi posao za jedan servis
   async checkService(threshold: ServiceThreshold): Promise<ServiceCheck> {
@@ -26,7 +26,7 @@ export class MonitoringService implements IMonitoringService {
     } catch (err: any) {
       status = ServiceStatus.DOWN;
       responseTimeMs = null;
-      
+
       if (err?.code === "ECONNABORTED" || err?.message?.includes("timeout")) {
         errorType = "timeout";
       } else if (err?.response) {

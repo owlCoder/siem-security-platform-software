@@ -4,7 +4,7 @@ import { BackupValidationLogDTO } from "../../models/backup/BackupValidationLogD
 import { BackupValidationResultDTO } from "../../models/backup/BackupValidationResultDTO";
 
 export interface IBackupValidationAPI {
-    runValidation(): Promise<boolean>;
+    runValidation(token: string): Promise<boolean>;
     getAllLogs(token: string): Promise<BackupValidationLogDTO[]>;
     getLastValidation(token: string): Promise<BackupValidationLogDTO | null>;
     getSummary(token: string): Promise<BackupValidationResultDTO>;
