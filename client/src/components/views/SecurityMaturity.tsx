@@ -11,6 +11,7 @@ import { AlertCategory } from "../../enums/AlertCategory";
 import { useAuth } from "../../hooks/useAuthHook";
 import { RecommendationPriority, SecurityMaturityRecommendationDTO } from "../../models/security-maturity/SecurityMaturityRecommendationDTO";
 import RecommendationCard from "../security-maturity/RecommendationCard";
+import { TrendMetricType } from "../../enums/TrendMetricType";
 
 const testSecurityMaturity: SecuirtyMaturityCurrentDTO = {
   scoreValue: 72,
@@ -30,13 +31,39 @@ const testSecurityMaturity: SecuirtyMaturityCurrentDTO = {
   }
 };
 
-const testSecurityMaturityTrend: SecurityMaturityTrendDTO[] = [
-  { bucketStart: "2024-01-01", value: 58, sampleCount: 120 },
-  { bucketStart: "2024-02-01", value: 61, sampleCount: 140 },
-  { bucketStart: "2024-03-01", value: 65, sampleCount: 160 },
-  { bucketStart: "2024-04-01", value: 69, sampleCount: 180 },
-  { bucketStart: "2024-05-01", value: 72, sampleCount: 200 },
-];
+const testTrends: Partial<Record<TrendMetricType, SecurityMaturityTrendDTO[]>> = {
+  [TrendMetricType.MTTD]: [
+    { bucketStart: "2024-01-01", value: 25, sampleCount: 120 },
+    { bucketStart: "2024-02-01", value: 22, sampleCount: 140 },
+    { bucketStart: "2024-03-01", value: 20, sampleCount: 160 },
+    { bucketStart: "2024-04-01", value: 18, sampleCount: 180 },
+    { bucketStart: "2024-05-01", value: 16, sampleCount: 200 },
+  ],
+
+  [TrendMetricType.MTTR]: [
+    { bucketStart: "2024-01-01", value: 90, sampleCount: 120 },
+    { bucketStart: "2024-02-01", value: 82, sampleCount: 140 },
+    { bucketStart: "2024-03-01", value: 75, sampleCount: 160 },
+    { bucketStart: "2024-04-01", value: 68, sampleCount: 180 },
+    { bucketStart: "2024-05-01", value: 60, sampleCount: 200 },
+  ],
+
+  [TrendMetricType.SMS]: [
+    { bucketStart: "2024-01-01", value: 55, sampleCount: 120 },
+    { bucketStart: "2024-02-01", value: 60, sampleCount: 140 },
+    { bucketStart: "2024-03-01", value: 65, sampleCount: 160 },
+    { bucketStart: "2024-04-01", value: 70, sampleCount: 180 },
+    { bucketStart: "2024-05-01", value: 75, sampleCount: 200 },
+  ],
+
+  [TrendMetricType.FALSE_ALARM_RATE]: [
+    { bucketStart: "2024-01-01", value: 0.25, sampleCount: 120 },
+    { bucketStart: "2024-02-01", value: 0.22, sampleCount: 140 },
+    { bucketStart: "2024-03-01", value: 0.18, sampleCount: 160 },
+    { bucketStart: "2024-04-01", value: 0.15, sampleCount: 180 },
+    { bucketStart: "2024-05-01", value: 0.12, sampleCount: 200 },
+  ],
+};
 
 const testRecommendations: SecurityMaturityRecommendationDTO[] = [
   {
@@ -79,23 +106,45 @@ export default function SecurityMaturity({
   const { token } = useAuth();
   const [summary, setSummary] = useState<SecuirtyMaturityCurrentDTO | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [trend, setTrend] = useState<SecurityMaturityTrendDTO[]>([]);
+  const [trends, setTrends] = useState<Partial<Record<TrendMetricType, SecurityMaturityTrendDTO[]>>>({});
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
 
-      try {
+      try{
         const res = await securityMaturityApi.getCurrent(token!);
         setSummary(res);
-      } catch (err) {
-        console.error("Security maturity fetch failed", err);
-        setSummary(testSecurityMaturity);
-        setTrend(testSecurityMaturityTrend);
-      } finally {
-        setIsLoading(false);
+
+        const period = "7d";
+        const metrics: TrendMetricType[] = [
+          TrendMetricType.MTTD,
+          TrendMetricType.MTTR,
+          TrendMetricType.SMS,
+          TrendMetricType.FALSE_ALARM_RATE,
+        ];
+
+        const results = await Promise.all(
+          metrics.map((metric) =>
+            securityMaturityApi.getTrend(token!, metric, period))
+        );
+
+        const trendMap: Partial<Record<TrendMetricType, SecurityMaturityTrendDTO[]>> = {};
+
+        metrics.forEach((metric, index) => {
+          trendMap[metric] = results[index];
+        });
+
+        setTrends(trendMap);
+      } catch(err){
+          console.error("Security Maturity fetch failed", err);
+          
+          setSummary(testSecurityMaturity);
+          setTrends(testTrends);
+      } finally{
+          setIsLoading(false);
       }
-    };
+    }
 
     fetchData();
   }, [token, securityMaturityApi]);
@@ -142,7 +191,7 @@ export default function SecurityMaturity({
 
         <div className="mt-5! grid grid-cols-2 gap-5">
           <div className="rounded-lg border-2 border-[#282A28] bg-[#1f2123] p-6 h-full pt-4 pb-4">
-            <SecurityMaturityTrend data={trend} />
+            <SecurityMaturityTrend data={trends} />
           </div>
 
           <div className="rounded-lg border-2 border-[#282A28] bg-[#1f2123] p-6 h-full pt-4 pb-4">

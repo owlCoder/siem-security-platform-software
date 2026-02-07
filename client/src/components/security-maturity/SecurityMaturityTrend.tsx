@@ -1,43 +1,111 @@
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { SecurityMaturityTrendDTO } from "../../models/security-maturity/SecurityMaturityTrendDTO";
+import { TrendMetricType } from "../../enums/TrendMetricType";
+import { useState } from "react";
 
 interface Props{
-    data: SecurityMaturityTrendDTO[];
+    data: Partial<Record<TrendMetricType, SecurityMaturityTrendDTO[]>>;
 }
 
+type ChartRow = {
+    bucketStart: string;
+} & Partial<Record<TrendMetricType, number>>;
+
+const METRIC_COLORS: Record<TrendMetricType, string> = {
+    MTTD: "#007a55",
+    MTTR: "#4A9DAE",
+    SMS: "#facc15",
+    FALSE_ALARM_RATE: "#ef4444",
+};
+
+
+
 export default function SecurityMaturityTrend({data}: Props){
+
+    const [visibleMetrics, setVisibleMetrics] = useState<TrendMetricType[]>([TrendMetricType.MTTD,]);
+
+    const firstMetric = Object.values(data)[0];
+
+    const combinedData: ChartRow[] = firstMetric?.map((point, index) => {
+        const row: ChartRow = {
+            bucketStart: point.bucketStart
+        };
+
+        (Object.keys(data) as TrendMetricType[]).forEach((metric) => {
+            row[metric] = data[metric]?.[index]?.value;
+        });
+
+        return row;
+    }) ?? [];
+
     return (
-        <div className="flex flex-col items-center justify-center w-full min-h-[250]" style={{marginTop: "30px", marginBottom: "10px"}}>
-            <h3 className="text-sm uppercase tracking-widest text-gray-400">
-                    Security Maturity Trend
-            </h3>
-
-            <div className="w-full h-[220px] mt-5! mr-5!">
+        <div className="flex flex-col justify-center w-full min-h-[220px]" style={{marginTop: "30px", marginBottom: "30px"}}>
+                <h3 className="text-center text-sm uppercase tracking-widest text-gray-400 mb-5!">
+                    Security Maturity Score
+                </h3>
+            <div className="h-[350px] p-4!">
                 <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={data}>
-                        <CartesianGrid stroke="#333" strokeDasharray="3 3" vertical={false} opacity={0.5} />
-
-                        <XAxis dataKey="bucketStart" tickFormatter={(v) => v.slice(5, 7)} tick={{ fill: "#ffffff", fontSize: 13, fontWeight: "bold" }} axisLine={false} tickLine={false} />
-                        <YAxis domain={[0, 100]} tick={{ fill: "#ffffff", fontSize: 13, fontWeight: "bold" }} axisLine={false} tickLine={false} />
-
-                        <Tooltip contentStyle={{
+                    <AreaChart data={combinedData}>
+                        <XAxis
+                        dataKey="bucketStart"
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: "#fff", fontSize: 12, fontWeight: "bold" }}
+                        />
+                        <YAxis
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: "#fff", fontSize: 12, fontWeight: "bold" }}
+                        />
+                        <Tooltip
+                        contentStyle={{
                             backgroundColor: "#1f2123",
                             border: "1px solid #292a28",
                             borderRadius: "8px",
                         }}
-                        labelFormatter={(label) => `Period: ${label}`}
-                        formatter={(value) => [`Score: ${value}`, ""]} />
+                        />
 
-                        <Line 
+                        {visibleMetrics.map((metric) => (
+                        <Area
+                            key={metric}
                             type="monotone"
-                            dataKey="value"
-                            stroke="#007a55"
-                            strokeWidth={3}
-                            dot={{r: 4}}
-                            activeDot={{r: 6}} />
-                    </LineChart>
+                            dataKey={metric}
+                            stroke={METRIC_COLORS[metric]}
+                            fill={METRIC_COLORS[metric]}
+                            fillOpacity={0.15}
+                            strokeWidth={4}
+                            dot={false}
+                        />
+                        ))}
+                    </AreaChart>
                 </ResponsiveContainer>
             </div>
-        </div>
-    )
+
+            <div className="flex flex-col items-center m-4!">
+                <div className="flex gap-2">
+                {(Object.values(TrendMetricType) as TrendMetricType[]).map(
+                    (metric) => (
+                    <button
+                        key={metric}
+                        onClick={() =>
+                        setVisibleMetrics((prev) =>
+                            prev.includes(metric)
+                            ? prev.filter((m) => m !== metric)
+                            : [...prev, metric]
+                        )
+                        }
+                        className={`px-4! py-2! rounded-[10px]! text-xs font-semibold transition-all ${
+                        visibleMetrics.includes(metric)
+                            ? "bg-[#007a55]"
+                            : "bg-[#313338]"
+                        }`}
+                    >
+                        {metric}
+                    </button>
+                    )
+                )}
+                </div>
+            </div>
+    </div>
+    );
 }

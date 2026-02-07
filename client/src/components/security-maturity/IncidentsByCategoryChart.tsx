@@ -24,7 +24,7 @@ export default function IncidentsByCategoryChart({data}: Props){
     };
 
     return (
-        <div className="flex flex-col items-center justify-center w-full h-[320px]" style={{marginTop: "30px", marginBottom: "10px"}}>
+        <div className="flex flex-col items-center justify-center w-full h-[450px]" style={{marginTop: "30px", marginBottom: "10px"}}>
             <h3 className="text-sm uppercase tracking-widest text-gray-400">
                 Incidents By Category
             </h3>
