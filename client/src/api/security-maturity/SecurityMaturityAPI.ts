@@ -3,6 +3,7 @@ import { SecuirtyMaturityCurrentDTO } from "../../models/security-maturity/Secur
 import { SecuirtyMaturityIncidentsByCategoryDTO } from "../../models/security-maturity/SecurityMaturityIncidentsByCategory";
 import { SecurityMaturityTrendDTO } from "../../models/security-maturity/SecurityMaturityTrendDTO";
 import { ISecurityMaturityAPI } from "./ISecurityMaturityAPI";
+import { SecurityMaturityRecommendationDTO } from "../../models/security-maturity/SecurityMaturityRecommendationDTO";
 
 export class SecurityMaturityAPI implements ISecurityMaturityAPI {
   private readonly axiosInstance: AxiosInstance;
@@ -49,6 +50,18 @@ export class SecurityMaturityAPI implements ISecurityMaturityAPI {
       method: "GET",
       headers: { Authorization: `Bearer ${token}` },
       params: { period },
+    });
+
+    return response.data.response;
+  }
+
+  async getRecommendations(
+    token: string,
+  ): Promise<SecurityMaturityRecommendationDTO[]> {
+    const response: AxiosResponse = await this.axiosInstance.post("", {
+      url: "security-maturity/recommendations",
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     return response.data.response;

@@ -1,4 +1,4 @@
-import { Request, Response, Router } from "express";
+import { Request, RequestHandler, Response, Router } from "express";
 import { IGatewayService } from "../../Domain/services/IGatewayService";
 import { requireSysAdmin } from "../../Middlewares/authorization/AuthorizeMiddleware";
 
@@ -7,7 +7,7 @@ export class SecurityMaturityGatewayController {
 
   constructor(
     private readonly gatewayService: IGatewayService,
-    private readonly authenticate: any,
+    private readonly authenticate: RequestHandler,
   ) {
     this.router = Router();
     this.initializeRoutes();
@@ -15,21 +15,21 @@ export class SecurityMaturityGatewayController {
 
   private initializeRoutes(): void {
     this.router.get(
-      "/securityMaturity/current",
+      "/security-maturity/current",
       this.authenticate,
       requireSysAdmin,
       this.getCurrent.bind(this),
     );
 
     this.router.get(
-      "/securityMaturity/trend",
+      "/security-maturity/trend",
       this.authenticate,
       requireSysAdmin,
       this.getTrend.bind(this),
     );
 
     this.router.get(
-      "/securityMaturity/incidents-by-category",
+      "/security-maturity/incidents-by-category",
       this.authenticate,
       requireSysAdmin,
       this.getIncidentsByCategory.bind(this),
@@ -38,6 +38,7 @@ export class SecurityMaturityGatewayController {
     this.router.get(
       "/security-maturity/recommendations",
       this.authenticate,
+      requireSysAdmin,
       this.getSecurityMaturityRecommendations.bind(this),
     );
   }

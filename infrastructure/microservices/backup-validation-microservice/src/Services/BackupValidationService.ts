@@ -60,14 +60,14 @@ export class BackupValidationService implements IBackupValidationService {
             for (const source of BACKUP_SOURCES) {
                 for (const table of source.tables) {
                     const dumpCommand = 
-                    `${process.env.MYSQLDUMP_BIN} ` +
+                    `"${process.env.MYSQLDUMP_BIN}" ` +
                     `-h ${process.env.MYSQL_HOST} ` +
                     `-P ${process.env.MYSQL_PORT} ` +
                     `-u ${process.env.MYSQL_USER} ` +
                     `-p${process.env.MYSQL_PASSWORD} ` +
                     `${source.dbName} ${table} ` +
                     `--no-tablespaces  >> "${this.backupFilePath}"`;
-                
+
                 runShellCommand(dumpCommand);
             }
             }
@@ -102,19 +102,18 @@ export class BackupValidationService implements IBackupValidationService {
 
             for (const table of TABLES) {
                 const dropCommand = 
-                    `${process.env.MYSQL_BIN} ` +
+                    `"${process.env.MYSQL_BIN}" ` +
                     `-h ${process.env.MYSQL_HOST} ` +
                     `-P ${process.env.MYSQL_PORT} ` +
                     `-u ${process.env.MYSQL_USER} ` +
                     `-p${process.env.MYSQL_PASSWORD} ` +
                     `${SHADOW_DB_NAME} ` +
                     `-e "DROP TABLE IF EXISTS ${table};"`;
-
                 runShellCommand(dropCommand);
             }
 
             const restoreCommand = 
-                `${process.env.MYSQL_BIN} ` +
+                `"${process.env.MYSQL_BIN}" ` +
                 `-h ${process.env.MYSQL_HOST} ` +
                 `-P ${process.env.MYSQL_PORT} ` +
                 `-u ${process.env.MYSQL_USER} ` +
