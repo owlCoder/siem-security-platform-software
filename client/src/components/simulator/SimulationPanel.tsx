@@ -116,27 +116,26 @@ export function SimulationPanel({ simulatorApi }: SimulationPanelProps) {
   };
 
   return (
-    <div className="flex flex-col w-full bg-[#1f2123] border-2 border-[#282A28] rounded-[12px] px-8 py-7 mb-4">
-
-      {/* HEADER */}
-      <div className="flex items-center justify-between pb-4 border-b border-[#2c2c2c]">
-        <h3 className="text-white text-lg font-semibold">
+    <div className="flex flex-col w-full h-full">
+      <div className="flex items-center justify-between pb-6 border-b border-[#3a3a3a]">
+        <h3 className="text-white text-base font-semibold tracking-tight">
           Security Incident Simulator
         </h3>
 
         {activeSimulation && (
-          <span className="text-xs text-[#a6a6a6] bg-[#1f1f1f] px-3 py-1 rounded-lg border border-[#333]">
+          <span className="text-xs text-gray-400 bg-[#1f1f1f] px-3 py-1.5 rounded-lg border border-[#3a3a3a] font-mono">
             ID: {activeSimulation.id}
           </span>
         )}
       </div>
 
-      {/* INPUT SECTION */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-5 pt-6 pb-6 border-b border-[#2c2c2c]">
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-[#a6a6a6]">Type</label>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-6 pb-6 border-b border-[#3a3a3a]">
+        <div className="flex flex-col gap-2">
+          <label className="text-xs text-gray-400 uppercase tracking-wider font-semibold">
+            Type
+          </label>
           <select
-            className="w-full px-4 py-2 rounded-[10px] border-2 border-[#333] bg-[#1f1f1f] text-white text-sm focus:outline-none focus:border-[#007a55] transition-colors duration-200"
+            className="w-full px-4 py-3 rounded-lg border-2 border-[#282A28] bg-[#1f1f1f] text-white text-sm focus:outline-none focus:border-[#007a55] transition-colors duration-200"
             value={type}
             onChange={(e) => setType(e.target.value as SimulationType)}
           >
@@ -148,47 +147,52 @@ export function SimulationPanel({ simulatorApi }: SimulationPanelProps) {
           </select>
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-[#a6a6a6]">Intensity (events/sec)</label>
+        <div className="flex flex-col gap-2">
+          <label className="text-xs text-gray-400 uppercase tracking-wider font-semibold">
+            Intensity (events/sec)
+          </label>
           <input
             type="number"
             min={1}
             value={intensity}
             onChange={(e) => setIntensity(Number(e.target.value))}
-            className="w-full px-4 py-2 rounded-[10px] border-2 border-[#333] bg-[#1f1f1f] text-white text-sm focus:outline-none focus:border-[#007a55]"
+            className="w-full px-4 py-3 rounded-lg border-2 border-[#282A28] bg-[#1f1f1f] text-white text-sm focus:outline-none focus:border-[#007a55] transition-colors duration-200"
           />
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-[#a6a6a6]">Duration (sec)</label>
+        <div className="flex flex-col gap-2">
+          <label className="text-xs text-gray-400 uppercase tracking-wider font-semibold">
+            Duration (sec)
+          </label>
           <input
             type="number"
             min={1}
             value={durationSeconds}
             onChange={(e) => setDurationSeconds(Number(e.target.value))}
-            className="w-full px-4 py-2 rounded-[10px] border-2 border-[#333] bg-[#1f1f1f] text-white text-sm focus:outline-none focus:border-[#007a55]"
+            className="w-full px-4 py-3 rounded-lg border-2 border-[#282A28] bg-[#1f1f1f] text-white text-sm focus:outline-none focus:border-[#007a55] transition-colors duration-200"
           />
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-[#a6a6a6]">Target</label>
+        <div className="flex flex-col gap-2">
+          <label className="text-xs text-gray-400 uppercase tracking-wider font-semibold">
+            Target
+          </label>
           <input
             value={target}
             onChange={(e) => setTarget(e.target.value)}
             placeholder="auth-service"
-            className="w-full px-4 py-2 rounded-[10px] border-2 border-[#333] bg-[#1f1f1f] text-white placeholder:text-[#a6a6a6] text-sm focus:outline-none focus:border-[#007a55]"
+            className="w-full px-4 py-3 rounded-lg border-2 border-[#282A28] bg-[#1f1f1f] text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#007a55] transition-colors duration-200"
           />
         </div>
       </div>
 
-      {/* BUTTONS + STATUS */}
-      <div className="flex flex-wrap items-center gap-3 pt-5 pb-5 border-b border-[#2c2c2c]">
+      <div className="flex flex-wrap items-center gap-3 pt-6 pb-6 border-b border-[#3a3a3a]">
         <button
           onClick={startSimulation}
           disabled={isLoading}
-          className={`px-5 py-2 rounded-[10px] text-white text-sm font-semibold transition-all duration-200 ${isLoading
-              ? "bg-[#313338] cursor-not-allowed"
-              : "bg-[#007a55] hover:bg-[#008b65]"
+          className={`px-5 py-3 rounded-lg text-white text-sm font-semibold transition-all duration-200 shadow-sm ${isLoading
+            ? "bg-[#2a2a2a] cursor-not-allowed opacity-50"
+            : "bg-[#007a55] hover:bg-[#008b65]"
             }`}
         >
           Start
@@ -197,9 +201,9 @@ export function SimulationPanel({ simulatorApi }: SimulationPanelProps) {
         <button
           onClick={stopSimulation}
           disabled={!activeSimulation || isLoading}
-          className={`px-5 py-2 rounded-[10px] text-white text-sm font-semibold transition-all duration-200 ${!activeSimulation || isLoading
-              ? "bg-[#313338] cursor-not-allowed"
-              : "bg-red-600 hover:bg-red-700"
+          className={`px-5 py-3 rounded-lg text-white text-sm font-semibold transition-all duration-200 shadow-sm ${!activeSimulation || isLoading
+            ? "bg-[#2a2a2a] cursor-not-allowed opacity-50"
+            : "bg-red-600 hover:bg-red-700"
             }`}
         >
           Stop
@@ -208,41 +212,39 @@ export function SimulationPanel({ simulatorApi }: SimulationPanelProps) {
         <button
           onClick={refreshSimulation}
           disabled={!activeSimulation || isLoading}
-          className={`px-5 py-2 rounded-[10px] text-white text-sm font-semibold transition-all duration-200 ${!activeSimulation || isLoading
-              ? "bg-[#313338] cursor-not-allowed"
-              : "bg-[#1f6feb] hover:bg-[#2a7fff]"
+          className={`px-5 py-3 rounded-lg text-white text-sm font-semibold transition-all duration-200 shadow-sm ${!activeSimulation || isLoading
+            ? "bg-[#2a2a2a] cursor-not-allowed opacity-50"
+            : "bg-[#1f6feb] hover:bg-[#2a7fff]"
             }`}
         >
           Refresh
         </button>
 
         {activeSimulation && (
-          <div className="ml-3 text-xs text-[#a6a6a6]">
-            Status:{" "}
+          <div className="ml-2 text-xs text-gray-400">
+            <span className="uppercase tracking-wider font-semibold">Status:</span>{" "}
             <span className="text-white font-semibold">
               {activeSimulation.status}
             </span>
-            <span className="mx-2 text-[#555]">|</span>
-            Events:{" "}
-            <span className="text-[#00ff88] font-semibold">
+            <span className="mx-2 text-[#3a3a3a]">|</span>
+            <span className="uppercase tracking-wider font-semibold">Events:</span>{" "}
+            <span className="text-green-500 font-semibold">
               {activeSimulation.eventsGenerated}
             </span>
           </div>
         )}
       </div>
 
-      {/* ERROR */}
       {error && (
-        <div className="pt-4 text-sm font-semibold text-red-500">
+        <div className="pb-6 mb-6 text-sm font-semibold text-red-500 border-b border-[#3a3a3a]">
           {error}
         </div>
       )}
 
-      {/* CHART */}
-      <div className="pt-6">
-        <div className="h-[200px] bg-[#1f2123] rounded-[10px] border border-[#333] p-4">
+      <div>
+        <div className="h-[240px] bg-[#1f1f1f] rounded-lg border-2 border-[#282A28] p-5">
           {timelineData.length === 0 ? (
-            <div className="text-xs text-[#666] flex items-center justify-center h-full">
+            <div className="text-sm text-gray-500 flex items-center justify-center h-full">
               No simulation data yet.
             </div>
           ) : (
@@ -265,5 +267,4 @@ export function SimulationPanel({ simulatorApi }: SimulationPanelProps) {
       </div>
     </div>
   );
-
 }
