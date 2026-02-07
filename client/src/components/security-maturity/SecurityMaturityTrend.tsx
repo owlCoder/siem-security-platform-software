@@ -3,8 +3,12 @@ import { SecurityMaturityTrendDTO } from "../../models/security-maturity/Securit
 import { TrendMetricType } from "../../enums/TrendMetricType";
 import { useState } from "react";
 
-interface Props{
-    data: Partial<Record<TrendMetricType, SecurityMaturityTrendDTO[]>>;
+type TrendPeriod = "24h" | "7d";
+
+interface Props {
+  data: Partial<Record<TrendMetricType, SecurityMaturityTrendDTO[]>>;
+  period: TrendPeriod;
+  onPeriodChange: (period: TrendPeriod) => void;
 }
 
 type ChartRow = {
@@ -20,11 +24,11 @@ const METRIC_COLORS: Record<TrendMetricType, string> = {
 
 
 
-export default function SecurityMaturityTrend({data}: Props){
+export default function SecurityMaturityTrend({data, period, onPeriodChange}: Props){
 
     const [visibleMetrics, setVisibleMetrics] = useState<TrendMetricType[]>([TrendMetricType.MTTD,]);
 
-    const firstMetric = Object.values(data)[0];
+    const firstMetric = data[visibleMetrics[0]];
 
     const combinedData: ChartRow[] = firstMetric?.map((point, index) => {
         const row: ChartRow = {
@@ -43,6 +47,24 @@ export default function SecurityMaturityTrend({data}: Props){
                 <h3 className="text-center text-sm uppercase tracking-widest text-gray-400 mb-5!">
                     Security Maturity Score
                 </h3>
+
+            <div className="flex justify-center gap-2 mb-4">
+                {(["24h", "7d"] as const).map((p) => (
+                    <button
+                    key={p}
+                    onClick={() => onPeriodChange(p)}
+                    className={`px-3 py-1 rounded-[8px] text-xs font-semibold transition-all
+                        ${
+                        period === p
+                            ? "bg-[#007a55] text-white"
+                            : "bg-[#313338] text-gray-300 hover:bg-[#3a3d40]"
+                        }`}
+                    >
+                    {p}
+                    </button>
+                ))}
+            </div>
+            
             <div className="h-[350px] p-4!">
                 <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={combinedData}>

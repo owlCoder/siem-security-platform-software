@@ -30,7 +30,6 @@ const testSecurityMaturity: SecuirtyMaturityCurrentDTO = {
     OTHER: 36
   }
 };
-
 const testTrends: Partial<Record<TrendMetricType, SecurityMaturityTrendDTO[]>> = {
   [TrendMetricType.MTTD]: [
     { bucketStart: "2024-01-01", value: 25, sampleCount: 120 },
@@ -38,6 +37,11 @@ const testTrends: Partial<Record<TrendMetricType, SecurityMaturityTrendDTO[]>> =
     { bucketStart: "2024-03-01", value: 20, sampleCount: 160 },
     { bucketStart: "2024-04-01", value: 18, sampleCount: 180 },
     { bucketStart: "2024-05-01", value: 16, sampleCount: 200 },
+    { bucketStart: "2024-06-01", value: 19, sampleCount: 180 },
+    { bucketStart: "2024-07-01", value: 23, sampleCount: 160 },
+    { bucketStart: "2024-08-01", value: 18, sampleCount: 140 },
+    { bucketStart: "2024-09-01", value: 15, sampleCount: 150 },
+    { bucketStart: "2024-10-01", value: 14, sampleCount: 170 },
   ],
 
   [TrendMetricType.MTTR]: [
@@ -46,6 +50,11 @@ const testTrends: Partial<Record<TrendMetricType, SecurityMaturityTrendDTO[]>> =
     { bucketStart: "2024-03-01", value: 75, sampleCount: 160 },
     { bucketStart: "2024-04-01", value: 68, sampleCount: 180 },
     { bucketStart: "2024-05-01", value: 60, sampleCount: 200 },
+    { bucketStart: "2024-06-01", value: 55, sampleCount: 190 },
+    { bucketStart: "2024-07-01", value: 50, sampleCount: 175 },
+    { bucketStart: "2024-08-01", value: 48, sampleCount: 160 },
+    { bucketStart: "2024-09-01", value: 42, sampleCount: 155 },
+    { bucketStart: "2024-10-01", value: 38, sampleCount: 165 },
   ],
 
   [TrendMetricType.SMS]: [
@@ -54,6 +63,11 @@ const testTrends: Partial<Record<TrendMetricType, SecurityMaturityTrendDTO[]>> =
     { bucketStart: "2024-03-01", value: 65, sampleCount: 160 },
     { bucketStart: "2024-04-01", value: 70, sampleCount: 180 },
     { bucketStart: "2024-05-01", value: 75, sampleCount: 200 },
+    { bucketStart: "2024-06-01", value: 78, sampleCount: 210 },
+    { bucketStart: "2024-07-01", value: 82, sampleCount: 220 },
+    { bucketStart: "2024-08-01", value: 85, sampleCount: 205 },
+    { bucketStart: "2024-09-01", value: 88, sampleCount: 195 },
+    { bucketStart: "2024-10-01", value: 92, sampleCount: 215 },
   ],
 
   [TrendMetricType.FALSE_ALARM_RATE]: [
@@ -62,6 +76,11 @@ const testTrends: Partial<Record<TrendMetricType, SecurityMaturityTrendDTO[]>> =
     { bucketStart: "2024-03-01", value: 0.18, sampleCount: 160 },
     { bucketStart: "2024-04-01", value: 0.15, sampleCount: 180 },
     { bucketStart: "2024-05-01", value: 0.12, sampleCount: 200 },
+    { bucketStart: "2024-06-01", value: 0.11, sampleCount: 210 },
+    { bucketStart: "2024-07-01", value: 0.10, sampleCount: 190 },
+    { bucketStart: "2024-08-01", value: 0.09, sampleCount: 170 },
+    { bucketStart: "2024-09-01", value: 0.08, sampleCount: 160 },
+    { bucketStart: "2024-10-01", value: 0.07, sampleCount: 150 },
   ],
 };
 
@@ -105,18 +124,23 @@ export default function SecurityMaturity({
 }: SecurityMaturityProps) {
   const { token } = useAuth();
   const [summary, setSummary] = useState<SecuirtyMaturityCurrentDTO | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isUpdatingTrends, setIsUpdatingTrends] = useState(false);
   const [trends, setTrends] = useState<Partial<Record<TrendMetricType, SecurityMaturityTrendDTO[]>>>({});
+  const [period, setPeriod] = useState<"24h" | "7d">("7d");
 
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
+      if(!summary){
+        setIsInitialLoading(true);
+      } else{
+        setIsUpdatingTrends(true);
+      }
 
       try{
         const res = await securityMaturityApi.getCurrent(token!);
         setSummary(res);
 
-        const period = "7d";
         const metrics: TrendMetricType[] = [
           TrendMetricType.MTTD,
           TrendMetricType.MTTR,
@@ -140,16 +164,26 @@ export default function SecurityMaturity({
           console.error("Security Maturity fetch failed", err);
           
           setSummary(testSecurityMaturity);
-          setTrends(testTrends);
+          if(period == "24h"){
+            const mock24h = Object.keys(testTrends).reduce((acc, key) => {
+              const k = key as TrendMetricType;
+              acc[k] = testTrends[k]?.slice(-2).map(p => ({...p, bucketStart: p.bucketStart}));
+              return acc;
+            }, {} as any);
+            setTrends(mock24h);
+          } else{
+            setTrends(testTrends);
+          }
       } finally{
-          setIsLoading(false);
+          setIsInitialLoading(false);
+          setIsUpdatingTrends(false);
       }
     }
 
     fetchData();
-  }, [token, securityMaturityApi]);
+  }, [token, securityMaturityApi, period]);
 
-  if (isLoading) {
+  if (isInitialLoading) {
     return (
       <div className="bg-transparent border-2 border-solid rounded-[14px] border-[#282A28] p-6">
         Loading security maturity...
@@ -191,7 +225,7 @@ export default function SecurityMaturity({
 
         <div className="mt-5! grid grid-cols-2 gap-5">
           <div className="rounded-lg border-2 border-[#282A28] bg-[#1f2123] p-6 h-full pt-4 pb-4">
-            <SecurityMaturityTrend data={trends} />
+            <SecurityMaturityTrend data={trends} period={period} onPeriodChange={setPeriod} />
           </div>
 
           <div className="rounded-lg border-2 border-[#282A28] bg-[#1f2123] p-6 h-full pt-4 pb-4">
