@@ -129,9 +129,9 @@ export default function IncidentTable({ incidents }: IncidentTableProps) {
                                                             <h4 className="text-[#a78bfa] text-[12px] font-bold uppercase mb-1! tracking-wider">
                                                                 AI Correlation Analysis
                                                             </h4>
-                                                            <p className="text-gray-300 text-[14px] leading-relaxed bg-[#252526] p-4! rounded-lg border border-[#333]">
+                                                            <div className="text-gray-300 text-[14px] leading-relaxed bg-[#252526] p-4! rounded-lg border border-[#333]">
                                                                 {incident.correlationSummary || "Analysis is pending or not available for this incident."}
-                                                            </p>
+                                                            </div>
                                                         </div>
                                                     </div>
 
@@ -141,9 +141,27 @@ export default function IncidentTable({ incidents }: IncidentTableProps) {
                                                             <span className="text-[11px] text-gray-500 uppercase font-semibold tracking-wider">
                                                                 Technical Context:
                                                             </span>
-                                                            <code className="block mt-1! text-[11px] text-[#888] font-mono bg-[#111] p-2! rounded border border-[#222]">
-                                                                {incident.correlationRefs}
-                                                            </code>
+                                                            <div className="block mt-1! text-[11px] text-[#888] bg-[#111] p-3! rounded border border-[#222]">
+                                                                {(() => {
+                                                                    try {
+                                                                        const data = JSON.parse(incident.correlationRefs);
+                                                                        return (
+                                                                            <div className="space-y-1">
+                                                                                <div className="flex gap-2">
+                                                                                    <span className="text-gray-500">Checks Analyzed:</span>
+                                                                                    <span className="text-[#a78bfa] font-semibold">{data.checksAnalyzed}</span>
+                                                                                </div>
+                                                                                <div className="flex gap-2">
+                                                                                    <span className="text-gray-500">Total Service History:</span>
+                                                                                    <span className="text-[#a78bfa] font-semibold">{data.totalServiceHistory}</span>
+                                                                                </div>
+                                                                            </div>
+                                                                        );
+                                                                    } catch (e) {
+                                                                        return <code className="font-mono">{incident.correlationRefs}</code>;
+                                                                    }
+                                                                })()}
+                                                            </div>
                                                         </div>
                                                     )}
                                                 </div>

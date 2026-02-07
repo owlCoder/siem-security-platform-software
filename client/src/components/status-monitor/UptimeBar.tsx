@@ -56,9 +56,21 @@ export default function UptimeBar({ service }: Props) {
                                 key={index}
                                 className={`flex-1 rounded-[4px] ${barColor} hover:opacity-80 transition-all cursor-help relative group`}
                             >
-                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-max bg-[#1f1f1f] text-white text-[11px] py-1.5 px-3 rounded-lg border border-[#333] z-10 whitespace-nowrap shadow-xl">
-                                    {tooltipText}
+                            <div className={`
+                                    absolute bottom-full mb-3 hidden group-hover:block
+                                    bg-[#1f1f1f] text-white
+                                    py-3 px-4 rounded-lg border border-[#444] shadow-2xl
+                                    z-50 min-w-[160px] max-w-[220px]
+                                    ${index < 5 ? 'left-0' : index > 24 ? 'right-0' : 'left-1/2 -translate-x-1/2'}
+                                `}>
+                                    <div className="font-bold text-[12px] text-[#a78bfa] mb-2 text-center">
+                                        {tooltipText.split(':')[0]}
+                                    </div>
+                                    <div className="text-[11px] text-gray-300 text-center leading-relaxed">
+                                        {tooltipText.split(':')[1]?.trim()}
+                                    </div>
                                 </div>
+
                             </div>
                         );
                     })}
