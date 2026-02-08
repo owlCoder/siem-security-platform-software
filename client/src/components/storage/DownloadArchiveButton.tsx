@@ -14,7 +14,7 @@ export default function DownloadArchiveButton({ archiveId, fileName, storageApi 
         try {
             setIsDownloading(true);
 
-            const data = await storageApi.downloadArchive(/*token,*/ archiveId);
+            const data = await storageApi.downloadArchive(token, archiveId);
             const blob = new Blob([data]);
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement("a");

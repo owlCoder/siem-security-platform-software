@@ -1,5 +1,5 @@
 import RiskLevelBadge from "../../insider-threat/RiskLevelBadge";
-import { PiUserFill } from "react-icons/pi";
+import { PiInfoBold, PiUserFill } from "react-icons/pi";
 import { UserRiskTableProps } from "../../../types/props/insider-threat/UserRiskTableProps";
 
 const getRiskScoreColor = (score: number): string => {
@@ -95,7 +95,7 @@ export default function UserRiskTable({ profiles, onSelectUser }: UserRiskTableP
                       e.currentTarget.style.background = "transparent";
                     }}
                   >
-                    View Analysis
+                    <PiInfoBold size={14} className="mr-1 align-middle" /> View Analysis
                   </button>
                 </td>
               </tr>

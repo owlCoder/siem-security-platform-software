@@ -116,22 +116,22 @@ export default function Ueba({ uebaApi }: UebaProps) {
   };
 
   return (
-    <div className="border-2 border-[#282A28] bg-transparent rounded-[14px] p-4">
-      <div className="flex items-center gap-2 mb-4">
+    <div className="border-2 border-[#282A28] bg-transparent rounded-[14px] p-4!">
+      <div className="flex items-center gap-2! mb-4!">
         <MdOutlineAnalytics size={24} className="text-[#60cdff]" />
         <h2 className="text-xl font-semibold">User & Entity Behavior Analytics</h2>
       </div>
 
       {/* Error Message */}
       {error && (
-        <div className="mb-4 p-3 bg-red-900 border border-red-700 rounded text-red-200 text-sm">
+        <div className="mb-4! p-3! bg-red-900 border border-red-700 rounded text-red-200 text-sm">
           {error}
         </div>
       )}
 
       {/* Loading State */}
       {loading && (
-        <div className="text-center py-4 text-[#60cdff]">
+        <div className="text-center py-4! text-[#60cdff]">
           Loading anomalies...
         </div>
       )}

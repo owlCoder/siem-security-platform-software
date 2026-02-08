@@ -74,7 +74,7 @@ export default function AnomaliesGraph({
   const { data: chartData, avg } = generateChartData();
 
   return (
-    <div className="bg-[#1f1f1f] border border-[#282A28] rounded-lg p-4 mb-4">
+    <div className="bg-[#1f1f1f] border border-[#282A28] rounded-lg p-4! mb-4!">
       {chartData.length === 0 ? (
         <div className="text-center text-gray-400 py-8">
           No data available for the selected filter

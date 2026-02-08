@@ -126,9 +126,9 @@ export async function createApp(): Promise<Express> {
     try {
       const job = new CalculateHourlyKpiSnapshotJob(kpiSnapshotService);
       
-      job.execute().catch(err =>
+      /*job.execute().catch(err =>
         loger.log("[Startup KPI Job] Failed: " + err)
-      );
+      );*/
 
       const scheduler = new HourlyAlignedScheduler(job, loger);
       scheduler.start();

@@ -50,7 +50,7 @@ export default function IntegrityStatusCard({ status, onVerify, loading }: Integ
                     <button
                         onClick={onVerify}
                         disabled={loading}
-                        className="bg-[#007a55] hover:bg-[#008b65] text-white px-5 py-2.5 rounded-lg font-semibold flex items-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                        className="bg-[#007a55] hover:bg-[#008b65] text-white px-5! py-2.5! rounded-lg! font-semibold flex items-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                     >
                         <FiRefreshCw className={loading ? "animate-spin" : ""} />
                         Run Audit
