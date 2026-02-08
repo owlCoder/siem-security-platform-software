@@ -94,7 +94,7 @@ export default function MaturityScoreGauge({score, level}: Props){
                 {score.toFixed(2)}
             </div>
 
-            <div className="mt-5! text-xl uppercase tracking-widest text-gray-500">
+            <div className="mt-5! text-xl uppercase tracking-widest text-gray-500 text-center">
                 Maturity Level:{" "}
                 <span
                     className="font-bold"

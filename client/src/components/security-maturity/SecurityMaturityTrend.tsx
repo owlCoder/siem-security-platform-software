@@ -36,7 +36,8 @@ export default function SecurityMaturityTrend({data, period, onPeriodChange}: Pr
         };
 
         (Object.keys(data) as TrendMetricType[]).forEach((metric) => {
-            row[metric] = data[metric]?.[index]?.value;
+            const val = data[metric]?.[index]?.value;
+            row[metric] = (val === undefined || val < 0) ? 0 : val;
         });
 
         return row;
