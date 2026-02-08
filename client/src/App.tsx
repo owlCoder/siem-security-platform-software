@@ -29,6 +29,7 @@ import { StatusMonitorAPI } from "./api/status-monitor/StatusMonitorAPI";
 import { IntegrityAPI } from "./api/integrity/IntegrityAPI";
 import { IUebaAPI } from "./api/ueba/IUebaAPI";
 import { UebaAPI } from "./api/ueba/UebaAPI";
+import ProtectedRoute from "./components/protected_route/ProtectedRoute";
 
 const auth_api: IAuthAPI = new AuthAPI();
 const alerts_api: IAlertAPI = new AlertAPI();
@@ -50,20 +51,12 @@ function App() {
   return (
     <>
       <Routes>
-        {/* <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute requiredRole="admin,seller">
-              <DashboardPage userAPI={user_api} anotherAPI={API} />
-            </ProtectedRoute>
-          }
-        /> */}
         <Route path="/" element={<AuthPage authAPI={auth_api} />} />
 
-        {/* Temporary unprotected route — should require authentication */}
         <Route
           path="/mainLayout"
           element={
+            <ProtectedRoute requiredRole="SysAdmin" redirectTo="/">
             <MainLayout
               alertsAPI={alerts_api}
               parserAPI={parser_api}
@@ -80,6 +73,7 @@ function App() {
               statusMonitorApi={statusMonitorApi}
               uebaApi={ueba_api}
             />
+            </ProtectedRoute>
           }
         />
       </Routes>

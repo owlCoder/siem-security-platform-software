@@ -120,12 +120,6 @@ export default function LoginForm({ authAPI, handleLoginSuccess, handleOtpSucces
         )}
       </button>
 
-      {/* Placeholder button until auth is implemented */}
-
-      <button onClick={() => navigate('/mainLayout')}>Skip Login</button>
-
-
-
     </form>
   );
 };
