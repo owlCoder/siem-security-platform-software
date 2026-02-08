@@ -6,15 +6,6 @@ type Props = {
     level: MaturityLevel;
 }
 
-const colorMap: Record<MaturityLevel, string> = {
-        INITIAL: "#ef4444",
-        MANAGED: "#facc15",
-        DEFINED: "#22c55e",
-        QUANTITATIVELY_MANAGED: "#22c55e",
-        OPTIMIZING: "#22c55e",
-        UNKNOWN: "#9ca3af",
-};
-
 export default function MaturityScoreGauge({score, level}: Props){
     const getColor = (val: number) => {
         if(val >= 70) return "#22c55e";
@@ -98,7 +89,7 @@ export default function MaturityScoreGauge({score, level}: Props){
                 Maturity Level:{" "}
                 <span
                     className="font-bold"
-                    style={{ color: colorMap[level] }}
+                    style={{ color: activeColor }}
                 >
                     {level.replace("_", " ")}
                 </span>

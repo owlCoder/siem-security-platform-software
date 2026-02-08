@@ -23,6 +23,10 @@ export default function IncidentsByCategoryChart({data}: Props){
         return null;
     };
 
+    const formatCategory = (category: string) => {
+        return category.replace(/_/g, " ");
+    };
+
     return (
         <div className="flex flex-col items-center justify-center w-full h-full" style={{marginTop: "30px", marginBottom: "10px"}}>
             <h3 className="text-sm uppercase tracking-widest text-gray-400">
@@ -41,6 +45,7 @@ export default function IncidentsByCategoryChart({data}: Props){
 
                         <XAxis
                             dataKey="category"
+                            tickFormatter={formatCategory}
                             tick={{fill: "#fff", fontSize: 13, fontWeight: "bold"}}
                             axisLine={false}
                             tickLine={false}
@@ -49,7 +54,8 @@ export default function IncidentsByCategoryChart({data}: Props){
                         <YAxis
                             tick={{fill: "#fff", fontSize: 13, fontWeight: "bold"}}
                             axisLine={false}
-                            tickLine={false} />
+                            tickLine={false} 
+                            domain={[0, (dataMax: number) => (dataMax * 1.20)]}/>
                         <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(34, 210, 99, 0.1)' }} />
 
                         <Bar
